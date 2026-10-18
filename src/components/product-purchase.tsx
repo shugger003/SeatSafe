@@ -51,6 +51,7 @@ export function ProductPurchase({
     if (stock <= 0) return "Out of stock.";
     return null;
   }, [blocked, options.length, selected, price, stock]);
+  const quantityCap = stock > 0 ? Math.min(20, stock) : blocked || price == null ? 20 : 1;
 
   function addToCart() {
     if (reason) return;
@@ -83,12 +84,7 @@ export function ProductPurchase({
       <div className="flex flex-wrap items-end gap-4">
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Quantity</span>
-          <QuantityStepper
-            value={quantity}
-            max={Math.max(1, stock || 1)}
-            disabled={Boolean(reason)}
-            onChange={setQuantity}
-          />
+          <QuantityStepper value={quantity} max={quantityCap} onChange={setQuantity} />
         </div>
         <Price minor={price} currency={currency} compare={compare} className="pb-2 text-lg" />
       </div>
@@ -109,6 +105,7 @@ export function ProductPurchase({
       {control}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper p-3 lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <QuantityStepper value={quantity} max={quantityCap} onChange={setQuantity} />
           <Price minor={price} currency={currency} />
           <button type="button" onClick={addToCart} disabled={Boolean(reason)} className="ml-auto inline-flex min-h-11 items-center justify-center rounded-md bg-pine px-4 text-sm font-medium text-paper disabled:opacity-50">
             {reason ? "Unavailable" : "Add to cart"}
