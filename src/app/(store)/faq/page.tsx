@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Notice } from "@/components/ui";
+import { EmptyState, PageHeader } from "@/components/ui";
 import { getFaqs, getHomepage } from "@/lib/db";
 import { live } from "@/lib/live";
 
@@ -13,21 +13,27 @@ export default async function FaqPage() {
   const faqs = (await getFaqs()).filter((faq) => faq.published);
   const groups = [...new Set(faqs.map((faq) => faq.category))];
   return (
-    <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
-      <h1 className="font-display text-5xl">{home.faqHeading}</h1>
-      <p className="mt-4 text-muted">{home.faqIntro}</p>
+    <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+      <PageHeader title={home.faqHeading} lede={home.faqIntro} />
       {faqs.length === 0 ? (
-        <div className="mt-8"><Notice>Questions and answers will be published when the business confirms them.</Notice></div>
+        <div className="mt-10">
+          <EmptyState
+            title="No answers are published yet"
+            body="Questions appear here after the business confirms them. Send a message if you need something sooner."
+            href="/contact"
+            action="Ask a question"
+          />
+        </div>
       ) : (
         groups.map((group) => (
-          <section key={group} className="mt-10">
-            <h2 className="text-sm uppercase tracking-[0.16em] text-clay">{group}</h2>
-            <div className="mt-3 divide-y divide-line border-y border-line">
+          <section key={group} className="mt-12 grid gap-6 border-t border-line pt-8 md:grid-cols-[180px_1fr]">
+            <h2 className="text-sm font-medium capitalize text-pine">{group}</h2>
+            <div className="divide-y divide-line">
               {faqs.filter((faq) => faq.category === group).map((faq) => (
-                <details key={faq.id} className="py-4">
-                  <summary className="text-lg">{faq.question}</summary>
-                  <p className="pt-3 text-sm leading-6 text-muted">{faq.answer}</p>
-                </details>
+                <article key={faq.id} className="grid gap-2 py-5 md:grid-cols-2">
+                  <h3 className="font-display text-2xl">{faq.question}</h3>
+                  <p className="text-sm leading-6 text-muted">{faq.answer}</p>
+                </article>
               ))}
             </div>
           </section>

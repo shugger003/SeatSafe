@@ -20,9 +20,9 @@ export function Button({
   onClick?: () => void;
 }) {
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[0.95rem] font-medium shadow-[0_1px_0_rgb(255_252_247_/_0.18)_inset] transition-[transform,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
-    variant === "primary" && "bg-pine text-paper shadow-soft hover:bg-pine-dark active:scale-[0.98]",
-    variant === "secondary" && "border border-line bg-surface text-ink shadow-none hover:border-pine/40 hover:bg-mist",
+    "inline-flex min-h-11 items-center justify-center gap-2 px-6 text-[0.95rem] font-medium transition-[transform,background-color,border-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
+    variant === "primary" && "bg-ink text-paper hover:bg-pine active:translate-y-px",
+    variant === "secondary" && "border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper",
     variant === "quiet" && "px-0 text-ink underline-offset-4 hover:underline",
     variant === "danger" && "bg-danger text-paper",
     className,
@@ -59,7 +59,7 @@ export function Price({
 
 export function Notice({ children, tone = "plain" }: { children: React.ReactNode; tone?: "plain" | "warn" }) {
   return (
-    <p className={cn("rounded-[10px] border px-4 py-3 text-sm leading-6", tone === "warn" ? "border-clay/40 bg-[#f8f1e6] text-ink" : "border-line bg-surface text-muted")}>
+    <p className={cn("border px-4 py-3 text-sm leading-6", tone === "warn" ? "border-clay/40 bg-mist text-ink" : "border-line bg-surface text-muted")}>
       {children}
     </p>
   );
@@ -89,11 +89,20 @@ export function Prose({ text }: { text: string }) {
   );
 }
 
+export function PageHeader({ title, lede }: { title: string; lede?: string }) {
+  return (
+    <header className="max-w-2xl">
+      <h1 className="text-balance font-display text-5xl leading-[0.98] tracking-[-0.03em] sm:text-6xl">{title}</h1>
+      {lede ? <p className="mt-4 max-w-[42rem] text-lg leading-8 text-muted">{lede}</p> : null}
+    </header>
+  );
+}
+
 export function EmptyState({ title, body, href, action }: { title: string; body: string; href?: string; action?: string }) {
   return (
-    <div className="rounded-[16px] border border-dashed border-line bg-surface px-6 py-12 text-center">
-      <h2 className="font-display text-3xl">{title}</h2>
-      <p className="mx-auto mt-3 max-w-md text-muted">{body}</p>
+    <div className="border border-line bg-surface px-6 py-14 sm:px-10">
+      <h2 className="font-display text-4xl tracking-[-0.03em]">{title}</h2>
+      <p className="mt-3 max-w-md text-muted">{body}</p>
       {href && action ? (
         <div className="mt-6">
           <Button href={href}>{action}</Button>
@@ -129,7 +138,7 @@ export function Field({
         required={required}
         defaultValue={defaultValue}
         autoComplete={autoComplete}
-        className="min-h-11 rounded-[12px] border border-line bg-surface px-3 text-base text-ink shadow-[0_1px_0_rgb(255_252_247_/_0.8)_inset] transition-[border-color,box-shadow] focus:border-pine focus:outline-none"
+        className="field"
       />
       {hint ? <span className="text-muted">{hint}</span> : null}
     </label>
