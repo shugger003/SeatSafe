@@ -8,6 +8,14 @@ import { POLICY_LINKS } from "@/lib/defaults";
 import { safeHref } from "@/lib/safe";
 import type { StoreSettings } from "@/lib/types";
 
+const SHOP = [
+  { href: "/shop", label: "Shop" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/faq", label: "Questions" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
 export function Footer({ store, year }: { store: StoreSettings; year: number }) {
   const socials = [
     { href: safeHref(store.social.instagram), label: "Instagram", icon: InstagramLogo },
@@ -18,44 +26,23 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
   ].filter((item) => item.href);
 
   return (
-    <footer className="mt-16 bg-pine text-paper">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:px-8 md:grid-cols-4">
-        <div className="md:col-span-2">
-          <p className="font-display text-3xl">{store.businessName}</p>
-          <p className="mt-3 max-w-md text-sm leading-6 text-paper/75">{store.shortDescription}</p>
-          {store.legalName ? <p className="mt-3 text-sm text-paper/70">{store.legalName}</p> : null}
-        </div>
+    <footer className="border-t border-line bg-surface">
+      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-paper/60">Shopping</p>
-          <ul className="mt-4 space-y-2 text-sm text-paper/85">
-            <li><Link href="/shop">Shop</Link></li>
-            <li><Link href="/how-it-works">How it works</Link></li>
-            <li><Link href="/faq">FAQs</Link></li>
-            <li><Link href="/cart">Cart</Link></li>
-          </ul>
-        </div>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-paper/60">Support</p>
-          <ul className="mt-4 space-y-2 text-sm text-paper/85">
-            <li><Link href="/contact">Contact</Link></li>
-            <li><Link href="/about">About us</Link></li>
-            {POLICY_LINKS.map((policy) => (
-              <li key={policy.href}>
-                <Link href={policy.href}>{policy.label}</Link>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 space-y-1 text-sm text-paper/70">
-            {store.email ? <p><a href={`mailto:${store.email}`}>{store.email}</a></p> : null}
-            {store.phone ? <p><a href={`tel:${store.phone}`}>{store.phone}</a></p> : null}
+          <p className="font-display text-3xl tracking-[-0.02em] text-pine">{store.businessName}</p>
+          <p className="mt-5 max-w-md text-sm leading-6 text-muted">{store.shortDescription}</p>
+          {store.legalName ? <p className="mt-3 text-sm text-muted">{store.legalName}</p> : null}
+          <div className="mt-5 space-y-1 text-sm text-muted">
+            {store.email ? <p><a className="underline-offset-4 hover:text-ink hover:underline" href={`mailto:${store.email}`}>{store.email}</a></p> : null}
+            {store.phone ? <p><a className="underline-offset-4 hover:text-ink hover:underline" href={`tel:${store.phone}`}>{store.phone}</a></p> : null}
             {store.address ? <p>{store.address}</p> : null}
             {store.supportHours ? <p>{store.supportHours}</p> : null}
           </div>
           {socials.length > 0 ? (
-            <ul className="mt-4 flex gap-3">
+            <ul className="mt-6 flex gap-1">
               {socials.map((item) => (
                 <li key={item.label}>
-                  <a href={item.href!} aria-label={item.label} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-paper/25 hover:bg-paper/10">
+                  <a href={item.href!} aria-label={item.label} className="inline-flex h-11 w-11 items-center justify-center text-ink hover:text-pine">
                     <item.icon size={20} aria-hidden="true" />
                   </a>
                 </li>
@@ -63,9 +50,33 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
             </ul>
           ) : null}
         </div>
+        <div>
+          <h2 className="text-sm font-medium">Shop</h2>
+          <ul className="mt-4 space-y-3 text-sm">
+            {SHOP.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="text-muted underline-offset-4 hover:text-ink hover:underline">{link.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-sm font-medium">Information</h2>
+          <ul className="mt-4 space-y-3 text-sm">
+            {POLICY_LINKS.map((policy) => (
+              <li key={policy.href}>
+                <Link href={policy.href} className="text-muted underline-offset-4 hover:text-ink hover:underline">{policy.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <div className="border-t border-paper/15 px-5 py-4 text-center text-xs text-paper/60 sm:px-8">
-        © {year} {store.businessName}
+      <div className="border-t border-line px-5 py-5 text-xs text-muted sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2">
+          <p>© {year} {store.businessName}</p>
+          {store.storeStatus === "paused" ? <p>Ordering is paused.</p> : null}
+          {store.storeStatus === "coming_soon" ? <p>Orders open when the catalog, delivery, and payment details are published.</p> : null}
+        </div>
       </div>
     </footer>
   );

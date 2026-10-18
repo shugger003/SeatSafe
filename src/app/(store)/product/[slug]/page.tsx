@@ -66,11 +66,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <nav className="text-sm text-muted" aria-label="Breadcrumb">
         <Link href="/">Home</Link> / <Link href="/shop">Shop</Link> / <span>{product.name}</span>
       </nav>
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
+      <div className="mt-6 grid items-center gap-8 lg:grid-cols-2">
         <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto">
           {product.images.length === 0 ? (
             <div className="min-w-full">
-              <ProductMedia alt={`${product.name} image placeholder`} priority />
+              <ProductMedia alt={`${product.name} image placeholder`} priority tone="stage" />
             </div>
           ) : (
             product.images.map((image, index) => (
@@ -81,10 +81,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           )}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-clay">{product.category || product.status.replaceAll("_", " ")}</p>
-          <h1 className="mt-2 font-display text-5xl leading-tight">{product.name}</h1>
-          <p className="mt-4 text-lg text-muted">{product.shortDescription}</p>
-          <div className="mt-6 pb-24 lg:pb-0">
+          <p className="text-sm text-pine">{product.category || product.status.replaceAll("_", " ")}</p>
+          <h1 className="mt-2 font-display text-5xl leading-[0.98] tracking-[-0.03em]">{product.name}</h1>
+          <p className="mt-4 text-lg leading-8 text-muted">{product.shortDescription}</p>
+          <div className="mt-6 border-t border-line pt-6 pb-24 lg:pb-0">
             <ProductPurchase
               productId={product.id}
               name={product.name}
@@ -136,8 +136,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <h2 className="font-display text-3xl">Usage</h2>
           <ol className="mt-4 grid gap-3 md:grid-cols-2">
             {product.instructions.map((step, index) => (
-              <li key={step.title} className="rounded-[16px] border border-line bg-surface p-4">
-                <p className="text-sm text-clay">0{index + 1}</p>
+              <li key={step.title} className="border border-line bg-surface p-4">
+                <p className="text-sm text-pine">0{index + 1}</p>
                 <h3 className="font-display text-2xl">{step.title}</h3>
                 <p className="mt-2 text-sm text-muted">{step.body}</p>
               </li>
