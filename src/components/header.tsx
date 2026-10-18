@@ -7,6 +7,7 @@ import { List } from "@phosphor-icons/react/dist/ssr/List";
 import { ShoppingBag } from "@phosphor-icons/react/dist/ssr/ShoppingBag";
 import { X } from "@phosphor-icons/react/dist/ssr/X";
 import { useCart } from "@/components/cart-provider";
+import { cn } from "@/lib/cn";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -34,28 +35,40 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-paper">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 sm:px-8">
-        <Link href="/" className="flex min-w-0 items-center gap-2 font-display text-xl tracking-tight">
+    <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/85 backdrop-blur-md">
+      <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center gap-4 px-5 sm:px-8">
+        <Link href="/" className="flex min-w-0 items-center gap-3 font-display text-xl tracking-tight">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="h-8 w-auto" />
-          ) : null}
+            <img src={logoUrl} alt="" className="h-9 w-auto" />
+          ) : (
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-pine text-sm text-paper" aria-hidden="true">
+              {businessName.slice(0, 1)}
+            </span>
+          )}
           <span className="truncate">{businessName}</span>
         </Link>
-        <nav className="ml-auto hidden items-center gap-6 text-sm lg:flex" aria-label="Primary">
-          {LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="text-ink/80 hover:text-ink">
-              {link.label}
-            </Link>
-          ))}
+        <nav className="ml-auto hidden items-center gap-1 lg:flex" aria-label="Primary">
+          {LINKS.map((link) => {
+            const active = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn("rounded-full px-3 py-2 text-sm", active ? "bg-mist text-pine" : "text-ink/75 hover:bg-surface hover:text-ink")}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
-        <Link href="/cart" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-[10px] px-2 lg:ml-4" aria-label={`Cart, ${count} items`}>
-          <ShoppingBag size={22} aria-hidden="true" />
+        <Link href="/cart" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-3 lg:ml-3" aria-label={`Cart, ${count} items`}>
+          <ShoppingBag size={20} aria-hidden="true" />
           <span className="min-w-5 text-sm tabular-nums">{count}</span>
         </Link>
-        <button type="button" className="inline-flex h-11 w-11 items-center justify-center lg:hidden" aria-label="Open menu" onClick={() => setOpen(true)}>
-          <List size={24} aria-hidden="true" />
+        <button type="button" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface lg:hidden" aria-label="Open menu" onClick={() => setOpen(true)}>
+          <List size={22} aria-hidden="true" />
         </button>
       </div>
       {open ? (
