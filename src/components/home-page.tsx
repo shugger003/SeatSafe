@@ -40,23 +40,38 @@ export function HomePage({
 
   return (
     <div>
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-8 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.86fr)] lg:gap-16 lg:pb-16 lg:pt-16">
-        <div className="lg:pb-10">
-          <h1 className="max-w-xl text-balance font-display text-5xl leading-[0.98] tracking-[-0.03em] sm:text-6xl">
-            {home.hero.headline}
-          </h1>
-          <p className="mt-6 max-w-lg text-lg leading-8 text-muted">{home.hero.description}</p>
-          <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <Button href={home.hero.primaryHref || cta.href}>
-              {home.hero.primaryLabel || cta.label}
+      <section className="mx-auto max-w-3xl px-5 pb-4 pt-14 text-center sm:px-8 sm:pt-20">
+        <h1 className="text-balance font-display text-4xl leading-tight tracking-[-0.03em] text-ink sm:text-5xl">
+          {home.hero.headline}
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-ink">{home.hero.description}</p>
+      </section>
+
+      <section className="bg-surface">
+        <div className="mx-auto max-w-3xl px-5 py-14 text-center sm:px-8">
+          <h2 className="text-balance font-display text-4xl leading-tight tracking-[-0.02em] text-pine sm:text-5xl">
+            {featured?.name || "The product"}
+          </h2>
+          {featured ? <p className="mx-auto mt-4 max-w-xl text-muted">{featured.shortDescription}</p> : null}
+          <div className="mt-4">
+            <Price minor={featured ? displayPrice(featured) : null} currency={featured?.currency || store.currency} compare={featured && featured.variants.length === 0 ? featured.compareAtPriceMinor : null} className="text-lg" />
+          </div>
+          {featured ? <p className="mt-3 text-sm text-pine">{availabilityLabel(featured)}</p> : null}
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button href={featured ? `/product/${featured.slug}` : cta.href}>
+              {home.hero.primaryLabel || "View the product"}
             </Button>
             <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
               {home.hero.secondaryLabel || "How it works"}
             </Button>
           </div>
-          {featured ? <p className="mt-8 text-sm text-pine">{availabilityLabel(featured)}</p> : null}
+          {featured && purchaseBlockersForDisplay(featured, store, paymentsReady)[0] ? (
+            <p className="mx-auto mt-4 max-w-md text-sm text-muted">{purchaseBlockersForDisplay(featured, store, paymentsReady)[0]}</p>
+          ) : (
+            <p className="mx-auto mt-4 max-w-md text-sm text-muted">{cta.note}</p>
+          )}
         </div>
-        <div className="stage">
+        <div className="stage mx-auto max-w-4xl px-5 pb-14 sm:px-8">
           <ProductMedia
             src={featured?.images[0]?.src}
             alt={featured?.images[0]?.alt || "Product image placeholder"}
@@ -65,24 +80,6 @@ export function HomePage({
           />
         </div>
       </section>
-
-      {featured && products.length === 1 ? (
-        <section className="bg-mist">
-          <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <h2 className="font-display text-5xl tracking-[-0.03em]">{featured.name}</h2>
-              <p className="mt-3 max-w-xl text-muted">{featured.shortDescription}</p>
-              <div className="mt-4">
-                <Price minor={displayPrice(featured)} currency={featured.currency} compare={featured.variants.length ? null : featured.compareAtPriceMinor} className="text-lg" />
-              </div>
-              {purchaseBlockersForDisplay(featured, store, paymentsReady)[0] ? (
-                <p className="mt-3 text-sm text-muted">{purchaseBlockersForDisplay(featured, store, paymentsReady)[0]}</p>
-              ) : null}
-            </div>
-            <Button href={`/product/${featured.slug}`}>View details</Button>
-          </div>
-        </section>
-      ) : null}
 
       {benefits.length > 0 ? (
         <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
@@ -219,13 +216,12 @@ export function HomePage({
         </section>
       ) : null}
 
-      <section className="bg-ink text-paper">
-        <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
-          <h2 className="max-w-xl font-display text-5xl leading-[0.98] tracking-[-0.03em] text-paper sm:text-6xl">{home.finalHeading}</h2>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-paper/75">{home.finalText}</p>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-paper/60">{cta.note}</p>
+      <section className="bg-surface">
+        <div className="mx-auto max-w-3xl px-5 py-16 text-center sm:px-8">
+          <h2 className="font-display text-4xl leading-tight tracking-[-0.02em] text-pine sm:text-5xl">{home.finalHeading}</h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-muted">{home.finalText}</p>
           <div className="mt-8">
-            <Button href={cta.href} variant="light">{cta.label}</Button>
+            <Button href={cta.href}>{cta.label}</Button>
           </div>
         </div>
       </section>
@@ -242,7 +238,7 @@ const NEXT_STEPS = [
   {
     href: "/how-it-works",
     title: "How it works",
-    body: "Usage steps appear when the manufacturer\u2019s instructions are published.",
+    body: "Usage steps appear when the manufacturer’s instructions are published.",
   },
   {
     href: "/contact",
@@ -253,9 +249,9 @@ const NEXT_STEPS = [
 
 function SectionHeading({ title, intro }: { title: string; intro: string }) {
   return (
-    <div className="max-w-2xl">
-      <h2 className="text-balance font-display text-4xl leading-[0.98] tracking-[-0.03em] sm:text-5xl">{title}</h2>
-      {intro ? <p className="mt-4 max-w-[42rem] leading-7 text-muted">{intro}</p> : null}
+    <div className="mx-auto max-w-2xl text-center">
+      <h2 className="text-balance font-display text-4xl leading-tight tracking-[-0.02em] text-pine sm:text-5xl">{title}</h2>
+      {intro ? <p className="mt-4 leading-7 text-muted">{intro}</p> : null}
     </div>
   );
 }
