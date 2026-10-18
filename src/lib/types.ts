@@ -298,6 +298,7 @@ export type Order = {
   subtotalMinor: number;
   deliveryFeeMinor: number;
   discountMinor: number;
+  discountCode: string | null;
   totalMinor: number;
   currency: string;
   paymentStatus: PaymentStatus;
