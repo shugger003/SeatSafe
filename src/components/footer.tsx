@@ -19,9 +19,9 @@ const QUICK_LINKS = [
 ];
 
 const COMPANY_LINKS = [
-  { href: "/about", label: "Our story" },
-  { href: "/contact", label: "Bulk orders" },
-  { href: "/contact", label: "Become a stockist" },
+  { href: "/contact", label: "Bulk Buying" },
+  { href: "/contact", label: "Become an Affiliate" },
+  { href: "/contact", label: "Become a Distributor" },
 ];
 
 const REGIONS = ["Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern", "Greater Accra", "North East", "Northern", "Oti", "Savannah", "Upper East", "Upper West", "Volta", "Western", "Western North"];
