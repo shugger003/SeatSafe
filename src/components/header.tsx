@@ -17,7 +17,17 @@ const LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Header({ businessName, logoUrl }: { businessName: string; logoUrl: string }) {
+export function Header({
+  businessName,
+  logoUrl,
+  phone,
+  email,
+}: {
+  businessName: string;
+  logoUrl: string;
+  phone: string;
+  email: string;
+}) {
   const { count } = useCart();
   const pathname = usePathname();
   const [openPath, setOpenPath] = useState<string | null>(null);
@@ -55,18 +65,30 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 sm:px-8">
-        <Link href="/" className="flex min-w-0 items-center gap-3 font-display text-[1.35rem] tracking-[-0.03em]">
+    <header className="z-30">
+      <div className="bg-pine text-paper">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 px-5 py-3 text-sm">
+          {phone ? <a href={`tel:${phone}`}>Mobile: {phone}</a> : null}
+          {email ? <a href={`mailto:${email}`}>Email: {email}</a> : null}
+          {!phone && !email ? <span>Contact details have not been published</span> : null}
+          <Link href="/shop" className="font-medium tracking-[0.16em]">SHOP ONLINE</Link>
+        </div>
+      </div>
+      <div className="border-b border-line bg-surface">
+        <Link href="/" className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-5 py-6 text-center">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="h-8 w-auto" />
+            <img src={logoUrl} alt="" className="h-14 w-auto" />
           ) : (
             <Mark name={businessName} />
           )}
-          <span className="truncate">{businessName}</span>
+          <span className="font-display text-3xl tracking-[-0.03em] text-pine">{businessName}</span>
         </Link>
-        <nav className="ml-auto hidden items-center gap-1 md:flex" aria-label="Primary">
+      </div>
+      <div className="sticky top-0 border-b border-line bg-surface/95 backdrop-blur-md">
+      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_auto] items-center px-5 md:grid-cols-[1fr_auto_1fr] md:px-8">
+        <p className="text-sm font-medium tracking-[0.14em] md:hidden">MENU</p>
+        <nav className="col-start-2 hidden items-center justify-center gap-1 md:flex" aria-label="Primary">
           {LINKS.map((link) => {
             const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
@@ -75,8 +97,8 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "px-3 py-2 text-sm text-muted transition-colors hover:text-ink",
-                  active && "text-ink underline decoration-pine underline-offset-8",
+                  "px-3 py-2 text-sm text-muted transition-colors hover:text-pine",
+                  active && "text-pine",
                 )}
               >
                 {link.label}
@@ -86,7 +108,7 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
         </nav>
         <Link
           href="/cart"
-          className="ml-auto inline-flex min-h-11 items-center gap-2 px-1 text-sm md:ml-2"
+          className="ml-auto inline-flex min-h-11 items-center gap-2 px-1 text-sm md:col-start-3 md:ml-0 md:justify-self-end"
           aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}
         >
           <ShoppingBag size={18} aria-hidden="true" />
@@ -103,8 +125,9 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
           <List size={22} aria-hidden="true" />
         </button>
       </div>
+      </div>
       {open ? (
-        <div className="fixed inset-0 z-50 bg-paper md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="fixed inset-0 z-50 bg-surface md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="flex h-16 items-center justify-between px-5">
             <p className="font-display text-xl">{businessName}</p>
             <button ref={closeRef} type="button" className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close menu" onClick={() => setOpen(false)}>
@@ -139,7 +162,7 @@ export function Header({ businessName, logoUrl }: { businessName: string; logoUr
 function Mark({ name }: { name: string }) {
   const letter = name.trim().charAt(0).toUpperCase() || "S";
   return (
-    <span className="grid h-8 w-8 shrink-0 place-items-center border border-ink text-sm" aria-hidden="true">
+    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-mist font-display text-2xl text-pine" aria-hidden="true">
       {letter}
     </span>
   );

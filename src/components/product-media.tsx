@@ -22,25 +22,25 @@ export function ProductMedia({
         className={cn(
           "relative flex items-center justify-center overflow-hidden px-8 text-center",
           stage
-            ? "aspect-[4/5] min-h-[22rem] bg-pine text-paper lg:min-h-[34rem]"
-            : "aspect-[4/3] max-h-[28rem] bg-stone text-ink",
+            ? "aspect-[16/10] w-full max-w-full rounded-lg bg-mist text-pine"
+            : "aspect-[4/3] max-h-[28rem] rounded-lg bg-mist text-ink",
           className,
         )}
       >
         <div
-          className={cn("pointer-events-none absolute border", stage ? "inset-6 border-paper/20" : "inset-5 border-ink/10")}
+          className={cn("pointer-events-none absolute rounded-md border", stage ? "inset-6 border-pine/25" : "inset-5 border-ink/10")}
           aria-hidden="true"
         />
         <div className="relative max-w-[16rem]">
           <p className={cn("font-display leading-none tracking-[-0.03em]", stage ? "text-4xl sm:text-5xl" : "text-3xl")}>Photograph not published</p>
-          <p className={cn("mt-4 text-sm leading-6", stage ? "text-paper/75" : "text-muted")}>This frame is not a picture of the product.</p>
+          <p className="mt-4 text-sm leading-6 text-muted">This frame is not a picture of the product.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("overflow-hidden bg-stone", className)}>
+    <div className={cn("overflow-hidden rounded-lg bg-mist", className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
