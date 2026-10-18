@@ -85,6 +85,7 @@ export function ProductPurchase({
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Quantity</span>
           <QuantityStepper value={quantity} max={quantityCap} onChange={setQuantity} />
+          <span className="text-muted">{stock > 0 ? `${stock} in stock` : "Out of stock"}</span>
         </div>
         <Price minor={price} currency={currency} compare={compare} className="pb-2 text-lg" />
       </div>
@@ -97,6 +98,10 @@ export function ProductPurchase({
         {reason ? "Unavailable" : "Add to cart"}
       </button>
       {reason ? <p className="text-sm text-muted">{reason}</p> : <p className="text-sm text-muted">The final total is confirmed on the server at checkout.</p>}
+      <div className="text-sm leading-6 text-muted">
+        <p className="font-medium text-ink">Payment</p>
+        <p>Checkout opens Paystack. You can pay by card, mobile money, or bank transfer. This site does not store the card number.</p>
+      </div>
     </div>
   );
 

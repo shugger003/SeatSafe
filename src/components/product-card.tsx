@@ -8,14 +8,12 @@ export function availabilityLabel(product: Product) {
   if (product.status === "coming_soon") return "Coming soon";
   if (product.status === "unavailable") return "Temporarily unavailable";
   if (product.status !== "published") return "Not available";
-  const price = displayPrice(product);
-  if (price == null) return "Price to be confirmed";
   const stock = product.variants.length
     ? product.variants.reduce((sum, variant) => sum + (variant.available ? variant.stockQuantity : 0), 0)
     : product.stockQuantity;
   if (stock <= 0) return "Out of stock";
-  if (stock <= product.lowStockThreshold) return "Limited availability";
-  return "In stock";
+  if (displayPrice(product) != null && stock <= product.lowStockThreshold) return `${stock} left`;
+  return `${stock} in stock`;
 }
 
 export function ProductCard({ product, heading = "h2" }: { product: Product; heading?: "h2" | "h3" }) {
