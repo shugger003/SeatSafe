@@ -20,9 +20,9 @@ export function Button({
   onClick?: () => void;
 }) {
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 px-6 text-[0.95rem] font-medium transition-[transform,background-color,border-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
-    variant === "primary" && "bg-ink text-paper hover:bg-pine active:translate-y-px",
-    variant === "secondary" && "border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-6 text-[0.95rem] font-medium transition-[transform,background-color,border-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
+    variant === "primary" && "border border-ink bg-surface text-ink hover:border-pine hover:text-pine active:translate-y-px",
+    variant === "secondary" && "bg-pine text-paper hover:bg-pine-dark",
     variant === "quiet" && "px-0 text-ink underline-offset-4 hover:underline",
     variant === "danger" && "bg-danger text-paper",
     variant === "light" && "bg-paper text-ink hover:bg-mist active:translate-y-px",
@@ -101,7 +101,7 @@ export function PageHeader({ title, lede }: { title: string; lede?: string }) {
 
 export function EmptyState({ title, body, href, action }: { title: string; body: string; href?: string; action?: string }) {
   return (
-    <div className="border border-line bg-surface px-6 py-14 sm:px-10">
+    <div className="rounded-lg border border-line bg-surface px-6 py-14 sm:px-10">
       <h2 className="font-display text-4xl tracking-[-0.03em]">{title}</h2>
       <p className="mt-3 max-w-md text-muted">{body}</p>
       {href && action ? (
