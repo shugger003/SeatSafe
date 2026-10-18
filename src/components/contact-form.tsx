@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { contactAction } from "@/app/actions/store";
+import { Notice } from "@/components/ui";
 
 export function ContactForm() {
   const [message, setMessage] = useState("");
+  const [ok, setOk] = useState(false);
   const [pending, setPending] = useState(false);
 
   return (
     <form
-      className="grid gap-4"
+      className="grid content-start gap-5 border border-line bg-surface p-6 sm:p-8"
       onSubmit={async (event) => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
@@ -22,17 +24,35 @@ export function ContactForm() {
           company: String(form.get("company") || ""),
         });
         setPending(false);
-        setMessage(result.ok ? (result.emailed ? "Message sent." : "Message saved. Email delivery is not configured, so check inquiries in the dashboard.") : result.message);
+        setOk(result.ok);
+        setMessage(result.ok ? (result.emailed ? "Message sent. The store can reply from the address you gave." : "Message saved. Email delivery is not configured, so the store will see it in the dashboard.") : result.message);
         if (result.ok) event.currentTarget.reset();
       }}
     >
-      <label className="grid gap-1 text-sm">Name<input name="name" required className="min-h-11 rounded-[10px] border border-line bg-surface px-3" /></label>
-      <label className="grid gap-1 text-sm">Email<input name="email" type="email" required className="min-h-11 rounded-[10px] border border-line bg-surface px-3" /></label>
-      <label className="grid gap-1 text-sm">Phone<input name="phone" className="min-h-11 rounded-[10px] border border-line bg-surface px-3" /></label>
-      <label className="grid gap-1 text-sm">Message<textarea name="message" required minLength={10} className="min-h-32 rounded-[10px] border border-line bg-surface px-3 py-2" /></label>
-      <label className="hidden">Company<input name="company" tabIndex={-1} autoComplete="off" /></label>
-      <button disabled={pending} className="min-h-11 rounded-[10px] bg-pine px-4 text-paper disabled:opacity-50">{pending ? "Sending…" : "Send message"}</button>
-      {message ? <p className="text-sm">{message}</p> : null}
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Name</span>
+        <input name="name" required autoComplete="name" className="field" />
+      </label>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Email</span>
+        <input name="email" type="email" required autoComplete="email" className="field" />
+      </label>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Phone, optional</span>
+        <input name="phone" type="tel" autoComplete="tel" className="field" />
+      </label>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Message</span>
+        <textarea name="message" required minLength={10} className="field min-h-32" />
+      </label>
+      <label className="hidden">
+        Company
+        <input name="company" tabIndex={-1} autoComplete="off" />
+      </label>
+      <button disabled={pending} className="min-h-11 bg-ink px-6 text-paper transition-colors hover:bg-pine disabled:opacity-50">
+        {pending ? "Sending\u2026" : "Send message"}
+      </button>
+      {message ? <Notice tone={ok ? "plain" : "warn"}>{message}</Notice> : null}
     </form>
   );
 }
