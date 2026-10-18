@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/components/cart-provider";
+import { QuantityStepper } from "@/components/quantity-stepper";
 import { Price } from "@/components/ui";
 import { track } from "@/components/analytics";
 
@@ -58,7 +59,7 @@ export function ProductPurchase({
   }
 
   const control = (
-    <div className="grid gap-3">
+    <div className="grid gap-4 rounded-lg border border-line bg-surface p-5 text-left">
       {options.length > 0 ? (
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Option</span>
@@ -68,39 +69,34 @@ export function ProductPurchase({
               setVariantId(event.target.value);
               setQuantity(1);
             }}
-            className="min-h-11 rounded-[10px] border border-line bg-surface px-3"
+            className="field"
           >
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
-                {option.available && option.stockQuantity > 0 ? "" : " — unavailable"}
+                {option.available && option.stockQuantity > 0 ? "" : " (unavailable)"}
               </option>
             ))}
           </select>
         </label>
       ) : null}
-      <div className="flex items-center gap-3">
-        <label className="grid gap-1.5 text-sm">
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Quantity</span>
-          <input
-            type="number"
-            min={1}
-            max={Math.max(1, Math.min(20, stock || 1))}
+          <QuantityStepper
             value={quantity}
-            onChange={(event) => setQuantity(Math.max(1, Math.min(20, Number(event.target.value) || 1)))}
-            className="h-11 w-24 rounded-[10px] border border-line bg-surface px-3"
+            max={Math.max(1, stock || 1)}
             disabled={Boolean(reason)}
+            onChange={setQuantity}
           />
-        </label>
-        <div className="pt-6">
-          <Price minor={price} currency={currency} compare={compare} className="text-lg" />
         </div>
+        <Price minor={price} currency={currency} compare={compare} className="pb-2 text-lg" />
       </div>
       <button
         type="button"
         onClick={addToCart}
         disabled={Boolean(reason)}
-        className="hidden min-h-12 items-center justify-center rounded-[10px] bg-pine px-5 font-medium text-paper disabled:opacity-50 lg:inline-flex"
+        className="hidden min-h-12 w-full items-center justify-center rounded-md bg-pine px-5 font-medium text-paper transition-colors hover:bg-pine-dark active:translate-y-px disabled:opacity-50 lg:inline-flex"
       >
         {reason ? "Unavailable" : "Add to cart"}
       </button>
@@ -114,7 +110,7 @@ export function ProductPurchase({
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper p-3 lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center gap-3">
           <Price minor={price} currency={currency} />
-          <button type="button" onClick={addToCart} disabled={Boolean(reason)} className="ml-auto inline-flex min-h-11 items-center justify-center rounded-[10px] bg-pine px-4 text-sm font-medium text-paper disabled:opacity-50">
+          <button type="button" onClick={addToCart} disabled={Boolean(reason)} className="ml-auto inline-flex min-h-11 items-center justify-center rounded-md bg-pine px-4 text-sm font-medium text-paper disabled:opacity-50">
             {reason ? "Unavailable" : "Add to cart"}
           </button>
         </div>
