@@ -3,21 +3,21 @@
 @theme {
   --font-display: var(--font-newsreader), "Iowan Old Style", Palatino, "Palatino Linotype", serif;
   --font-sans: var(--font-manrope), "Avenir Next", "Segoe UI", sans-serif;
-  --color-paper: #f4f5f3;
-  --color-surface: #fbfbfa;
-  --color-stone: #e6ebe8;
-  --color-ink: #141816;
-  --color-muted: #3e4743;
-  --color-line: #d5dbd8;
-  --color-pine: #14312b;
-  --color-pine-dark: #0c221e;
-  --color-mist: #e7eeea;
-  --color-clay: #8a4e3c;
-  --color-danger: #7d332c;
-  --shadow-soft: 0 18px 40px -28px rgb(20 24 22 / 0.4);
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
+  --color-paper: #fff5f8;
+  --color-surface: #ffffff;
+  --color-stone: #f6d7e3;
+  --color-ink: #241c20;
+  --color-muted: #6a5560;
+  --color-line: #efd3de;
+  --color-pine: #c2186a;
+  --color-pine-dark: #8f124e;
+  --color-mist: #f8e3eb;
+  --color-clay: #a14a62;
+  --color-danger: #9b2c2c;
+  --shadow-soft: 0 18px 40px -28px rgb(143 18 78 / 0.35);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
 html {
@@ -42,7 +42,7 @@ h3,
 }
 
 ::selection {
-  background: #d5e3dc;
+  background: #f3c2d4;
   color: var(--color-ink);
 }
 
@@ -77,7 +77,7 @@ summary::-webkit-details-marker {
 .field {
   min-height: 2.75rem;
   width: 100%;
-  border-radius: 0;
+  border-radius: 4px;
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   padding: 0.55rem 0.8rem;
@@ -92,7 +92,7 @@ summary::-webkit-details-marker {
 
 .field:focus {
   border-color: var(--color-ink);
-  box-shadow: 0 0 0 3px rgb(20 49 43 / 0.12);
+  box-shadow: 0 0 0 3px rgb(194 24 106 / 0.16);
 }
 
 @media (prefers-reduced-motion: no-preference) {
