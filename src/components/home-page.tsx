@@ -264,12 +264,17 @@ function trustRows(store: StoreSettings, paymentsReady: boolean) {
   if (paymentsReady && process.env.PAYSTACK_SECRET_KEY) {
     rows.push({
       label: "Payment",
-      value: "Payments are confirmed with Paystack before an order is marked paid. Card details are not stored on this website.",
+      value: "Card, mobile money, or bank transfer through Paystack. The order is marked paid only after Paystack confirms the money. Card details are not stored on this website.",
     });
   } else if (paymentsReady) {
     rows.push({
       label: "Payment",
       value: "A test payment gateway is enabled in this environment. It does not collect real money.",
+    });
+  } else {
+    rows.push({
+      label: "Payment",
+      value: "Card, mobile money, or bank transfer through Paystack. Payment starts once the Paystack account is connected.",
     });
   }
   return rows;
