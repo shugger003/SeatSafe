@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr/ArrowRight";
+import { ProductCard, availabilityLabel } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { StoreIcon } from "@/components/icons";
-import { Button, Notice, Price } from "@/components/ui";
+import { Button, EmptyState, Price } from "@/components/ui";
 import { videoEmbed } from "@/lib/media";
 import { purchaseBlockersForDisplay, displayPrice } from "@/lib/commerce";
 import { formatMoney } from "@/lib/money";
@@ -40,43 +40,68 @@ export function HomePage({
 
   return (
     <div>
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-14 sm:px-8 lg:grid-cols-12 lg:py-24">
-        <div className="rise lg:col-span-6">
-          {home.hero.eyebrow ? <p className="text-xs font-medium uppercase tracking-[0.18em] text-clay">{home.hero.eyebrow}</p> : null}
-          <h1 className="mt-4 max-w-xl text-balance font-display text-5xl leading-[1.02] sm:text-7xl">{home.hero.headline}</h1>
-          <p className="mt-6 max-w-lg text-lg leading-8 text-muted">{home.hero.description}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href={home.hero.primaryHref || cta.href}>
-              {home.hero.primaryLabel || cta.label}
-              <ArrowRight size={16} aria-hidden="true" />
+      <section className="bg-mist">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-16">
+        <div className="stage lg:order-2">
+          <ProductMedia
+            src={featured?.images[0]?.src}
+            alt={featured?.images[0]?.alt || `${featured?.name || "SAFESEAT"} photograph`}
+            priority
+            tone="stage"
+          />
+        </div>
+        <div>
+          <p className="text-xs font-medium tracking-[0.22em] text-pine">{store.businessName}</p>
+          <h1 className="mt-3 max-w-xl text-balance font-display text-5xl leading-[0.95] tracking-[-0.03em] sm:text-6xl">
+            {featured?.name || home.hero.headline}
+          </h1>
+          <p className="mt-5 max-w-md text-lg leading-8 text-muted">{featured?.shortDescription || home.hero.description}</p>
+          <div className="mt-6">
+            <Price minor={featured ? displayPrice(featured) : null} currency={featured?.currency || store.currency} compare={featured && featured.variants.length === 0 ? featured.compareAtPriceMinor : null} className="text-lg" />
+          </div>
+          {featured ? <p className="mt-3 text-sm text-muted">{availabilityLabel(featured)}</p> : null}
+          {featured && purchaseBlockersForDisplay(featured, store, paymentsReady)[0] ? (
+            <p className="mt-2 max-w-md text-sm text-muted">{purchaseBlockersForDisplay(featured, store, paymentsReady)[0]}</p>
+          ) : null}
+          <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <Button href={featured ? `/product/${featured.slug}` : cta.href}>
+              {home.hero.primaryLabel || "View SAFESEAT"}
             </Button>
-            <Button href={home.hero.secondaryHref || "/how-it-works"} variant="secondary">
+            <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
               {home.hero.secondaryLabel || "How it works"}
             </Button>
           </div>
         </div>
-        <div className="lg:col-span-6 lg:pl-6">
-          <ProductMedia
-            src={featured?.images[0]?.src}
-            alt={featured?.images[0]?.alt || "Product image placeholder"}
-            priority
-          />
         </div>
       </section>
 
       {benefits.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
           <SectionHeading title={home.benefitsHeading} intro={home.benefitsIntro} />
-          <ol className="mt-8 divide-y divide-line overflow-hidden rounded-[22px] border border-line bg-surface shadow-soft">
-            {benefits.map((benefit, index) => (
-              <li key={benefit.id} className="grid gap-4 p-5 sm:grid-cols-[auto_1fr] sm:items-start sm:p-6">
-                <span className="font-display text-3xl text-clay tabular-nums">0{index + 1}</span>
+          <ul className="mt-10 divide-y divide-line border-y border-line">
+            {benefits.map((benefit) => (
+              <li key={benefit.id} className="grid gap-3 py-6 sm:grid-cols-[220px_1fr] sm:items-baseline">
+                <h3 className="flex items-center gap-3 font-display text-2xl">
+                  <StoreIcon name={benefit.icon} />
+                  {benefit.title}
+                </h3>
+                <p className="max-w-2xl text-sm leading-6 text-muted">{benefit.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {steps.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8" id="how-it-works">
+          <SectionHeading title={home.stepsHeading} intro={home.stepsIntro} />
+          <ol className="mt-12 divide-y divide-line border-y border-line">
+            {steps.map((step, index) => (
+              <li key={step.id} className="grid gap-3 py-8 sm:grid-cols-[4.5rem_1fr] sm:items-baseline">
+                <p className="font-display text-2xl text-pine tabular-nums">{String(index + 1).padStart(2, "0")}</p>
                 <div>
-                  <div className="flex items-center gap-3">
-                    <StoreIcon name={benefit.icon} />
-                    <h3 className="font-display text-2xl">{benefit.title}</h3>
-                  </div>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{benefit.description}</p>
+                  <h3 className="font-display text-3xl tracking-[-0.03em]">{step.title}</h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{step.body}</p>
                 </div>
               </li>
             ))}
@@ -84,48 +109,48 @@ export function HomePage({
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8" id="how-it-works">
-        <SectionHeading title={home.stepsHeading} intro={home.stepsIntro} />
-        {steps.length > 0 ? (
-          <ol className="mt-8 grid gap-px overflow-hidden rounded-[22px] bg-line md:grid-cols-3">
-            {steps.map((step, index) => (
-              <li key={step.id} className="bg-paper p-6">
-                <p className="font-display text-4xl text-pine tabular-nums">0{index + 1}</p>
-                <h3 className="mt-4 font-display text-2xl">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <div className="mt-6">
-            <Notice>Usage instructions have not been published. Follow the directions supplied with the product once they are available.</Notice>
-          </div>
-        )}
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
-        <SectionHeading title={home.showcaseHeading} intro={home.showcaseIntro} />
-        {products.length === 0 ? (
-          <div className="mt-6">
-            <Notice>No products are published yet.</Notice>
-          </div>
-        ) : products.length === 1 && featured ? (
-          <FeaturedProduct product={featured} store={store} paymentsReady={paymentsReady} />
-        ) : (
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {products.length > 1 ? (
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+          <SectionHeading title={home.showcaseHeading} intro={home.showcaseIntro} />
+          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <li key={product.id}>
-                <ProductLink product={product} />
+                <ProductCard product={product} heading="h3" />
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : products.length === 0 ? (
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+          <EmptyState
+            title="No products are published yet"
+            body="The shop stays empty until the business publishes a listing. You can still send a question."
+            href="/contact"
+            action="Ask a question"
+          />
+        </section>
+      ) : null}
+
+      {benefits.length + steps.length + useCases.length + faqs.length === 0 ? (
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+          <h2 className="font-display text-4xl tracking-[-0.03em] sm:text-5xl">What you can do now</h2>
+          <ul className="mt-10 divide-y divide-line border-y border-line">
+            {NEXT_STEPS.map((item) => (
+              <li key={item.href} className="grid gap-2 py-6 sm:grid-cols-[220px_1fr] sm:items-baseline">
+                <h3 className="font-display text-2xl">
+                  <Link href={item.href} className="underline-offset-4 hover:underline">{item.title}</Link>
+                </h3>
+                <p className="max-w-2xl text-sm leading-6 text-muted">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {video ? (
         <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
           <SectionHeading title={home.video.heading} intro={home.video.description} />
-          <div className="mt-8 overflow-hidden rounded-[16px] border border-line bg-ink">
+          <div className="mt-8 overflow-hidden bg-ink">
             {video.kind === "file" ? (
               <video className="aspect-video w-full" controls preload="none" poster={home.video.posterUrl || undefined}>
                 <source src={video.src} />
@@ -140,149 +165,89 @@ export function HomePage({
       {useCases.length > 0 ? (
         <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
           <SectionHeading title={home.useCasesHeading} intro={home.useCasesIntro} />
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {useCases.map((item) => (
-              <li key={item.id} className="grid gap-4 rounded-[16px] border border-line bg-surface p-5 sm:grid-cols-[120px_1fr]">
-                {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.imageUrl} alt={item.imageAlt || ""} className="h-28 w-full rounded-[10px] object-cover" loading="lazy" />
-                ) : (
-                  <div className="flex h-28 items-center justify-center rounded-[10px] bg-mist text-pine">
-                    <StoreIcon name={item.icon} size={28} />
-                  </div>
-                )}
-                <div>
-                  <h3 className="font-display text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted">{item.description}</p>
-                </div>
+              <li key={item.id} className="border-t border-line pt-5">
+                <h3 className="flex items-center gap-3 font-display text-2xl">
+                  <StoreIcon name={item.icon} />
+                  {item.title}
+                </h3>
+                <p className="mt-2 max-w-md text-sm leading-6 text-muted">{item.description}</p>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
-        <SectionHeading title={home.trustHeading} intro={home.trustIntro} />
-        {trust.length > 0 ? (
-          <dl className="mt-8 divide-y divide-line rounded-[16px] border border-line bg-surface">
+      {trust.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+          <SectionHeading title={home.trustHeading} intro={home.trustIntro} />
+          <dl className="mt-8 divide-y divide-line border-y border-line">
             {trust.map((row) => (
-              <div key={row.label} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr]">
+              <div key={row.label} className="grid gap-1 py-4 sm:grid-cols-[180px_1fr]">
                 <dt className="text-sm font-medium">{row.label}</dt>
                 <dd className="text-sm leading-6 text-muted">{row.value}</dd>
               </div>
             ))}
           </dl>
-        ) : (
-          <div className="mt-6">
-            <Notice>Support, delivery, and payment details will appear here when the business publishes them.</Notice>
-          </div>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
-        <SectionHeading title={home.faqHeading} intro={home.faqIntro} />
-        {faqs.length > 0 ? (
-          <div className="mt-6 divide-y divide-line border-y border-line">
+      {faqs.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
+          <SectionHeading title={home.faqHeading} intro={home.faqIntro} />
+          <div className="mt-8 divide-y divide-line border-y border-line">
             {faqs.map((faq) => (
-              <details key={faq.id} className="group py-4">
-                <summary className="flex items-center justify-between gap-4 text-lg">
-                  {faq.question}
-                  <span aria-hidden="true" className="text-muted group-open:hidden">+</span>
-                  <span aria-hidden="true" className="hidden text-muted group-open:inline">–</span>
-                </summary>
-                <p className="max-w-3xl pt-3 text-sm leading-6 text-muted">{faq.answer}</p>
-              </details>
+              <article key={faq.id} className="grid gap-2 py-5 md:grid-cols-[1fr_1.2fr] md:gap-10">
+                <h3 className="font-display text-2xl">{faq.question}</h3>
+                <p className="max-w-xl text-sm leading-6 text-muted">{faq.answer}</p>
+              </article>
             ))}
           </div>
-        ) : (
-          <div className="mt-6">
-            <Notice>Questions and answers will be published when the business confirms them.</Notice>
+          <div className="mt-4">
+            <Link href="/faq" className="text-sm underline underline-offset-4">All questions</Link>
           </div>
-        )}
-        <div className="mt-4">
-          <Link href="/faq" className="text-sm underline underline-offset-4">All questions</Link>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
-        <div className="relative overflow-hidden rounded-[28px] bg-pine px-6 py-14 text-paper sm:px-12">
-          <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-paper/10" aria-hidden="true" />
-          <h2 className="max-w-xl font-display text-4xl leading-tight sm:text-5xl">{home.finalHeading}</h2>
-          <p className="mt-4 max-w-xl text-paper/80">{home.finalText}</p>
-          <p className="mt-2 max-w-xl text-sm text-paper/70">{cta.note}</p>
+      <section className="bg-pine text-paper">
+        <div className="mx-auto max-w-3xl px-5 py-16 text-center sm:px-8">
+          <h2 className="font-display text-4xl leading-tight tracking-[-0.03em] text-paper sm:text-5xl">{home.finalHeading}</h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-paper/80">{home.finalText}</p>
           <div className="mt-8">
-            <Link href={cta.href} className="inline-flex min-h-11 items-center rounded-full bg-paper px-5 font-medium text-pine hover:bg-surface">
-              {cta.label}
-            </Link>
+            <Button href={cta.href} variant="light">{cta.label}</Button>
           </div>
         </div>
       </section>
     </div>
   );
 }
+
+const NEXT_STEPS = [
+  {
+    href: "/shop",
+    title: "Shop",
+    body: "The catalog lists published products only. A price appears after the business confirms it.",
+  },
+  {
+    href: "/how-it-works",
+    title: "How it works",
+    body: "Usage steps appear when the manufacturer’s instructions are published.",
+  },
+  {
+    href: "/contact",
+    title: "Contact",
+    body: "Send a question while company details and ordering are still being confirmed.",
+  },
+];
 
 function SectionHeading({ title, intro }: { title: string; intro: string }) {
   return (
-    <div className="max-w-2xl">
-      <h2 className="text-balance font-display text-4xl leading-tight sm:text-5xl">{title}</h2>
-      {intro ? <p className="mt-3 text-muted">{intro}</p> : null}
+    <div className="mx-auto max-w-2xl text-center">
+      <h2 className="text-balance font-display text-4xl leading-tight tracking-[-0.03em] sm:text-5xl">{title}</h2>
+      {intro ? <p className="mt-4 leading-7 text-muted">{intro}</p> : null}
     </div>
   );
-}
-
-function FeaturedProduct({ product, store, paymentsReady }: { product: Product; store: StoreSettings; paymentsReady: boolean }) {
-  const blockers = purchaseBlockersForDisplay(product, store, paymentsReady);
-  return (
-    <article className="mt-8 grid items-center gap-8 rounded-[24px] border border-line bg-surface p-4 shadow-soft sm:p-6 lg:grid-cols-2">
-      <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || `${product.name} image placeholder`} />
-      <div>
-        <p className="text-xs uppercase tracking-[0.16em] text-clay">{statusLabel(product)}</p>
-        <h3 className="mt-2 font-display text-4xl">{product.name}</h3>
-        <p className="mt-3 text-muted">{product.shortDescription}</p>
-        <div className="mt-4">
-          <Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} className="text-xl" />
-          {product.variants.length > 0 && displayPrice(product) != null ? <p className="mt-1 text-sm text-muted">From this price. Options are on the product page.</p> : null}
-        </div>
-        {blockers[0] ? <p className="mt-3 text-sm text-muted">{blockers[0]}</p> : null}
-        <div className="mt-6">
-          <Button href={`/product/${product.slug}`}>View details</Button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function ProductLink({ product }: { product: Product }) {
-  return (
-    <article className="h-full rounded-[16px] border border-line bg-surface p-3">
-      <Link href={`/product/${product.slug}`}>
-        <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || `${product.name} image placeholder`} />
-        <h3 className="mt-4 font-display text-2xl">{product.name}</h3>
-      </Link>
-      <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted">{product.shortDescription}</p>
-      <p className="mt-3 text-sm">{statusLabel(product)}</p>
-      <p className="mt-1">
-        <Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} />
-      </p>
-      <Link href={`/product/${product.slug}`} className="mt-4 inline-flex min-h-11 items-center text-sm underline underline-offset-4">
-        View details
-      </Link>
-    </article>
-  );
-}
-
-function statusLabel(product: Product) {
-  if (product.status === "coming_soon") return "Coming soon";
-  if (product.status === "unavailable") return "Temporarily unavailable";
-  if (product.status !== "published") return "Not available";
-  const price = displayPrice(product);
-  if (price == null) return "Price to be confirmed";
-  const stock = product.variants.length
-    ? product.variants.reduce((sum, variant) => sum + (variant.available ? variant.stockQuantity : 0), 0)
-    : product.stockQuantity;
-  if (stock <= 0) return "Out of stock";
-  if (stock <= product.lowStockThreshold) return "Limited availability";
-  return "In stock";
 }
 
 function trustRows(store: StoreSettings, paymentsReady: boolean) {
@@ -307,6 +272,5 @@ function trustRows(store: StoreSettings, paymentsReady: boolean) {
       value: "A test payment gateway is enabled in this environment. It does not collect real money.",
     });
   }
-  rows.push({ label: "Policies", value: "Shipping, returns, privacy, and terms are linked in the footer. Draft policies say so on the page." });
   return rows;
 }
