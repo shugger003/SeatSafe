@@ -22,8 +22,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const pages = Math.max(1, Math.ceil(result.total / result.pageSize));
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
-      <h1 className="font-display text-5xl">Shop</h1>
+    <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-clay">Catalog</p>
+      <h1 className="mt-2 font-display text-5xl sm:text-6xl">Shop</h1>
       <form className="mt-6 flex flex-col gap-3 sm:flex-row" action="/shop">
         <label className="sr-only" htmlFor="q">Search products</label>
         <input id="q" name="q" defaultValue={params.q} placeholder="Search" className="min-h-11 flex-1 rounded-[10px] border border-line bg-surface px-3" />
@@ -41,7 +42,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       ) : (
         <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {result.products.map((product) => (
-            <li key={product.id} className="rounded-[16px] border border-line bg-surface p-3">
+            <li key={product.id} className="rounded-[22px] border border-line bg-surface p-3 shadow-soft transition-transform duration-200 hover:-translate-y-0.5">
               <Link href={`/product/${product.slug}`}>
                 <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || `${product.name} image placeholder`} />
                 <h2 className="mt-4 font-display text-2xl">{product.name}</h2>

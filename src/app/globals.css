@@ -25,7 +25,12 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-paper);
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(980px 420px at 0% -8%, rgb(231 240 234 / 0.95), transparent 62%),
+    radial-gradient(720px 360px at 100% 0%, rgb(138 104 67 / 0.1), transparent 58%),
+    radial-gradient(rgb(28 25 21 / 0.045) 0.65px, transparent 0.65px);
+  background-size: auto, auto, 4px 4px;
   color: var(--color-ink);
   text-rendering: optimizeLegibility;
 }

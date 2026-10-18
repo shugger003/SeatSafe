@@ -20,9 +20,9 @@ export function Button({
   onClick?: () => void;
 }) {
   const classes = cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] px-4 text-[0.95rem] font-medium transition-[transform,background-color,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
-    variant === "primary" && "bg-pine text-paper hover:bg-pine-dark active:scale-[0.99]",
-    variant === "secondary" && "border border-line bg-surface text-ink hover:border-ink/30",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[0.95rem] font-medium shadow-[0_1px_0_rgb(255_252_247_/_0.18)_inset] transition-[transform,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50",
+    variant === "primary" && "bg-pine text-paper shadow-soft hover:bg-pine-dark active:scale-[0.98]",
+    variant === "secondary" && "border border-line bg-surface text-ink shadow-none hover:border-pine/40 hover:bg-mist",
     variant === "quiet" && "px-0 text-ink underline-offset-4 hover:underline",
     variant === "danger" && "bg-danger text-paper",
     className,
@@ -129,7 +129,7 @@ export function Field({
         required={required}
         defaultValue={defaultValue}
         autoComplete={autoComplete}
-        className="min-h-11 rounded-[10px] border border-line bg-surface px-3 text-base text-ink"
+        className="min-h-11 rounded-[12px] border border-line bg-surface px-3 text-base text-ink shadow-[0_1px_0_rgb(255_252_247_/_0.8)_inset] transition-[border-color,box-shadow] focus:border-pine focus:outline-none"
       />
       {hint ? <span className="text-muted">{hint}</span> : null}
     </label>

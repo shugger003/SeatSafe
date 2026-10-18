@@ -30,7 +30,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           </div>
         ) : null}
         {store.showPreparationNotice && store.preparationNotice ? (
-          <p className="border-b border-line bg-[#f8f1e6] px-4 py-2 text-center text-sm">{store.preparationNotice}</p>
+          <p className="border-b border-clay/20 bg-[#f8f1e6] px-4 py-2.5 text-center text-sm">{store.preparationNotice}</p>
         ) : null}
         <Header businessName={store.businessName} logoUrl={logo} />
         <main id="main" className="flex-1">
