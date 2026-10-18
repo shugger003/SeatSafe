@@ -61,8 +61,10 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
               {store.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={store.logoUrl} alt="" className="h-12 w-auto" />
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-paper">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={store.logoUrl} alt="" className="h-12 w-12 object-contain" />
+                </span>
               ) : (
                 <svg viewBox="0 0 32 32" className="h-12 w-12" aria-hidden="true">
                   <circle cx="16" cy="16" r="15" fill="#f3eee4" />
