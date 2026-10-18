@@ -99,11 +99,11 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
               </ul>
             ) : null}
           </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
             <FooterColumn title="Information" links={POLICY_LINKS} />
             <FooterColumn title="Quick links" links={QUICK_LINKS} />
             <FooterColumn title="Company" links={COMPANY_LINKS} />
-          </div>
+          </nav>
         </div>
 
         <div className="mt-14">
