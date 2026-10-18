@@ -12,11 +12,11 @@ export default async function ProductsPage() {
     <div>
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-4xl">Products</h1>
-        <Link href="/admin/products/new" className="inline-flex min-h-11 items-center rounded-[10px] bg-pine px-4 text-sm text-paper">New product</Link>
+        <Link href="/admin/products/new" className="inline-flex min-h-11 items-center rounded-full bg-pine px-5 text-sm text-paper hover:bg-pine-dark">New product</Link>
       </div>
-      <ul className="mt-6 divide-y divide-line border-y border-line">
+      <ul className="mt-6 divide-y divide-line overflow-hidden rounded-[20px] border border-line bg-surface shadow-soft">
         {products.map((product) => (
-          <li key={product.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+          <li key={product.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 text-sm">
             <Link href={`/admin/products/${product.id}`} className="font-medium">{product.name}</Link>
             <span>{product.status.replaceAll("_", " ")}</span>
             <span>{product.priceMinor == null ? "No price" : formatMoney(product.priceMinor, product.currency)}</span>

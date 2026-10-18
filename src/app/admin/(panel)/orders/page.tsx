@@ -30,9 +30,9 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         </select>
         <button className="min-h-11 rounded-[10px] bg-pine px-4 text-paper">Filter</button>
       </form>
-      <ul className="mt-6 divide-y divide-line border-y border-line text-sm">
+      <ul className="mt-6 divide-y divide-line overflow-hidden rounded-[20px] border border-line bg-surface text-sm shadow-soft">
         {result.orders.map((order) => (
-          <li key={order.id} className="grid gap-1 py-3 sm:grid-cols-4">
+          <li key={order.id} className="grid gap-1 px-4 py-4 sm:grid-cols-4">
             <Link href={`/admin/orders/${order.id}`} className="font-medium">{order.orderNumber}</Link>
             <span>{order.customerName}</span>
             <span>{order.paymentStatus} · {order.fulfillmentStatus}</span>

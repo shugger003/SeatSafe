@@ -17,11 +17,13 @@ export function ProductMedia({
       <div
         role="img"
         aria-label={alt || "Product image placeholder"}
-        className={cn("flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-[16px] border border-line bg-mist px-6 text-center text-pine", className)}
+        className={cn("relative flex aspect-[4/5] flex-col items-center justify-center overflow-hidden rounded-[22px] bg-pine px-8 text-center text-paper shadow-soft", className)}
       >
+        <div className="pointer-events-none absolute inset-5 rounded-[16px] border border-paper/20" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-paper/10" aria-hidden="true" />
         <ImageSquare size={36} weight="light" aria-hidden="true" />
-        <p className="text-sm font-medium">Product image placeholder</p>
-        <p className="max-w-xs text-xs leading-5 text-muted">Photography will replace this frame. This is not a picture of the product.</p>
+        <p className="mt-4 text-sm font-medium tracking-wide">Photography comes later</p>
+        <p className="mt-2 max-w-[16rem] text-xs leading-5 text-paper/75">This frame is a placeholder. It is not a picture of the product.</p>
       </div>
     );
   }
