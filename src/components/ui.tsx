@@ -12,7 +12,7 @@ export function Button({
   onClick,
 }: {
   href?: string;
-  variant?: "primary" | "secondary" | "quiet" | "danger";
+  variant?: "primary" | "secondary" | "quiet" | "danger" | "light";
   type?: "button" | "submit";
   disabled?: boolean;
   children: React.ReactNode;
@@ -25,6 +25,7 @@ export function Button({
     variant === "secondary" && "border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper",
     variant === "quiet" && "px-0 text-ink underline-offset-4 hover:underline",
     variant === "danger" && "bg-danger text-paper",
+    variant === "light" && "bg-paper text-ink hover:bg-mist active:translate-y-px",
     className,
   );
   if (href) return <Link href={href} className={classes}>{children}</Link>;
