@@ -40,7 +40,7 @@ export function HomePage({
 
   return (
     <div>
-      <section className="mx-auto grid max-w-6xl items-end gap-12 px-5 pb-8 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.86fr)] lg:gap-20 lg:pb-16 lg:pt-16">
+      <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-8 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.86fr)] lg:gap-16 lg:pb-16 lg:pt-16">
         <div className="lg:pb-10">
           <h1 className="max-w-xl text-balance font-display text-5xl leading-[0.98] tracking-[-0.03em] sm:text-6xl">
             {home.hero.headline}
@@ -61,15 +61,16 @@ export function HomePage({
             src={featured?.images[0]?.src}
             alt={featured?.images[0]?.alt || "Product image placeholder"}
             priority
+            tone="stage"
           />
         </div>
       </section>
 
       {featured && products.length === 1 ? (
-        <section className="border-y border-line">
-          <div className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
+        <section className="bg-mist">
+          <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
             <div>
-              <h2 className="font-display text-4xl tracking-[-0.03em]">{featured.name}</h2>
+              <h2 className="font-display text-5xl tracking-[-0.03em]">{featured.name}</h2>
               <p className="mt-3 max-w-xl text-muted">{featured.shortDescription}</p>
               <div className="mt-4">
                 <Price minor={displayPrice(featured)} currency={featured.currency} compare={featured.variants.length ? null : featured.compareAtPriceMinor} className="text-lg" />
@@ -218,13 +219,13 @@ export function HomePage({
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
-        <div className="border-t border-line pt-16">
-          <h2 className="max-w-xl font-display text-5xl leading-[0.98] tracking-[-0.03em] sm:text-6xl">{home.finalHeading}</h2>
-          <p className="mt-4 max-w-xl text-lg text-muted">{home.finalText}</p>
-          <p className="mt-2 max-w-xl text-sm text-muted">{cta.note}</p>
+      <section className="bg-ink text-paper">
+        <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
+          <h2 className="max-w-xl font-display text-5xl leading-[0.98] tracking-[-0.03em] text-paper sm:text-6xl">{home.finalHeading}</h2>
+          <p className="mt-5 max-w-xl text-lg leading-8 text-paper/75">{home.finalText}</p>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-paper/60">{cta.note}</p>
           <div className="mt-8">
-            <Button href={cta.href}>{cta.label}</Button>
+            <Button href={cta.href} variant="light">{cta.label}</Button>
           </div>
         </div>
       </section>
