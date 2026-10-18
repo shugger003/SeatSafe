@@ -40,11 +40,11 @@ export function HomePage({
 
   return (
     <div>
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-12 lg:py-20">
+      <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-14 sm:px-8 lg:grid-cols-12 lg:py-24">
         <div className="rise lg:col-span-6">
           {home.hero.eyebrow ? <p className="text-xs font-medium uppercase tracking-[0.18em] text-clay">{home.hero.eyebrow}</p> : null}
-          <h1 className="mt-3 max-w-xl font-display text-[2.6rem] leading-[1.05] sm:text-6xl">{home.hero.headline}</h1>
-          <p className="mt-5 max-w-lg text-lg leading-8 text-muted">{home.hero.description}</p>
+          <h1 className="mt-4 max-w-xl text-balance font-display text-5xl leading-[1.02] sm:text-7xl">{home.hero.headline}</h1>
+          <p className="mt-6 max-w-lg text-lg leading-8 text-muted">{home.hero.description}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href={home.hero.primaryHref || cta.href}>
               {home.hero.primaryLabel || cta.label}
@@ -55,7 +55,7 @@ export function HomePage({
             </Button>
           </div>
         </div>
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6 lg:pl-6">
           <ProductMedia
             src={featured?.images[0]?.src}
             alt={featured?.images[0]?.alt || "Product image placeholder"}
@@ -67,26 +67,31 @@ export function HomePage({
       {benefits.length > 0 ? (
         <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
           <SectionHeading title={home.benefitsHeading} intro={home.benefitsIntro} />
-          <ul className="mt-8 grid gap-4 md:grid-cols-3">
-            {benefits.map((benefit) => (
-              <li key={benefit.id} className="rounded-[16px] border border-line bg-surface p-5">
-                <StoreIcon name={benefit.icon} />
-                <h3 className="mt-4 font-display text-2xl">{benefit.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted">{benefit.description}</p>
+          <ol className="mt-8 divide-y divide-line overflow-hidden rounded-[22px] border border-line bg-surface shadow-soft">
+            {benefits.map((benefit, index) => (
+              <li key={benefit.id} className="grid gap-4 p-5 sm:grid-cols-[auto_1fr] sm:items-start sm:p-6">
+                <span className="font-display text-3xl text-clay tabular-nums">0{index + 1}</span>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <StoreIcon name={benefit.icon} />
+                    <h3 className="font-display text-2xl">{benefit.title}</h3>
+                  </div>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{benefit.description}</p>
+                </div>
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
       ) : null}
 
       <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8" id="how-it-works">
         <SectionHeading title={home.stepsHeading} intro={home.stepsIntro} />
         {steps.length > 0 ? (
-          <ol className="mt-8 grid gap-4 md:grid-cols-3">
+          <ol className="mt-8 grid gap-px overflow-hidden rounded-[22px] bg-line md:grid-cols-3">
             {steps.map((step, index) => (
-              <li key={step.id} className="rounded-[16px] border border-line bg-surface p-5">
-                <p className="text-sm tabular-nums text-clay">0{index + 1}</p>
-                <h3 className="mt-3 font-display text-2xl">{step.title}</h3>
+              <li key={step.id} className="bg-paper p-6">
+                <p className="font-display text-4xl text-pine tabular-nums">0{index + 1}</p>
+                <h3 className="mt-4 font-display text-2xl">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">{step.body}</p>
               </li>
             ))}
@@ -183,7 +188,7 @@ export function HomePage({
                 <summary className="flex items-center justify-between gap-4 text-lg">
                   {faq.question}
                   <span aria-hidden="true" className="text-muted group-open:hidden">+</span>
-                  <span aria-hidden="true" className="hidden text-muted group-open:inline">\u2013</span>
+                  <span aria-hidden="true" className="hidden text-muted group-open:inline">–</span>
                 </summary>
                 <p className="max-w-3xl pt-3 text-sm leading-6 text-muted">{faq.answer}</p>
               </details>
@@ -200,12 +205,13 @@ export function HomePage({
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
-        <div className="rounded-[16px] bg-pine px-6 py-12 text-paper sm:px-12">
+        <div className="relative overflow-hidden rounded-[28px] bg-pine px-6 py-14 text-paper sm:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-paper/10" aria-hidden="true" />
           <h2 className="max-w-xl font-display text-4xl leading-tight sm:text-5xl">{home.finalHeading}</h2>
           <p className="mt-4 max-w-xl text-paper/80">{home.finalText}</p>
           <p className="mt-2 max-w-xl text-sm text-paper/70">{cta.note}</p>
           <div className="mt-8">
-            <Link href={cta.href} className="inline-flex min-h-11 items-center rounded-[10px] bg-paper px-5 font-medium text-pine">
+            <Link href={cta.href} className="inline-flex min-h-11 items-center rounded-full bg-paper px-5 font-medium text-pine hover:bg-surface">
               {cta.label}
             </Link>
           </div>
@@ -218,7 +224,7 @@ export function HomePage({
 function SectionHeading({ title, intro }: { title: string; intro: string }) {
   return (
     <div className="max-w-2xl">
-      <h2 className="font-display text-4xl leading-tight">{title}</h2>
+      <h2 className="text-balance font-display text-4xl leading-tight sm:text-5xl">{title}</h2>
       {intro ? <p className="mt-3 text-muted">{intro}</p> : null}
     </div>
   );
@@ -227,7 +233,7 @@ function SectionHeading({ title, intro }: { title: string; intro: string }) {
 function FeaturedProduct({ product, store, paymentsReady }: { product: Product; store: StoreSettings; paymentsReady: boolean }) {
   const blockers = purchaseBlockersForDisplay(product, store, paymentsReady);
   return (
-    <article className="mt-8 grid items-center gap-8 rounded-[16px] border border-line bg-surface p-4 sm:p-6 lg:grid-cols-2">
+    <article className="mt-8 grid items-center gap-8 rounded-[24px] border border-line bg-surface p-4 shadow-soft sm:p-6 lg:grid-cols-2">
       <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || `${product.name} image placeholder`} />
       <div>
         <p className="text-xs uppercase tracking-[0.16em] text-clay">{statusLabel(product)}</p>
