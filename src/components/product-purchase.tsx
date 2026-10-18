@@ -45,7 +45,7 @@ export function ProductPurchase({
   const compare = selected ? selected.compareAtPriceMinor : baseCompare;
   const stock = selected ? (selected.available ? selected.stockQuantity : 0) : baseStock;
   const reason = useMemo(() => {
-    if (blocked) return blocked;
+    if (blocked && blocked !== "Payment setup is still pending.") return blocked;
     if (options.length > 0 && !selected) return "Choose an option.";
     if (price == null || price <= 0) return "A price has not been published.";
     if (stock <= 0) return "Out of stock.";
