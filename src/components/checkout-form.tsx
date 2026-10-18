@@ -137,8 +137,9 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
           <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatMoney(quote?.subtotalMinor ?? 0, currency)}</dd></div>
           <div className="flex justify-between"><dt>Delivery</dt><dd>{quote?.deliveryFeeMinor == null ? "Not set" : formatMoney(quote.deliveryFeeMinor, currency)}</dd></div>
           <div className="flex justify-between"><dt>Discount</dt><dd>{formatMoney(quote?.discountMinor ?? 0, currency)}</dd></div>
-          <div className="flex justify-between text-base font-medium"><dt>Total to pay</dt><dd>{quote?.purchasable && quote.totalMinor != null ? formatMoney(quote.totalMinor, currency) : "Not ready"}</dd></div>
+          <div className="flex justify-between text-base font-medium"><dt>Total to pay</dt><dd>{quote?.totalMinor == null ? "Not ready" : formatMoney(quote.totalMinor, currency)}</dd></div>
         </dl>
+        {quote && !quote.purchasable && quote.blockers[0] ? <p className="mt-4 text-sm leading-6 text-muted">{quote.blockers[0]}</p> : null}
         <button type="submit" disabled={pending || !quote?.purchasable} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-pine px-4 font-medium text-paper transition-colors hover:bg-pine-dark disabled:opacity-50">
           {pending ? "Starting payment…" : "Continue to payment"}
         </button>
