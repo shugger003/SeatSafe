@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { CartLineInput } from "@/lib/types";
 
 type CartContextValue = {
@@ -16,37 +16,68 @@ type CartContextValue = {
   setDiscountCode: (code: string) => void;
 };
 
+type CartSnapshot = { lines: CartLineInput[]; discountCode: string };
+
 const CartContext = createContext<CartContextValue | null>(null);
 const KEY = "seat-cart-v1";
+const EMPTY: CartSnapshot = { lines: [], discountCode: "" };
+
+let snapshot: CartSnapshot = EMPTY;
+const listeners = new Set<() => void>();
 
 function same(a: CartLineInput, b: CartLineInput) {
   return a.productId === b.productId && a.variantId === b.variantId;
 }
 
+function readStored(): CartSnapshot {
+  try {
+    const stored = localStorage.getItem(KEY);
+    if (!stored) return EMPTY;
+    const parsed = JSON.parse(stored) as { lines?: CartLineInput[]; discountCode?: string };
+    const lines = Array.isArray(parsed.lines) ? parsed.lines.filter((line) => line.productId && line.quantity > 0) : [];
+    const discountCode = typeof parsed.discountCode === "string" ? parsed.discountCode : "";
+    return { lines, discountCode };
+  } catch {
+    return EMPTY;
+  }
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getSnapshot() {
+  return snapshot;
+}
+
+function getServerSnapshot() {
+  return EMPTY;
+}
+
+function publish(next: CartSnapshot) {
+  snapshot = next;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(next));
+  } catch {
+    // A full or private browser store keeps the cart in memory only.
+  }
+  listeners.forEach((listener) => listener());
+}
+
+let loaded = false;
+
+function getClientSnapshot() {
+  if (!loaded && typeof window !== "undefined") {
+    loaded = true;
+    snapshot = readStored();
+  }
+  return snapshot;
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [lines, setLines] = useState<CartLineInput[]>([]);
-  const [ready, setReady] = useState(false);
+  const stored = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
   const [notice, setNotice] = useState("");
-  const [discountCode, setDiscountCode] = useState("");
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as { lines?: CartLineInput[]; discountCode?: string };
-        if (Array.isArray(parsed.lines)) setLines(parsed.lines.filter((line) => line.productId && line.quantity > 0));
-        if (typeof parsed.discountCode === "string") setDiscountCode(parsed.discountCode);
-      }
-    } catch {
-      /* ignore damaged local cart */
-    }
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem(KEY, JSON.stringify({ lines, discountCode }));
-  }, [lines, discountCode, ready]);
 
   useEffect(() => {
     if (!notice) return;
@@ -54,37 +85,41 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  const value = useMemo<CartContextValue>(
-    () => ({
+  const value = useMemo<CartContextValue>(() => {
+    const lines = stored.lines;
+    const discountCode = stored.discountCode;
+    return {
       lines,
-      ready,
+      ready: true,
       count: lines.reduce((sum, line) => sum + line.quantity, 0),
       notice,
       discountCode,
-      setDiscountCode,
+      setDiscountCode: (code) => publish({ lines: getSnapshot().lines, discountCode: code }),
       add: (line, name) => {
         const quantity = Math.max(1, Math.min(20, Math.floor(line.quantity || 1)));
-        setLines((current) => {
-          const match = current.find((item) => same(item, line));
-          if (!match) return [...current, { ...line, quantity }];
-          return current.map((item) => (same(item, line) ? { ...item, quantity: Math.min(20, item.quantity + quantity) } : item));
-        });
+        const current = getSnapshot().lines;
+        const match = current.find((item) => same(item, line));
+        const next = match
+          ? current.map((item) => (same(item, line) ? { ...item, quantity: Math.min(20, item.quantity + quantity) } : item))
+          : [...current, { ...line, quantity }];
+        publish({ lines: next, discountCode: getSnapshot().discountCode });
         setNotice(`${name} added to cart`);
       },
       setQuantity: (productId, variantId, quantity) => {
-        setLines((current) =>
-          current
-            .map((item) => (item.productId === productId && item.variantId === variantId ? { ...item, quantity } : item))
-            .filter((item) => item.quantity > 0),
-        );
+        const next = getSnapshot()
+          .lines.map((item) => (item.productId === productId && item.variantId === variantId ? { ...item, quantity } : item))
+          .filter((item) => item.quantity > 0);
+        publish({ lines: next, discountCode: getSnapshot().discountCode });
       },
       remove: (productId, variantId) => {
-        setLines((current) => current.filter((item) => !(item.productId === productId && item.variantId === variantId)));
+        publish({
+          lines: getSnapshot().lines.filter((item) => !(item.productId === productId && item.variantId === variantId)),
+          discountCode: getSnapshot().discountCode,
+        });
       },
-      clear: () => setLines([]),
-    }),
-    [lines, ready, notice, discountCode],
-  );
+      clear: () => publish({ lines: [], discountCode: getSnapshot().discountCode }),
+    };
+  }, [notice, stored]);
 
   return (
     <CartContext.Provider value={value}>
@@ -93,7 +128,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         {notice}
       </div>
       {notice ? (
-        <div role="status" className="fixed bottom-4 left-1/2 z-40 max-w-[90vw] -translate-x-1/2 rounded-[10px] bg-ink px-4 py-3 text-sm text-paper shadow-soft">
+        <div role="status" className="fixed bottom-24 left-1/2 z-40 max-w-[90vw] -translate-x-1/2 bg-ink px-4 py-3 text-sm text-paper shadow-soft lg:bottom-6">
           {notice}
         </div>
       ) : null}
