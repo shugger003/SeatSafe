@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { List } from "@phosphor-icons/react/dist/ssr/List";
+import { Phone } from "@phosphor-icons/react/dist/ssr/Phone";
 import { ShoppingBag } from "@phosphor-icons/react/dist/ssr/ShoppingBag";
+import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr/WhatsappLogo";
 import { X } from "@phosphor-icons/react/dist/ssr/X";
 import { useCart } from "@/components/cart-provider";
 import { cn } from "@/lib/cn";
@@ -22,11 +24,15 @@ export function Header({
   logoUrl,
   productHref,
   productLabel,
+  phone,
+  whatsappHref,
 }: {
   businessName: string;
   logoUrl: string;
   productHref?: string;
   productLabel?: string;
+  phone?: string;
+  whatsappHref?: string | null;
 }) {
   const { count } = useCart();
   const pathname = usePathname();
@@ -119,7 +125,7 @@ export function Header({
         </button>
       </div>
       {open ? (
-        <div className="fixed inset-0 z-50 bg-pine text-paper md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-pine text-paper md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="flex h-16 items-center justify-between px-5">
             <p className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em]">
               {logoUrl ? (
@@ -153,6 +159,30 @@ export function Header({
               <span className="text-base tabular-nums text-paper/70">{count}</span>
             </Link>
           </nav>
+          {phone || whatsappHref ? (
+            <div className="mt-auto grid grid-cols-2 gap-3 px-5 pb-8 pt-10">
+              {phone ? (
+                <a
+                  href={`tel:${phone.replace(/\s+/g, "")}`}
+                  className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-paper px-3 font-medium text-pine", !whatsappHref && "col-span-2")}
+                >
+                  <Phone size={20} weight="fill" aria-hidden="true" />
+                  Call us
+                </a>
+              ) : null}
+              {whatsappHref ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#25d366] px-3 font-medium text-white", !phone && "col-span-2")}
+                >
+                  <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
+                  WhatsApp
+                </a>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </header>

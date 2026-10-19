@@ -27,17 +27,17 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
       <p className="text-xs font-medium uppercase tracking-[0.16em] text-clay">Catalog</p>
       <h1 className="mt-2 font-display text-5xl sm:text-6xl">Shop</h1>
-      <form className="mt-6 flex flex-col gap-3 sm:flex-row" action="/shop">
+      <form className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] gap-3 sm:flex" action="/shop">
         <label className="sr-only" htmlFor="q">Search products</label>
-        <input id="q" name="q" defaultValue={params.q} placeholder="Search" className="min-h-11 flex-1 rounded-[10px] border border-line bg-surface px-3" />
-        <select name="sort" defaultValue={params.sort || "featured"} className="min-h-11 rounded-[10px] border border-line bg-surface px-3" aria-label="Sort">
+        <input id="q" name="q" defaultValue={params.q} placeholder="Search" className="col-span-2 min-h-11 flex-1 rounded-[10px] border border-line bg-surface px-3" />
+        <select name="sort" defaultValue={params.sort || "featured"} className="min-h-11 min-w-0 rounded-[10px] border border-line bg-surface px-3" aria-label="Sort">
           <option value="featured">Featured</option>
           <option value="newest">Newest</option>
           <option value="name">Name</option>
           <option value="price_asc">Price, low to high</option>
           <option value="price_desc">Price, high to low</option>
         </select>
-        <button className="min-h-11 rounded-[10px] bg-pine px-4 text-paper">Apply</button>
+        <button className="min-h-11 rounded-[10px] bg-pine px-5 text-paper">Apply</button>
       </form>
       {result.products.length === 0 ? (
         <p className="mt-10 text-muted">No published products match this search.</p>
