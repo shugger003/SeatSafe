@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { availabilityLabel } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
+import { StockBadge } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { displayPrice } from "@/lib/commerce";
 import { listPublicProducts } from "@/lib/db";
@@ -48,7 +50,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                 <h2 className="mt-4 font-display text-2xl">{product.name}</h2>
               </Link>
               <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted">{product.shortDescription}</p>
-              <p className="mt-3 text-sm capitalize">{product.status.replaceAll("_", " ")}</p>
+              <StockBadge inStock={availabilityLabel(product) === "In stock"} label={availabilityLabel(product)} className="mt-3" />
               <p className="mt-1"><Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} /></p>
             </li>
           ))}
