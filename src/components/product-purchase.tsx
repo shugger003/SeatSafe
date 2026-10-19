@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { QuantityStepper } from "@/components/quantity-stepper";
+import { StockBadge } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { track } from "@/components/analytics";
 import { cn } from "@/lib/cn";
@@ -88,7 +89,7 @@ export function ProductPurchase({
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Quantity</span>
           <QuantityStepper value={quantity} max={quantityCap} onChange={setQuantity} />
-          <span className="text-muted">{stock > 0 ? `${stock} in stock` : "Out of stock"}</span>
+          <StockBadge inStock={stock > 0} className="mt-1" />
         </div>
         <Price minor={price} currency={currency} compare={compare} className="pb-2 text-lg" />
       </div>
