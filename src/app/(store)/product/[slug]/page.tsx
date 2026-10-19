@@ -70,7 +70,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto">
           {product.images.length === 0 ? (
             <div className="min-w-full">
-              <ProductMedia alt={`${product.name} image placeholder`} priority />
+              <ProductMedia alt={product.name} logo={store.logoUrl} priority />
             </div>
           ) : (
             product.images.map((image, index) => (
@@ -81,8 +81,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           )}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-clay">{product.category || product.status.replaceAll("_", " ")}</p>
-          <h1 className="mt-2 font-display text-5xl leading-tight">{product.name}</h1>
+          {product.category ? <p className="mb-2 text-xs uppercase tracking-[0.16em] text-clay">{product.category}</p> : null}
+          <h1 className="font-display text-5xl leading-tight">{product.name}</h1>
           <p className="mt-4 text-lg text-muted">{product.shortDescription}</p>
           <div className="mt-6 pb-24 lg:pb-0">
             <ProductPurchase
@@ -103,20 +103,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               blocked={product.variants.length === 0 ? blockers[0] ?? null : blockers.find((item) => !item.startsWith("This product is out of stock")) ?? null}
             />
           </div>
-          {store.deliveryMethods.filter((method) => method.active)[0] ? (
-            <p className="mt-4 text-sm text-muted">
-              Delivery: {store.deliveryMethods.filter((method) => method.active).map((method) => method.label).join(", ")}. The fee is added at checkout.
-            </p>
-          ) : (
-            <p className="mt-4 text-sm text-muted">Delivery information has not been published.</p>
-          )}
         </div>
       </div>
       <div className="mt-12 grid gap-10 lg:grid-cols-2">
-        <section>
-          <h2 className="font-display text-3xl">Description</h2>
-          <div className="mt-4"><Prose text={product.description || "A full description has not been published."} /></div>
-        </section>
+        {product.description ? (
+          <section>
+            <h2 className="font-display text-3xl">Description</h2>
+            <div className="mt-4"><Prose text={product.description} /></div>
+          </section>
+        ) : null}
         {product.benefits.length > 0 ? (
           <section>
             <h2 className="font-display text-3xl">Details</h2>
@@ -144,9 +139,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             ))}
           </ol>
         </section>
-      ) : (
-        <p className="mt-10 text-sm text-muted">Usage instructions for this product have not been published.</p>
-      )}
+      ) : null}
       {product.specs.length > 0 ? (
         <section className="mt-10">
           <h2 className="font-display text-3xl">Specifications</h2>
