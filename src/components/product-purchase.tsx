@@ -5,6 +5,7 @@ import { useCart } from "@/components/cart-provider";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { Price } from "@/components/ui";
 import { track } from "@/components/analytics";
+import { cn } from "@/lib/cn";
 
 type Option = {
   id: string;
@@ -24,6 +25,7 @@ export function ProductPurchase({
   baseCompare,
   baseStock,
   blocked,
+  stickyBar = true,
 }: {
   productId: string;
   name: string;
@@ -33,6 +35,7 @@ export function ProductPurchase({
   baseCompare: number | null;
   baseStock: number;
   blocked: string | null;
+  stickyBar?: boolean;
 }) {
   const { add } = useCart();
   useEffect(() => {
@@ -93,7 +96,10 @@ export function ProductPurchase({
         type="button"
         onClick={addToCart}
         disabled={Boolean(reason)}
-        className="hidden min-h-12 w-full items-center justify-center rounded-md bg-pine px-5 font-medium text-paper transition-colors hover:bg-pine-dark active:translate-y-px disabled:opacity-50 lg:inline-flex"
+        className={cn(
+          "min-h-12 w-full items-center justify-center rounded-md bg-pine px-5 font-medium text-paper transition-colors hover:bg-pine-dark active:translate-y-px disabled:opacity-50",
+          stickyBar ? "hidden lg:inline-flex" : "inline-flex",
+        )}
       >
         {reason ? "Unavailable" : "Add to cart"}
       </button>
@@ -104,6 +110,8 @@ export function ProductPurchase({
       </div>
     </div>
   );
+
+  if (!stickyBar) return control;
 
   return (
     <>
