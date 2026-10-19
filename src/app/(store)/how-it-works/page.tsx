@@ -8,7 +8,7 @@ export const instant = false;
 
 export const metadata: Metadata = {
   title: "How it works",
-  description: "Published usage steps for the toilet seat sanitizer.",
+  description: "How to use Sitsafe: shake, spray, wait 30 seconds, and sit.",
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -19,10 +19,10 @@ export default async function HowPage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{home.stepsHeading}</h1>
-      <p className="mt-4 max-w-2xl text-muted">{home.stepsIntro}</p>
+      {home.stepsIntro ? <p className="mt-4 max-w-2xl text-muted">{home.stepsIntro}</p> : null}
       {steps.length === 0 ? (
         <div className="mt-8">
-          <Notice>Usage instructions have not been published. Follow the directions supplied with the product once they are available.</Notice>
+          <Notice>Follow the directions on the bottle label.</Notice>
         </div>
       ) : (
         <ol className="mt-10 grid gap-6">

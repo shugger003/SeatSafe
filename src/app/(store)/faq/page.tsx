@@ -5,7 +5,7 @@ import { live } from "@/lib/live";
 
 export const instant = false;
 
-export const metadata: Metadata = { title: "FAQs", description: "Published answers about the product, delivery, and support.", alternates: { canonical: "/faq" } };
+export const metadata: Metadata = { title: "FAQs", description: "Answers about Sitsafe, payment, and support.", alternates: { canonical: "/faq" } };
 
 export default async function FaqPage() {
   await live();
@@ -15,9 +15,9 @@ export default async function FaqPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{home.faqHeading}</h1>
-      <p className="mt-4 text-muted">{home.faqIntro}</p>
+      {home.faqIntro ? <p className="mt-4 text-muted">{home.faqIntro}</p> : null}
       {faqs.length === 0 ? (
-        <div className="mt-8"><Notice>Questions and answers will be published when the business confirms them.</Notice></div>
+        <div className="mt-8"><Notice>Have a question? Contact us and we will answer it.</Notice></div>
       ) : (
         groups.map((group) => (
           <section key={group} className="mt-10">

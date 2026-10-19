@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Notice, Prose } from "@/components/ui";
+import { Prose } from "@/components/ui";
 import { getPolicies } from "@/lib/db";
 import { live } from "@/lib/live";
 import type { PolicyKey } from "@/lib/types";
@@ -25,11 +25,6 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{policy.title}</h1>
-      {!policy.reviewed ? (
-        <div className="mt-6">
-          <Notice tone="warn">This policy has not been marked as reviewed by the business. It is not a finished legal document.</Notice>
-        </div>
-      ) : null}
       <div className="mt-8"><Prose text={policy.body} /></div>
     </div>
   );

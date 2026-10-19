@@ -3,12 +3,14 @@ import { cn } from "@/lib/cn";
 export function ProductMedia({
   src,
   alt,
+  logo,
   priority = false,
   tone = "stone",
   className,
 }: {
   src?: string | null;
   alt: string;
+  logo?: string;
   priority?: boolean;
   tone?: "stone" | "stage";
   className?: string;
@@ -18,23 +20,19 @@ export function ProductMedia({
     return (
       <div
         role="img"
-        aria-label={alt || "Product image placeholder"}
+        aria-label={alt}
         className={cn(
-          "relative flex items-center justify-center overflow-hidden px-8 text-center",
-          stage
-            ? "aspect-[4/3] w-full max-w-full rounded-lg bg-pine text-paper lg:aspect-[4/5]"
-            : "aspect-[4/3] max-h-[28rem] rounded-lg bg-mist text-ink",
+          "flex items-center justify-center overflow-hidden",
+          stage ? "aspect-[4/3] w-full max-w-full rounded-lg bg-pine lg:aspect-[4/5]" : "aspect-[4/3] max-h-[28rem] rounded-lg bg-pine",
           className,
         )}
       >
-        <div
-          className={cn("pointer-events-none absolute inset-5 rounded-md border", stage ? "border-paper/25" : "border-ink/10")}
-          aria-hidden="true"
-        />
-        <div className="relative max-w-[16rem]">
-          <p className={cn("font-display leading-none tracking-[-0.03em]", stage ? "text-4xl sm:text-5xl" : "text-3xl")}>Photograph not published</p>
-          <p className={cn("mt-4 text-sm leading-6", stage ? "text-paper/75" : "text-muted")}>This frame is not a picture of the product.</p>
-        </div>
+        {logo ? (
+          <span className={cn("flex items-center justify-center rounded-full bg-white", stage ? "size-40 sm:size-52" : "size-28")}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logo} alt="" className="size-3/4 object-contain" />
+          </span>
+        ) : null}
       </div>
     );
   }

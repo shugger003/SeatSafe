@@ -15,12 +15,12 @@ export function availabilityLabel(product: Product) {
   return stock > 0 ? "In stock" : "Out of stock";
 }
 
-export function ProductCard({ product, heading = "h2" }: { product: Product; heading?: "h2" | "h3" }) {
+export function ProductCard({ product, logo, heading = "h2" }: { product: Product; logo?: string; heading?: "h2" | "h3" }) {
   const Title = heading;
   return (
     <article className="group h-full">
       <Link href={`/product/${product.slug}`} className="block h-full">
-        <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || `${product.name} image placeholder`} />
+        <ProductMedia src={product.images[0]?.src} alt={product.images[0]?.alt || product.name} logo={logo} />
         <div className="mt-4 flex items-start justify-between gap-4">
           <Title className="font-display text-2xl leading-tight tracking-[-0.02em] underline-offset-4 group-hover:underline">{product.name}</Title>
           <Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} />

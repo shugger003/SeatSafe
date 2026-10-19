@@ -19,11 +19,12 @@ export default async function AboutPage() {
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{about.heading}</h1>
       <div className="mt-6"><Prose text={about.body} /></div>
-      <dl className="mt-10 space-y-2 text-sm text-muted">
-        {store.legalName ? <div>Legal name: {store.legalName}</div> : null}
-        {store.address ? <div>{store.address}</div> : null}
-        {!store.legalName && !store.address ? <div>Company details have not been published.</div> : null}
-      </dl>
+      {store.legalName || store.address ? (
+        <dl className="mt-10 space-y-2 text-sm text-muted">
+          {store.legalName ? <div>Legal name: {store.legalName}</div> : null}
+          {store.address ? <div>{store.address}</div> : null}
+        </dl>
+      ) : null}
     </div>
   );
 }
