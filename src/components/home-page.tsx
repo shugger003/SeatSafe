@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ProductCard, availabilityLabel } from "@/components/product-card";
+import { ProductCard } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
+import { ProductPurchase } from "@/components/product-purchase";
 import { StoreIcon } from "@/components/icons";
 import { Button, EmptyState, Price } from "@/components/ui";
 import { videoEmbed } from "@/lib/media";
-import { purchaseBlockersForDisplay, displayPrice } from "@/lib/commerce";
+import { purchaseBlockersForDisplay } from "@/lib/commerce";
 import { formatMoney } from "@/lib/money";
 import type { Benefit, Faq, HomepageContent, Product, Step, StoreSettings, UseCase } from "@/lib/types";
 
@@ -35,6 +36,10 @@ export function HomePage({
     : paused
       ? { href: "/shop", label: "See availability", note: "Ordering is paused or the product is temporarily unavailable." }
       : { href: featured ? `/product/${featured.slug}` : "/shop", label: home.hero.primaryLabel || "View the product", note: "Orders open when the product, delivery, and payment details are published." };
+  const featuredBlockers = featured ? purchaseBlockersForDisplay(featured, store, paymentsReady) : [];
+  const featuredBlocker = featured?.variants.length
+    ? featuredBlockers.find((item) => !item.startsWith("This product is out of stock")) ?? null
+    : featuredBlockers[0] ?? null;
   const video = videoEmbed(home.video.url);
   const trust = trustRows(store, paymentsReady);
 
@@ -42,7 +47,7 @@ export function HomePage({
     <div>
       <section className="bg-mist">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-16">
-        <div className="stage lg:order-2">
+        <div className="stage order-2">
           <ProductMedia
             src={featured?.images[0]?.src}
             alt={featured?.images[0]?.alt || `${featured?.name || "SAFESEAT"} photograph`}
@@ -56,15 +61,34 @@ export function HomePage({
             {featured?.name || home.hero.headline}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-8 text-muted">{featured?.shortDescription || home.hero.description}</p>
-          <div className="mt-6">
-            <Price minor={featured ? displayPrice(featured) : null} currency={featured?.currency || store.currency} compare={featured && featured.variants.length === 0 ? featured.compareAtPriceMinor : null} className="text-lg" />
-          </div>
-          {featured ? <p className="mt-3 text-sm text-muted">{availabilityLabel(featured)}</p> : null}
-          {featured && purchaseBlockersForDisplay(featured, store, paymentsReady)[0] ? (
-            <p className="mt-2 max-w-md text-sm text-muted">{purchaseBlockersForDisplay(featured, store, paymentsReady)[0]}</p>
-          ) : null}
-          <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <Button href={featured ? `/product/${featured.slug}` : cta.href}>
+          {featured ? (
+            <div className="mt-6 max-w-md">
+              <ProductPurchase
+                productId={featured.id}
+                name={featured.name}
+                currency={featured.currency}
+                options={featured.variants.map((variant) => ({
+                  id: variant.id,
+                  name: variant.name,
+                  priceMinor: variant.priceMinor,
+                  compareAtPriceMinor: variant.compareAtPriceMinor,
+                  stockQuantity: variant.stockQuantity,
+                  available: variant.available,
+                }))}
+                basePrice={featured.priceMinor}
+                baseCompare={featured.compareAtPriceMinor}
+                baseStock={featured.stockQuantity}
+                blocked={featuredBlocker}
+                stickyBar={false}
+              />
+            </div>
+          ) : (
+            <div className="mt-6">
+              <Price minor={null} currency={store.currency} className="text-lg" />
+            </div>
+          )}
+          <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <Button href={featured ? `/product/${featured.slug}` : cta.href} variant={featured ? "quiet" : undefined}>
               {home.hero.primaryLabel || "View SAFESEAT"}
             </Button>
             <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
