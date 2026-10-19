@@ -60,13 +60,13 @@ function FooterAccordion({ title, children }: { title: string; children: ReactNo
   return (
     <details className="group border-b border-paper/20">
       <summary
-        className="flex min-h-12 cursor-pointer list-none items-center justify-between text-sm uppercase tracking-[0.14em] [&::-webkit-details-marker]:hidden"
+        className="flex min-h-11 cursor-pointer list-none items-center justify-between text-xs uppercase tracking-[0.14em] [&::-webkit-details-marker]:hidden"
         style={SANS_HEADING}
       >
         {title}
-        <CaretDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+        <CaretDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" />
       </summary>
-      <div className="pb-4">{children}</div>
+      <div className="pb-3">{children}</div>
     </details>
   );
 }
@@ -79,6 +79,24 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
     { href: safeHref(store.social.youtube), label: "YouTube", icon: YoutubeLogo },
     { href: safeHref(store.social.whatsapp), label: "WhatsApp", icon: WhatsappLogo },
   ].filter((item) => item.href);
+
+  const socialList = (className: string, buttonClass: string) => (
+    <ul className={className}>
+      {socials.map((item) => (
+        <li key={item.label}>
+          <a
+            href={item.href!}
+            aria-label={item.label}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center justify-center rounded-full bg-paper text-pine transition-colors hover:bg-mist ${buttonClass}`}
+          >
+            <item.icon size={20} weight="fill" aria-hidden="true" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
 
   const regionList = (
     <p className="text-sm leading-7 text-paper/80">
@@ -95,50 +113,37 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
 
   return (
     <footer className="bg-pine text-paper">
-      <div className="mx-auto max-w-6xl px-5 pt-10 sm:px-8 sm:pt-16">
-        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.25fr_2fr]">
+      <div className="mx-auto max-w-6xl px-5 pt-7 sm:px-8 sm:pt-16">
+        <div className="grid gap-5 sm:gap-12 lg:grid-cols-[1.25fr_2fr]">
           <div>
-            <Link href="/" className="inline-flex items-center gap-3">
-              {store.logoUrl ? (
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={store.logoUrl} alt="" className="h-12 w-12 object-contain" />
+            <div className="flex items-center justify-between gap-4 sm:block">
+              <Link href="/" className="inline-flex min-w-0 items-center gap-3">
+                {store.logoUrl ? (
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white sm:size-16">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={store.logoUrl} alt="" className="size-9 object-contain sm:size-12" />
+                  </span>
+                ) : (
+                  <svg viewBox="0 0 32 32" className="size-10 shrink-0 sm:size-12" aria-hidden="true">
+                    <circle cx="16" cy="16" r="15" fill="#f3eee4" />
+                    <circle cx="16" cy="16" r="8" fill="none" stroke="#1c4f45" strokeWidth="1.8" />
+                    <circle cx="16" cy="16" r="3.2" fill="none" stroke="#1c4f45" strokeWidth="1.6" />
+                  </svg>
+                )}
+                <span className="min-w-0">
+                  <span className="block font-semibold tracking-[0.18em] sm:text-lg sm:tracking-[0.22em]">{store.businessName}</span>
+                  {store.tagline ? <span className="block text-xs text-paper/70">{store.tagline}</span> : null}
                 </span>
-              ) : (
-                <svg viewBox="0 0 32 32" className="h-12 w-12" aria-hidden="true">
-                  <circle cx="16" cy="16" r="15" fill="#f3eee4" />
-                  <circle cx="16" cy="16" r="8" fill="none" stroke="#1c4f45" strokeWidth="1.8" />
-                  <circle cx="16" cy="16" r="3.2" fill="none" stroke="#1c4f45" strokeWidth="1.6" />
-                </svg>
-              )}
-              <span>
-                <span className="block text-lg font-semibold tracking-[0.22em]">{store.businessName}</span>
-                {store.tagline ? <span className="block text-xs text-paper/70">{store.tagline}</span> : null}
-              </span>
-            </Link>
-            <ul className="mt-5 text-sm lg:mt-7 lg:space-y-2">
+              </Link>
+              {socials.length > 0 ? socialList("flex shrink-0 gap-2 sm:hidden", "size-10") : null}
+            </div>
+            <ul className="mt-3 flex flex-wrap gap-x-5 text-sm sm:mt-5 sm:block lg:mt-7 lg:space-y-2">
               {store.phone ? <li><a className={tapLinkClass} href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a></li> : null}
               {store.email ? <li><a className={tapLinkClass} href={`mailto:${store.email}`}>{store.email}</a></li> : null}
               {store.address ? <li className="text-paper/80">{store.address}</li> : null}
               {store.supportHours ? <li className="text-paper/80">{store.supportHours}</li> : null}
             </ul>
-            {socials.length > 0 ? (
-              <ul className="mt-5 flex flex-wrap gap-3 sm:mt-7">
-                {socials.map((item) => (
-                  <li key={item.label}>
-                    <a
-                      href={item.href!}
-                      aria-label={item.label}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-paper text-pine transition-colors hover:bg-mist"
-                    >
-                      <item.icon size={20} weight="fill" aria-hidden="true" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            {socials.length > 0 ? socialList("mt-7 hidden flex-wrap gap-3 sm:flex", "size-11") : null}
           </div>
           <div className="border-t border-paper/20 sm:hidden">
             <nav aria-label="Footer">
@@ -161,11 +166,12 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
           <div className="mt-2">{regionList}</div>
         </div>
 
-        <div className="mt-2 py-6 text-center text-sm text-paper/75 sm:mt-12 sm:border-t sm:border-paper/20">
+        <div className="py-3 text-center text-xs text-paper/75 sm:mt-12 sm:border-t sm:border-paper/20 sm:py-6 sm:text-sm">
           <p>
-            Copyright © {year} · All rights reserved {store.businessName}
-            <span className="hidden px-2 text-paper/40 sm:inline" aria-hidden="true">|</span>
-            <a href="/sitemap.xml" className={`${linkClass} mx-auto mt-1 flex min-h-10 w-fit items-center sm:mt-0 sm:inline sm:min-h-0`}>Sitemap</a>
+            <span className="sm:hidden">© {year} {store.businessName}</span>
+            <span className="hidden sm:inline">Copyright © {year} · All rights reserved {store.businessName}</span>
+            <span className="px-2 text-paper/40" aria-hidden="true">|</span>
+            <a href="/sitemap.xml" className={`${linkClass} inline-flex min-h-10 items-center sm:inline sm:min-h-0`}>Sitemap</a>
           </p>
           {store.storeStatus === "paused" ? <p className="mt-2 text-xs">Ordering is paused.</p> : null}
           {store.storeStatus === "coming_soon" ? <p className="mt-2 text-xs">Orders open soon.</p> : null}
