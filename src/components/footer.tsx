@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { CaretDown } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { FacebookLogo } from "@phosphor-icons/react/dist/ssr/FacebookLogo";
 import { InstagramLogo } from "@phosphor-icons/react/dist/ssr/InstagramLogo";
 import { TiktokLogo } from "@phosphor-icons/react/dist/ssr/TiktokLogo";
@@ -31,18 +33,41 @@ const SANS_HEADING = { fontFamily: "var(--font-sans)", fontWeight: 700 };
 const linkClass = "text-paper/80 underline-offset-4 hover:text-paper hover:underline";
 const tapLinkClass = `${linkClass} inline-flex min-h-10 items-center lg:min-h-0`;
 
-function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+type FooterLink = { href: string; label: string };
+
+function FooterLinks({ links, className }: { links: FooterLink[]; className?: string }) {
+  return (
+    <ul className={className ? `text-sm ${className}` : "text-sm"}>
+      {links.map((link) => (
+        <li key={link.label}>
+          <Link href={link.href} className={tapLinkClass}>{link.label}</Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
       <h2 className="text-sm uppercase tracking-[0.14em]" style={SANS_HEADING}>{title}</h2>
-      <ul className="mt-3 text-sm lg:mt-5 lg:space-y-3">
-        {links.map((link) => (
-          <li key={link.label}>
-            <Link href={link.href} className={tapLinkClass}>{link.label}</Link>
-          </li>
-        ))}
-      </ul>
+      <FooterLinks links={links} className="mt-3 lg:mt-5 lg:space-y-3" />
     </div>
+  );
+}
+
+function FooterAccordion({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="group border-b border-paper/20">
+      <summary
+        className="flex min-h-12 cursor-pointer list-none items-center justify-between text-sm uppercase tracking-[0.14em] [&::-webkit-details-marker]:hidden"
+        style={SANS_HEADING}
+      >
+        {title}
+        <CaretDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="pb-4">{children}</div>
+    </details>
   );
 }
 
@@ -55,10 +80,23 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
     { href: safeHref(store.social.whatsapp), label: "WhatsApp", icon: WhatsappLogo },
   ].filter((item) => item.href);
 
+  const regionList = (
+    <p className="text-sm leading-7 text-paper/80">
+      {REGIONS.map((region, index) => (
+        <Fragment key={region}>
+          <span className="whitespace-nowrap">
+            {region}
+            {index < REGIONS.length - 1 ? <span className="pl-2 pr-1 text-paper/40" aria-hidden="true">|</span> : null}
+          </span>{" "}
+        </Fragment>
+      ))}
+    </p>
+  );
+
   return (
     <footer className="bg-pine text-paper">
-      <div className="mx-auto max-w-6xl px-5 pt-16 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.25fr_2fr]">
+      <div className="mx-auto max-w-6xl px-5 pt-10 sm:px-8 sm:pt-16">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.25fr_2fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
               {store.logoUrl ? (
@@ -85,7 +123,7 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
               {store.supportHours ? <li className="text-paper/80">{store.supportHours}</li> : null}
             </ul>
             {socials.length > 0 ? (
-              <ul className="mt-7 flex flex-wrap gap-3">
+              <ul className="mt-5 flex flex-wrap gap-3 sm:mt-7">
                 {socials.map((item) => (
                   <li key={item.label}>
                     <a
@@ -102,29 +140,28 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
               </ul>
             ) : null}
           </div>
-          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+          <div className="border-t border-paper/20 sm:hidden">
+            <nav aria-label="Footer">
+              <FooterAccordion title="Information"><FooterLinks links={POLICY_LINKS} /></FooterAccordion>
+              <FooterAccordion title="Quick links"><FooterLinks links={QUICK_LINKS} /></FooterAccordion>
+              <FooterAccordion title="Company"><FooterLinks links={COMPANY_LINKS} /></FooterAccordion>
+            </nav>
+            <FooterAccordion title="Ordering across Ghana">{regionList}</FooterAccordion>
+          </div>
+          <nav aria-label="Footer" className="hidden grid-cols-3 gap-x-6 gap-y-10 sm:grid">
             <FooterColumn title="Information" links={POLICY_LINKS} />
             <FooterColumn title="Quick links" links={QUICK_LINKS} />
             <FooterColumn title="Company" links={COMPANY_LINKS} />
           </nav>
         </div>
 
-        <div className="mt-14">
+        <div className="mt-14 hidden sm:block">
           <h2 className="text-base" style={SANS_HEADING}>Ordering across Ghana</h2>
           <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-paper/70">Regions</p>
-          <p className="mt-2 text-sm leading-7 text-paper/80">
-            {REGIONS.map((region, index) => (
-              <Fragment key={region}>
-                <span className="whitespace-nowrap">
-                  {region}
-                  {index < REGIONS.length - 1 ? <span className="pl-2 pr-1 text-paper/40" aria-hidden="true">|</span> : null}
-                </span>{" "}
-              </Fragment>
-            ))}
-          </p>
+          <div className="mt-2">{regionList}</div>
         </div>
 
-        <div className="mt-12 border-t border-paper/20 py-6 text-center text-sm text-paper/75">
+        <div className="mt-2 py-6 text-center text-sm text-paper/75 sm:mt-12 sm:border-t sm:border-paper/20">
           <p>
             Copyright © {year} · All rights reserved {store.businessName}
             <span className="hidden px-2 text-paper/40 sm:inline" aria-hidden="true">|</span>
