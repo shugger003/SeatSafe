@@ -42,7 +42,6 @@ export function CartView({ methods, currency }: { methods: DeliveryMethod[]; cur
     return (
       <EmptyState
         title="Your cart is empty"
-        body="When you add a product, it stays in this browser until you remove it."
         href="/shop"
         action="Browse the shop"
       />
@@ -104,8 +103,8 @@ export function CartView({ methods, currency }: { methods: DeliveryMethod[]; cur
         <dl className="mt-5 space-y-2 text-sm">
           <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatMoney(quote?.subtotalMinor ?? 0, currency)}</dd></div>
           <div className="flex justify-between"><dt>Discount</dt><dd>{formatMoney(quote?.discountMinor ?? 0, currency)}</dd></div>
-          <div className="flex justify-between gap-4"><dt>Delivery</dt><dd className="text-right">{quote?.deliveryFeeMinor == null ? "Calculated when a method is available" : formatMoney(quote.deliveryFeeMinor, currency)}</dd></div>
-          <div className="flex justify-between border-t border-line pt-3 text-base font-medium"><dt>Estimated total</dt><dd>{quote?.totalMinor == null ? "Not ready" : formatMoney(quote.totalMinor, currency)}</dd></div>
+          <div className="flex justify-between gap-4"><dt>Delivery</dt><dd className="text-right">{quote?.deliveryFeeMinor == null ? "Not set" : formatMoney(quote.deliveryFeeMinor, currency)}</dd></div>
+          <div className="flex justify-between border-t border-line pt-3 text-base font-medium"><dt>Total</dt><dd>{quote?.totalMinor == null ? "Not ready" : formatMoney(quote.totalMinor, currency)}</dd></div>
         </dl>
         {quote?.discountMessage ? <p className="mt-3 text-sm text-muted">{quote.discountMessage}</p> : null}
         {quote && !quote.purchasable ? (
@@ -113,7 +112,6 @@ export function CartView({ methods, currency }: { methods: DeliveryMethod[]; cur
             <Notice tone="warn">{quote.blockers[0]}</Notice>
           </div>
         ) : null}
-        <p className="mt-3 text-xs leading-5 text-muted">This summary is checked again on the server. It is not the final charge until checkout confirms it.</p>
         <div className="mt-4">
           <Button href="#checkout" className={loading ? "pointer-events-none opacity-60" : ""}>
             Checkout
@@ -125,7 +123,6 @@ export function CartView({ methods, currency }: { methods: DeliveryMethod[]; cur
       </aside>
       <section id="checkout" className="border-t border-line pt-10 lg:col-span-2">
         <h2 className="font-display text-4xl tracking-[-0.03em]">Checkout</h2>
-        <p className="mt-3 max-w-xl leading-7 text-muted">The amount in the summary is the amount for this order. Delivery details are collected here.</p>
         <div className="mt-8">
           <CheckoutForm methods={methods} currency={currency} />
         </div>

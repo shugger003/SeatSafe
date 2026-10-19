@@ -22,7 +22,7 @@ export function ContactForm() {
           company: String(form.get("company") || ""),
         });
         setPending(false);
-        setMessage(result.ok ? (result.emailed ? "Message sent." : "Message saved. Email delivery is not configured, so check inquiries in the dashboard.") : result.message);
+        setMessage(result.ok ? "Message sent." : result.message);
         if (result.ok) event.currentTarget.reset();
       }}
     >

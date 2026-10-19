@@ -99,11 +99,11 @@ export function PageHeader({ title, lede }: { title: string; lede?: string }) {
   );
 }
 
-export function EmptyState({ title, body, href, action }: { title: string; body: string; href?: string; action?: string }) {
+export function EmptyState({ title, body, href, action }: { title: string; body?: string; href?: string; action?: string }) {
   return (
     <div className="rounded-lg border border-line bg-surface px-6 py-14 sm:px-10">
       <h2 className="font-display text-4xl tracking-[-0.03em]">{title}</h2>
-      <p className="mt-3 max-w-md text-muted">{body}</p>
+      {body ? <p className="mt-3 max-w-md text-muted">{body}</p> : null}
       {href && action ? (
         <div className="mt-6">
           <Button href={href}>{action}</Button>
