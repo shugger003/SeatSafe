@@ -105,7 +105,7 @@ export function ProductPurchase({
         {reason ? "Unavailable" : "Add to cart"}
       </button>
       {reason ? <p className="text-sm text-muted">{reason}</p> : null}
-      <p className="text-sm leading-6 text-muted">Pay by card, mobile money, or bank transfer through Paystack.</p>
+      <p className="text-sm leading-6 text-muted">Pay with MTN, Telecel, or AirtelTigo mobile money.</p>
     </div>
   );
 

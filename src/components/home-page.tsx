@@ -300,7 +300,7 @@ function trustRows(store: StoreSettings, paymentsReady: boolean) {
     });
   }
   if (paymentsReady && process.env.PAYSTACK_SECRET_KEY) {
-    rows.push({ label: "Payment", value: "Card, mobile money, or bank transfer through Paystack." });
+    rows.push({ label: "Payment", value: "MTN, Telecel, or AirtelTigo mobile money." });
   } else if (paymentsReady) {
     rows.push({ label: "Payment", value: "Test payments only. No real money is collected." });
   } else if (store.phone || store.social.whatsapp) {

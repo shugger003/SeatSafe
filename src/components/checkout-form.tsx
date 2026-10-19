@@ -107,16 +107,8 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
           <legend className="text-sm font-medium">Payment</legend>
           <ul className="grid gap-2 text-sm">
             <li className="border border-line bg-surface px-3 py-3">
-              <span className="font-medium">Card</span>
-              <span className="mt-1 block text-muted">Visa, Mastercard, and other cards Paystack accepts.</span>
-            </li>
-            <li className="border border-line bg-surface px-3 py-3">
               <span className="font-medium">Mobile money</span>
-              <span className="mt-1 block text-muted">Mobile money networks in Ghana.</span>
-            </li>
-            <li className="border border-line bg-surface px-3 py-3">
-              <span className="font-medium">Bank transfer</span>
-              <span className="mt-1 block text-muted">Pay by bank transfer.</span>
+              <span className="mt-1 block text-muted">MTN, Telecel, or AirtelTigo.</span>
             </li>
           </ul>
         </fieldset>
