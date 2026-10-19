@@ -108,8 +108,8 @@ export function Header({
       </div>
       {open ? (
         <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Menu">
-          <div className="absolute inset-0 hidden bg-ink/50 md:block" aria-hidden="true" onClick={() => setOpen(false)} />
-          <div className="relative ml-auto flex h-full w-full flex-col overflow-y-auto bg-pine text-paper md:max-w-md md:shadow-2xl">
+          <div className="absolute inset-0 bg-ink/50" aria-hidden="true" onClick={() => setOpen(false)} />
+          <div className="relative ml-auto flex h-full w-[85%] max-w-sm flex-col overflow-y-auto bg-pine text-paper shadow-2xl md:w-full md:max-w-md">
             <div className="flex h-16 items-center justify-between px-5 md:px-8">
               <p className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em]">
                 {logoUrl ? (
