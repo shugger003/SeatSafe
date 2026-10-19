@@ -112,6 +112,12 @@ summary::-webkit-details-marker {
   }
 }
 
+@media (max-width: 63.99rem) {
+  body:has(.buy-bar) {
+    padding-bottom: 4.5rem;
+  }
+}
+
 .wa-bounce {
   animation: wa-bounce 2.4s ease-in-out infinite;
 }

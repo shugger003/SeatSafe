@@ -22,7 +22,7 @@ export function ProductMedia({
         className={cn(
           "relative flex items-center justify-center overflow-hidden px-8 text-center",
           stage
-            ? "aspect-[4/5] w-full max-w-full rounded-lg bg-pine text-paper"
+            ? "aspect-[4/3] w-full max-w-full rounded-lg bg-pine text-paper lg:aspect-[4/5]"
             : "aspect-[4/3] max-h-[28rem] rounded-lg bg-mist text-ink",
           className,
         )}

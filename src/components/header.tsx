@@ -70,7 +70,7 @@ export function Header({
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-pine text-paper">
+    <header className="sticky top-0 z-40 bg-pine text-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 sm:px-8">
         <Link href="/" className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em] text-paper">
           {logoUrl ? (
@@ -121,7 +121,15 @@ export function Header({
       {open ? (
         <div className="fixed inset-0 z-50 bg-pine text-paper md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="flex h-16 items-center justify-between px-5">
-            <p className="font-display text-xl">{businessName}</p>
+            <p className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em]">
+              {logoUrl ? (
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logoUrl} alt="" className="h-8 w-8 object-contain" />
+                </span>
+              ) : null}
+              <span className="truncate">{businessName}</span>
+            </p>
             <button ref={closeRef} type="button" className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close menu" onClick={() => setOpen(false)}>
               <X size={22} aria-hidden="true" />
             </button>

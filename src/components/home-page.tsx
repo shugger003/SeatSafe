@@ -87,14 +87,23 @@ export function HomePage({
               <Price minor={null} currency={store.currency} className="text-lg" />
             </div>
           )}
-          <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <Button href={featured ? `/product/${featured.slug}` : cta.href} variant={featured ? "quiet" : undefined}>
-              {home.hero.primaryLabel || "View SAFESEAT"}
-            </Button>
-            <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
-              {home.hero.secondaryLabel || "How it works"}
-            </Button>
-          </div>
+          {featured ? (
+            <div className="mt-4 grid max-w-md grid-cols-2 gap-3 sm:mt-6 sm:flex sm:items-center sm:gap-8">
+              <Link href={`/product/${featured.slug}`} className={HERO_LINK}>
+                {home.hero.primaryLabel || "View product"}
+              </Link>
+              <Link href={home.hero.secondaryHref || "/how-it-works"} className={HERO_LINK}>
+                {home.hero.secondaryLabel || "How it works"}
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <Button href={cta.href}>{home.hero.primaryLabel || "View SAFESEAT"}</Button>
+              <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
+                {home.hero.secondaryLabel || "How it works"}
+              </Button>
+            </div>
+          )}
         </div>
         </div>
       </section>
@@ -246,6 +255,9 @@ export function HomePage({
     </div>
   );
 }
+
+const HERO_LINK =
+  "inline-flex min-h-11 items-center justify-center rounded-md border border-pine/20 bg-surface px-3 text-center text-[0.95rem] font-medium text-ink transition-colors hover:bg-paper sm:border-0 sm:bg-transparent sm:px-0 sm:underline-offset-4 sm:hover:bg-transparent sm:hover:underline";
 
 const NEXT_STEPS = [
   {

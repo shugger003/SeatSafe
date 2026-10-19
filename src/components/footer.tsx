@@ -29,15 +29,16 @@ const REGIONS = ["Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern", 
 const SANS_HEADING = { fontFamily: "var(--font-sans)", fontWeight: 700 };
 
 const linkClass = "text-paper/80 underline-offset-4 hover:text-paper hover:underline";
+const tapLinkClass = `${linkClass} inline-flex min-h-10 items-center lg:min-h-0`;
 
 function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div>
       <h2 className="text-sm uppercase tracking-[0.14em]" style={SANS_HEADING}>{title}</h2>
-      <ul className="mt-5 space-y-3 text-sm">
+      <ul className="mt-3 text-sm lg:mt-5 lg:space-y-3">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className={linkClass}>{link.label}</Link>
+            <Link href={link.href} className={tapLinkClass}>{link.label}</Link>
           </li>
         ))}
       </ul>
@@ -77,9 +78,9 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
                 {store.tagline ? <span className="block text-xs text-paper/70">{store.tagline}</span> : null}
               </span>
             </Link>
-            <ul className="mt-7 space-y-2 text-sm">
-              {store.phone ? <li><a className={linkClass} href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a></li> : null}
-              {store.email ? <li><a className={linkClass} href={`mailto:${store.email}`}>{store.email}</a></li> : null}
+            <ul className="mt-5 text-sm lg:mt-7 lg:space-y-2">
+              {store.phone ? <li><a className={tapLinkClass} href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a></li> : null}
+              {store.email ? <li><a className={tapLinkClass} href={`mailto:${store.email}`}>{store.email}</a></li> : null}
               {store.address ? <li className="text-paper/80">{store.address}</li> : null}
               {store.supportHours ? <li className="text-paper/80">{store.supportHours}</li> : null}
             </ul>
@@ -126,8 +127,8 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
         <div className="mt-12 border-t border-paper/20 py-6 text-center text-sm text-paper/75">
           <p>
             Copyright © {year} · All rights reserved {store.businessName}
-            <span className="px-2 text-paper/40" aria-hidden="true">|</span>
-            <a href="/sitemap.xml" className={linkClass}>Sitemap</a>
+            <span className="hidden px-2 text-paper/40 sm:inline" aria-hidden="true">|</span>
+            <a href="/sitemap.xml" className={`${linkClass} mx-auto mt-1 flex min-h-10 w-fit items-center sm:mt-0 sm:inline sm:min-h-0`}>Sitemap</a>
           </p>
           {store.storeStatus === "paused" ? <p className="mt-2 text-xs">Ordering is paused.</p> : null}
           {store.storeStatus === "coming_soon" ? <p className="mt-2 text-xs">Orders open when the catalog, delivery, and payment details are published.</p> : null}
