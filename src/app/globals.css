@@ -112,6 +112,47 @@ summary::-webkit-details-marker {
   }
 }
 
+.wa-bounce {
+  animation: wa-bounce 2.4s ease-in-out infinite;
+}
+
+.wa-bounce:hover,
+.wa-bounce:focus-visible {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-bounce {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+@keyframes wa-bounce {
+  0%,
+  42%,
+  100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  12% {
+    transform: translateY(-22px);
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  22% {
+    transform: translateY(0);
+  }
+  29% {
+    transform: translateY(-9px);
+  }
+  36% {
+    transform: translateY(0);
+  }
+  39% {
+    transform: translateY(-3px);
+  }
+}
+
 @media print {
   header,
   footer,
