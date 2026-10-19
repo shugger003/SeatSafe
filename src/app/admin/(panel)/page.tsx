@@ -36,7 +36,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
       <dl className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <Stat label="Verified revenue" value={formatMoney(metrics.verifiedRevenueMinor, store.currency) || "—"} emphasis />
+        <Stat label="Verified revenue" value={formatMoney(metrics.verifiedRevenueMinor, store.currency) || "None"} emphasis />
         <Stat label="Orders" value={String(metrics.totalOrders)} />
         <Stat label="Pending payment" value={String(metrics.pendingOrders)} />
         <Stat label="Paid" value={String(metrics.paidOrders)} />

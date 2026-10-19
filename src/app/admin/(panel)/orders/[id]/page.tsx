@@ -33,7 +33,7 @@ export default async function OrderDetailPage({ params, searchParams }: { params
       </section>
       <ul className="text-sm">
         {order.lineItems.map((line) => (
-          <li key={`${line.productId}-${line.variantId}`}>{line.quantity} × {line.name} {line.variantName} · {formatMoney(line.lineTotalMinor, order.currency)} · SKU {line.sku || "—"}</li>
+          <li key={`${line.productId}-${line.variantId}`}>{line.quantity} × {line.name} {line.variantName} · {formatMoney(line.lineTotalMinor, order.currency)} · SKU {line.sku || "none"}</li>
         ))}
       </ul>
       <form action={fulfillmentAction} className="grid gap-3 rounded-[16px] border border-line p-4">

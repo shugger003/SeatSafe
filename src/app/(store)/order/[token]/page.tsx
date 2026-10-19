@@ -5,20 +5,19 @@ import { ResumePayment } from "@/components/resume-payment";
 import { getOrderByToken } from "@/lib/db";
 import { live } from "@/lib/live";
 import { formatMoney, formatWhen } from "@/lib/money";
-import { emailConfigured } from "@/lib/email";
 
 export const instant = false;
 
 export const metadata: Metadata = { title: "Order", robots: { index: false, follow: false } };
 
 const paymentCopy: Record<string, string> = {
-  pending: "Payment has not been verified yet.",
-  paid: "Payment was verified.",
-  failed: "The payment failed. Stock from this attempt has been released.",
-  cancelled: "The payment was cancelled. Stock from this attempt has been released.",
-  expired: "The payment window expired. Stock was released.",
-  review: "The provider response did not match the order total. It needs a manual review and is not marked paid.",
-  reconciled: "This order was reconciled in the dashboard. It is not counted as gateway-verified revenue.",
+  pending: "We are waiting for your payment to go through.",
+  paid: "Payment received. Thank you for your order.",
+  failed: "The payment did not go through.",
+  cancelled: "The payment was cancelled.",
+  expired: "The payment window expired.",
+  review: "We are checking your payment. We will contact you shortly.",
+  reconciled: "Payment received. Thank you for your order.",
 };
 
 export default async function OrderPage({ params }: { params: Promise<{ token: string }> }) {
@@ -36,11 +35,7 @@ export default async function OrderPage({ params }: { params: Promise<{ token: s
       <p className="mt-2 text-sm text-muted">Fulfillment: {order.fulfillmentStatus.replaceAll("_", " ")}</p>
       {order.paymentStatus === "paid" ? (
         <p className="mt-3 text-sm text-muted">
-          {emailed
-            ? "A confirmation email was sent."
-            : emailConfigured()
-              ? "The confirmation email could not be sent yet. Keep this page for your reference."
-              : "Email delivery is not configured, so no confirmation email was sent. Keep this page for your reference."}
+          {emailed ? "A confirmation email was sent." : "Keep this page for your reference."}
         </p>
       ) : null}
       {order.paymentStatus === "pending" ? <ResumePayment reference={order.paymentReference} /> : null}

@@ -5,7 +5,7 @@ import { live } from "@/lib/live";
 
 export const instant = false;
 
-export const metadata: Metadata = { title: "Contact", description: "Contact the store.", alternates: { canonical: "/contact" } };
+export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS Sitsafe.", alternates: { canonical: "/contact" } };
 
 export default async function ContactPage() {
   await live();
@@ -23,7 +23,7 @@ export default async function ContactPage() {
             {store.supportHours ? <div><dt className="font-medium">Hours</dt><dd>{store.supportHours}</dd></div> : null}
           </dl>
         ) : (
-          <p className="mt-4 text-muted">Contact details have not been published yet. You can still send a message.</p>
+          <p className="mt-4 text-muted">Send us a message and we will reply.</p>
         )}
       </div>
       <ContactForm />

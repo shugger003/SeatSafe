@@ -51,7 +51,7 @@ export function ProductPurchase({
   const reason = useMemo(() => {
     if (blocked && blocked !== "Payment setup is still pending.") return blocked;
     if (options.length > 0 && !selected) return "Choose an option.";
-    if (price == null || price <= 0) return "A price has not been published.";
+    if (price == null || price <= 0) return "Price coming soon.";
     if (stock <= 0) return "Out of stock.";
     return null;
   }, [blocked, options.length, selected, price, stock]);
@@ -104,11 +104,8 @@ export function ProductPurchase({
       >
         {reason ? "Unavailable" : "Add to cart"}
       </button>
-      {reason ? <p className="text-sm text-muted">{reason}</p> : <p className="text-sm text-muted">The final total is confirmed on the server at checkout.</p>}
-      <div className="text-sm leading-6 text-muted">
-        <p className="font-medium text-ink">Payment</p>
-        <p>Checkout opens Paystack. You can pay by card, mobile money, or bank transfer. This site does not store the card number.</p>
-      </div>
+      {reason ? <p className="text-sm text-muted">{reason}</p> : null}
+      <p className="text-sm leading-6 text-muted">Pay by card, mobile money, or bank transfer through Paystack.</p>
     </div>
   );
 

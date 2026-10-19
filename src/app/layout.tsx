@@ -17,10 +17,10 @@ const display = Newsreader({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: "Store",
+    default: "ASAS Sitsafe",
     template: "%s",
   },
-  description: "A toilet seat sanitizer storefront. Published product details come from the business.",
+  description: "Sitsafe toilet seat sanitizer from ASAS Sitsafe. Shake, spray, wait 30 seconds, and sit.",
 };
 
 export const viewport: Viewport = {

@@ -111,7 +111,7 @@ export function buildQuote(input: {
       message = product.status === "coming_soon" ? "Coming soon." : "Not available to purchase.";
     } else if (price == null || price <= 0) {
       available = false;
-      message = "Price has not been published.";
+      message = "Price coming soon.";
     } else if (!Number.isInteger(quantity) || quantity < 1) {
       available = false;
       message = "Enter a quantity of at least 1.";
@@ -148,7 +148,7 @@ export function buildQuote(input: {
   let deliveryLabel: string | null = null;
   let deliverySummary: string | null = null;
   if (methods.length === 0) {
-    blockers.push("Delivery pricing has not been published.");
+    blockers.push("Delivery is not available yet. Call or WhatsApp us to order.");
   } else if (!selected) {
     blockers.push("Choose a delivery method.");
   } else {
@@ -159,7 +159,7 @@ export function buildQuote(input: {
 
   if (input.store.storeStatus === "coming_soon") blockers.push("The store is not open for orders yet.");
   if (input.store.storeStatus === "paused") blockers.push("Ordering is temporarily paused.");
-  if (!input.paymentsReady) blockers.push("Payment is not configured yet, so checkout cannot take payment.");
+  if (!input.paymentsReady) blockers.push("Online payment is not open yet. Call or WhatsApp us to order.");
 
   const discountMinor = discountResult.ok ? discountResult.discountMinor : 0;
   const totalMinor = priced && deliveryFeeMinor != null ? subtotalMinor - discountMinor + deliveryFeeMinor : null;
@@ -205,13 +205,13 @@ export function purchaseBlockersForDisplay(product: CatalogProduct, store: Store
   if (product.status === "unavailable") blockers.push("This product is temporarily unavailable.");
   if (product.status === "published") {
     const price = displayPrice(product);
-    if (price == null || price <= 0) blockers.push("A price has not been published.");
+    if (price == null || price <= 0) blockers.push("Price coming soon.");
     const stock = product.variants.length
       ? product.variants.reduce((sum, variant) => sum + (variant.available ? variant.stockQuantity : 0), 0)
       : product.stockQuantity;
     if (stock <= 0) blockers.push("This product is out of stock.");
   }
-  if (activeDeliveryMethods(store).length === 0) blockers.push("Delivery pricing has not been published.");
+  if (activeDeliveryMethods(store).length === 0) blockers.push("Delivery is not available yet. Call or WhatsApp us to order.");
   if (!paymentsReady) blockers.push("Payment setup is still pending.");
   return blockers;
 }

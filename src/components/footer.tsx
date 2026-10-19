@@ -168,7 +168,7 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
             <a href="/sitemap.xml" className={`${linkClass} mx-auto mt-1 flex min-h-10 w-fit items-center sm:mt-0 sm:inline sm:min-h-0`}>Sitemap</a>
           </p>
           {store.storeStatus === "paused" ? <p className="mt-2 text-xs">Ordering is paused.</p> : null}
-          {store.storeStatus === "coming_soon" ? <p className="mt-2 text-xs">Orders open when the catalog, delivery, and payment details are published.</p> : null}
+          {store.storeStatus === "coming_soon" ? <p className="mt-2 text-xs">Orders open soon.</p> : null}
         </div>
       </div>
     </footer>

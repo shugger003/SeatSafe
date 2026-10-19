@@ -55,7 +55,6 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
     return (
       <EmptyState
         title="Your cart is empty"
-        body="Add a published product before checkout. The total is confirmed on the server, not in this browser."
         href="/shop"
         action="Browse the shop"
       />
@@ -102,23 +101,22 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
             ))}
           </fieldset>
         ) : (
-          <Notice tone="warn">Delivery pricing has not been published, so payment cannot start.</Notice>
+          <Notice tone="warn">Delivery is not available yet. Call or WhatsApp us to order.</Notice>
         )}
         <fieldset className="grid gap-3">
           <legend className="text-sm font-medium">Payment</legend>
-          <p className="text-sm leading-6 text-muted">Continue to payment opens Paystack. The order is marked paid only after Paystack confirms the money. This site does not store the card number.</p>
           <ul className="grid gap-2 text-sm">
             <li className="border border-line bg-surface px-3 py-3">
               <span className="font-medium">Card</span>
-              <span className="mt-1 block text-muted">Pay with a card Paystack accepts.</span>
+              <span className="mt-1 block text-muted">Visa, Mastercard, and other cards Paystack accepts.</span>
             </li>
             <li className="border border-line bg-surface px-3 py-3">
               <span className="font-medium">Mobile money</span>
-              <span className="mt-1 block text-muted">Pay with the mobile money networks Paystack shows for Ghana.</span>
+              <span className="mt-1 block text-muted">Mobile money networks in Ghana.</span>
             </li>
             <li className="border border-line bg-surface px-3 py-3">
               <span className="font-medium">Bank transfer</span>
-              <span className="mt-1 block text-muted">Pay by transfer to the account Paystack shows.</span>
+              <span className="mt-1 block text-muted">Pay by bank transfer.</span>
             </li>
           </ul>
         </fieldset>
@@ -143,7 +141,6 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
         <button type="submit" disabled={pending || !quote?.purchasable} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-pine px-4 font-medium text-paper transition-colors hover:bg-pine-dark disabled:opacity-50">
           {pending ? "Starting payment…" : "Continue to payment"}
         </button>
-        <p className="mt-3 text-xs leading-5 text-muted">You can check out as a guest. The button starts Paystack only after the server accepts the product, the price, and the delivery fee.</p>
       </aside>
     </form>
   );

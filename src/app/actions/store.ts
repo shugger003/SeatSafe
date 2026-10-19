@@ -59,7 +59,7 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
   if (!parsed.success) return { ok: false, errors: ["Check the required name, email, phone, and delivery fields."] };
   const digits = parsed.data.phone.replace(/\D/g, "");
   if (digits.length < 8 || digits.length > 15) return { ok: false, errors: ["Enter a phone number the courier can use."] };
-  if (paymentsMode() === "disabled") return { ok: false, errors: ["Payment is not configured yet, so checkout cannot take payment."] };
+  if (paymentsMode() === "disabled") return { ok: false, errors: ["Online payment is not open yet. Call or WhatsApp us to order."] };
 
   let created: Awaited<ReturnType<typeof createPendingOrder>>;
   try {
@@ -122,7 +122,7 @@ export async function resumePaymentAction(reference: string) {
   if (paymentsMode() === "test") {
     return { ok: true as const, url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(order.paymentReference)}` };
   }
-  if (paymentsMode() !== "live") return { ok: false as const, message: "Payment is not configured." };
+  if (paymentsMode() !== "live") return { ok: false as const, message: "Online payment is not open yet." };
   const payment = await initializePaystack(order);
   if (!payment.ok) return { ok: false as const, message: payment.message };
   return { ok: true as const, url: payment.url };
