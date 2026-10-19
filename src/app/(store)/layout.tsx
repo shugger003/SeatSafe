@@ -3,6 +3,7 @@ import { AnalyticsGate } from "@/components/analytics";
 import { CartProvider } from "@/components/cart-provider";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { WhatsAppBubble } from "@/components/whatsapp-bubble";
 import { getAnnouncement, getStore, listPublicProducts } from "@/lib/db";
 import { live } from "@/lib/live";
 import { safeHref } from "@/lib/safe";
@@ -29,6 +30,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const only = catalog.total === 1 ? catalog.products[0] : null;
   const href = safeHref(announcement.href);
   const logo = safeHref(store.logoUrl) || "";
+  const whatsapp = safeHref(store.social.whatsapp);
 
   return (
     <CartProvider>
@@ -59,6 +61,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           {children}
         </main>
         <Footer store={store} year={new Date().getFullYear()} />
+        {whatsapp ? <WhatsAppBubble href={whatsapp} /> : null}
         <AnalyticsGate />
       </div>
     </CartProvider>
