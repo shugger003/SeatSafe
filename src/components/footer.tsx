@@ -61,7 +61,7 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
               {store.logoUrl ? (
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-paper">
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={store.logoUrl} alt="" className="h-12 w-12 object-contain" />
                 </span>
