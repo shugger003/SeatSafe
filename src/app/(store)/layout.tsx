@@ -61,7 +61,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           {children}
         </main>
         <Footer store={store} year={new Date().getFullYear()} />
-        {whatsapp ? <WhatsAppBubble href={whatsapp} /> : null}
+        {whatsapp ? <WhatsAppBubble href={whatsapp} phone={store.phone} /> : null}
         <AnalyticsGate />
       </div>
     </CartProvider>

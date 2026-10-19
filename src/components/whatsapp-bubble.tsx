@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr/WhatsappLogo";
 import { cn } from "@/lib/cn";
 
-export function WhatsAppBubble({ href }: { href: string }) {
+export function WhatsAppBubble({ href, phone }: { href: string; phone?: string }) {
   const pathname = usePathname();
   const aboveBuyBar = pathname.startsWith("/product/");
 
@@ -14,12 +14,19 @@ export function WhatsAppBubble({ href }: { href: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
-      className={cn(
-        "fixed right-4 z-30 flex h-14 w-14 animate-bounce items-center justify-center rounded-full bg-[#25d366] text-white shadow-lg transition-colors hover:animate-none hover:bg-[#1ebe5a] focus-visible:animate-none motion-reduce:animate-none sm:right-6 lg:bottom-6",
-        aboveBuyBar ? "bottom-24" : "bottom-5",
-      )}
+      className={cn("group fixed right-4 z-30 flex items-center sm:right-6 lg:bottom-6", aboveBuyBar ? "bottom-24" : "bottom-5")}
     >
-      <WhatsappLogo size={30} weight="fill" aria-hidden="true" />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-full mr-4 hidden translate-x-2 whitespace-nowrap rounded-2xl bg-[#1c1f2b] px-5 py-3 text-left opacity-0 shadow-lg transition duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:block"
+      >
+        <span className="block text-base font-semibold text-white">Chat on WhatsApp</span>
+        {phone ? <span className="mt-0.5 block text-sm text-white/60">{phone}</span> : null}
+        <span className="absolute left-full top-1/2 -translate-y-1/2 border-y-[8px] border-l-[10px] border-y-transparent border-l-[#1c1f2b]" />
+      </span>
+      <span className="flex h-14 w-14 animate-bounce items-center justify-center rounded-full bg-[#25d366] text-white shadow-lg transition-colors group-hover:animate-none group-hover:bg-[#1ebe5a] group-focus-visible:animate-none motion-reduce:animate-none">
+        <WhatsappLogo size={30} weight="fill" aria-hidden="true" />
+      </span>
     </a>
   );
 }
