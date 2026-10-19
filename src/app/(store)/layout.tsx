@@ -51,6 +51,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           logoUrl={logo}
           productHref={only ? `/product/${only.slug}` : undefined}
           productLabel={only ? only.name.replace(/\s+toilet sanitizer$/i, "") : undefined}
+          phone={store.phone}
+          whatsappHref={whatsapp}
         />
         {store.showPreparationNotice && store.preparationNotice ? (
           <p className="bg-pine-dark px-5 py-2.5 text-center text-sm leading-6 text-paper/80">
