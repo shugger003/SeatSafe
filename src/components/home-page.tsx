@@ -32,10 +32,10 @@ export function HomePage({
   const openProduct = products.find((product) => purchaseBlockersForDisplay(product, store, paymentsReady).length === 0);
   const paused = store.storeStatus === "paused" || (products.length > 0 && products.every((product) => product.status === "unavailable"));
   const cta = openProduct
-    ? { href: `/product/${openProduct.slug}`, label: "Shop now", note: "The price is confirmed again on the server before payment." }
+    ? { href: `/product/${openProduct.slug}`, label: "Shop now" }
     : paused
-      ? { href: "/shop", label: "See availability", note: "Ordering is paused or the product is temporarily unavailable." }
-      : { href: featured ? `/product/${featured.slug}` : "/shop", label: home.hero.primaryLabel || "View the product", note: "Orders open when the product, delivery, and payment details are published." };
+      ? { href: "/shop", label: "See availability" }
+      : { href: featured ? `/product/${featured.slug}` : "/shop", label: home.hero.primaryLabel || "View the product" };
   const featuredBlockers = featured ? purchaseBlockersForDisplay(featured, store, paymentsReady) : [];
   const featuredBlocker = featured?.variants.length
     ? featuredBlockers.find((item) => !item.startsWith("This product is out of stock")) ?? null
@@ -50,7 +50,8 @@ export function HomePage({
         <div className="stage order-2">
           <ProductMedia
             src={featured?.images[0]?.src}
-            alt={featured?.images[0]?.alt || `${featured?.name || "SAFESEAT"} photograph`}
+            alt={featured?.images[0]?.alt || featured?.name || store.businessName}
+            logo={store.logoUrl}
             priority
             tone="stage"
           />
@@ -98,7 +99,7 @@ export function HomePage({
             </div>
           ) : (
             <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-              <Button href={cta.href}>{home.hero.primaryLabel || "View SAFESEAT"}</Button>
+              <Button href={cta.href}>{home.hero.primaryLabel || "View the product"}</Button>
               <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
                 {home.hero.secondaryLabel || "How it works"}
               </Button>
@@ -148,7 +149,7 @@ export function HomePage({
           <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <li key={product.id}>
-                <ProductCard product={product} heading="h3" />
+                <ProductCard product={product} logo={store.logoUrl} heading="h3" />
               </li>
             ))}
           </ul>
@@ -156,8 +157,8 @@ export function HomePage({
       ) : products.length === 0 ? (
         <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
           <EmptyState
-            title="No products are published yet"
-            body="The shop stays empty until the business publishes a listing. You can still send a question."
+            title="Nothing in the shop yet"
+            body="Send us a question and we will get back to you."
             href="/contact"
             action="Ask a question"
           />
@@ -246,7 +247,7 @@ export function HomePage({
       <section className="bg-pine text-paper">
         <div className="mx-auto max-w-3xl px-5 py-16 text-center sm:px-8">
           <h2 className="font-display text-4xl leading-tight tracking-[-0.03em] text-paper sm:text-5xl">{home.finalHeading}</h2>
-          <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-paper/80">{home.finalText}</p>
+          {home.finalText ? <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-paper/80">{home.finalText}</p> : null}
           <div className="mt-8">
             <Button href={cta.href} variant="light">{cta.label}</Button>
           </div>
@@ -263,17 +264,17 @@ const NEXT_STEPS = [
   {
     href: "/shop",
     title: "Shop",
-    body: "The catalog lists published products only. A price appears after the business confirms it.",
+    body: "See what is available to order.",
   },
   {
     href: "/how-it-works",
     title: "How it works",
-    body: "Usage steps appear when the manufacturer’s instructions are published.",
+    body: "How to use the product.",
   },
   {
     href: "/contact",
     title: "Contact",
-    body: "Send a question while company details and ordering are still being confirmed.",
+    body: "Send us a question.",
   },
 ];
 
@@ -292,26 +293,18 @@ function trustRows(store: StoreSettings, paymentsReady: boolean) {
   if (store.email) rows.push({ label: "Email", value: store.email });
   if (store.phone) rows.push({ label: "Phone", value: store.phone });
   for (const method of store.deliveryMethods.filter((item) => item.active)) {
+    if (method.feeMinor <= 0 && !method.summary) continue;
     rows.push({
       label: method.label,
-      value: `${formatMoney(method.feeMinor, store.currency) ?? ""} ${method.summary}`.trim(),
+      value: [method.feeMinor > 0 ? formatMoney(method.feeMinor, store.currency) : "", method.summary].filter(Boolean).join(". "),
     });
   }
   if (paymentsReady && process.env.PAYSTACK_SECRET_KEY) {
-    rows.push({
-      label: "Payment",
-      value: "Card, mobile money, or bank transfer through Paystack. The order is marked paid only after Paystack confirms the money. Card details are not stored on this website.",
-    });
+    rows.push({ label: "Payment", value: "Card, mobile money, or bank transfer through Paystack." });
   } else if (paymentsReady) {
-    rows.push({
-      label: "Payment",
-      value: "A test payment gateway is enabled in this environment. It does not collect real money.",
-    });
-  } else {
-    rows.push({
-      label: "Payment",
-      value: "Card, mobile money, or bank transfer through Paystack. Payment starts once the Paystack account is connected.",
-    });
+    rows.push({ label: "Payment", value: "Test payments only. No real money is collected." });
+  } else if (store.phone || store.social.whatsapp) {
+    rows.push({ label: "Payment", value: "Online payment is not open yet. Call or WhatsApp us to order." });
   }
   return rows;
 }
