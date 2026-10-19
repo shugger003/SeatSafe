@@ -87,27 +87,9 @@ export function Header({
           ) : null}
           <span className="truncate">{businessName}</span>
         </Link>
-        <nav className="ml-auto hidden items-center gap-1 md:flex" aria-label="Primary">
-          {links.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "px-3 py-2 text-sm text-paper/75 transition-colors hover:text-paper",
-                  active && "text-paper",
-                )}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
         <Link
           href="/cart"
-          className="ml-auto inline-flex min-h-11 items-center gap-2 px-1 text-sm md:ml-2"
+          className="ml-auto inline-flex min-h-11 items-center gap-2 px-1 text-sm"
           aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}
         >
           <ShoppingBag size={18} aria-hidden="true" />
@@ -116,7 +98,7 @@ export function Header({
         <button
           ref={menuRef}
           type="button"
-          className="inline-flex h-11 w-11 items-center justify-center md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-paper/10"
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen(true)}
@@ -125,64 +107,71 @@ export function Header({
         </button>
       </div>
       {open ? (
-        <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-pine text-paper md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <div className="flex h-16 items-center justify-between px-5">
-            <p className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em]">
-              {logoUrl ? (
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={logoUrl} alt="" className="h-8 w-8 object-contain" />
-                </span>
-              ) : null}
-              <span className="truncate">{businessName}</span>
-            </p>
-            <button ref={closeRef} type="button" className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close menu" onClick={() => setOpen(false)}>
-              <X size={22} aria-hidden="true" />
-            </button>
-          </div>
-          <nav className="grid px-5" aria-label="Mobile">
-            {links.map((link) => {
-              const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={active ? "page" : undefined}
-                  className={cn("border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em]", active && "text-paper")}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            <Link href="/cart" className="flex items-baseline justify-between border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em]">
-              Cart
-              <span className="text-base tabular-nums text-paper/70">{count}</span>
-            </Link>
-          </nav>
-          {phone || whatsappHref ? (
-            <div className="mt-auto grid grid-cols-2 gap-3 px-5 pb-8 pt-10">
-              {phone ? (
-                <a
-                  href={`tel:${phone.replace(/\s+/g, "")}`}
-                  className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-paper px-3 font-medium text-pine", !whatsappHref && "col-span-2")}
-                >
-                  <Phone size={20} weight="fill" aria-hidden="true" />
-                  Call us
-                </a>
-              ) : null}
-              {whatsappHref ? (
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#25d366] px-3 font-medium text-white", !phone && "col-span-2")}
-                >
-                  <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
-                  WhatsApp
-                </a>
-              ) : null}
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="absolute inset-0 hidden bg-ink/50 md:block" aria-hidden="true" onClick={() => setOpen(false)} />
+          <div className="relative ml-auto flex h-full w-full flex-col overflow-y-auto bg-pine text-paper md:max-w-md md:shadow-2xl">
+            <div className="flex h-16 items-center justify-between px-5 md:px-8">
+              <p className="flex min-w-0 items-center gap-3 text-sm font-medium tracking-[0.22em]">
+                {logoUrl ? (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={logoUrl} alt="" className="h-8 w-8 object-contain" />
+                  </span>
+                ) : null}
+                <span className="truncate">{businessName}</span>
+              </p>
+              <button ref={closeRef} type="button" className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close menu" onClick={() => setOpen(false)}>
+                <X size={22} aria-hidden="true" />
+              </button>
             </div>
-          ) : null}
+            <nav className="grid px-5 md:px-8" aria-label="Primary">
+              {links.map((link) => {
+                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn("border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em] transition-colors hover:text-paper", active ? "text-paper" : "text-paper/75")}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+              <Link
+                href="/cart"
+                aria-current={pathname === "/cart" ? "page" : undefined}
+                className={cn("flex items-baseline justify-between border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em] transition-colors hover:text-paper", pathname === "/cart" ? "text-paper" : "text-paper/75")}
+              >
+                Cart
+                <span className="text-base tabular-nums text-paper/70">{count}</span>
+              </Link>
+            </nav>
+            {phone || whatsappHref ? (
+              <div className="mt-auto grid grid-cols-2 gap-3 px-5 pb-8 pt-10 md:px-8">
+                {phone ? (
+                  <a
+                    href={`tel:${phone.replace(/\s+/g, "")}`}
+                    className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-paper px-3 font-medium text-pine", !whatsappHref && "col-span-2")}
+                  >
+                    <Phone size={20} weight="fill" aria-hidden="true" />
+                    Call us
+                  </a>
+                ) : null}
+                {whatsappHref ? (
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn("inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#25d366] px-3 font-medium text-white", !phone && "col-span-2")}
+                  >
+                    <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
+                    WhatsApp
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         </div>
       ) : null}
     </header>
