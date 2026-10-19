@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProductMedia } from "@/components/product-media";
+import { StockBadge } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { displayPrice } from "@/lib/commerce";
 import type { Product } from "@/lib/types";
@@ -11,9 +12,7 @@ export function availabilityLabel(product: Product) {
   const stock = product.variants.length
     ? product.variants.reduce((sum, variant) => sum + (variant.available ? variant.stockQuantity : 0), 0)
     : product.stockQuantity;
-  if (stock <= 0) return "Out of stock";
-  if (displayPrice(product) != null && stock <= product.lowStockThreshold) return `${stock} left`;
-  return `${stock} in stock`;
+  return stock > 0 ? "In stock" : "Out of stock";
 }
 
 export function ProductCard({ product, heading = "h2" }: { product: Product; heading?: "h2" | "h3" }) {
@@ -27,7 +26,7 @@ export function ProductCard({ product, heading = "h2" }: { product: Product; hea
           <Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} />
         </div>
         <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">{product.shortDescription}</p>
-        <p className="mt-3 text-sm text-pine">{availabilityLabel(product)}</p>
+        <StockBadge inStock={availabilityLabel(product) === "In stock"} label={availabilityLabel(product)} className="mt-3" />
       </Link>
     </article>
   );
