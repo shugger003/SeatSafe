@@ -1,80 +1,140 @@
 import { removeDeliveryAction, saveDeliveryAction, saveStoreAction } from "@/app/actions/admin";
+import { Badge, Card, Check, EmptyRow, Label, Notice, PageHeader, SubmitButton, field, textarea } from "@/components/admin/ui";
 import { getStore } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
-import { minorToMajorInput } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import { paymentsMode } from "@/lib/paystack";
 
 export const instant = false;
-
-const field = "field";
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ notice?: string }> }) {
   await live();
   const { notice } = await searchParams;
   const store = await getStore();
+  const payments = paymentsMode() !== "disabled";
+  const email = emailConfigured();
   return (
-    <div className="grid gap-10">
-      <div>
-        {notice ? <p className="mb-4 border border-line bg-mist px-3 py-2 text-sm">{notice}</p> : null}
-        <h1 className="font-display text-5xl tracking-[-0.03em]">Settings</h1>
-        <ul className="mt-3 text-sm text-muted">
-          <li>Payments: {paymentsMode()}</li>
-          <li>Checkout sends the customer to Paystack. Paystack shows the methods enabled on the account, usually card, mobile money, and bank transfer. The order is marked paid only after Paystack confirms the money. Set PAYSTACK_SECRET_KEY on the server to turn this on.</li>
-          <li>Email: {emailConfigured() ? "configured" : "not configured"}</li>
-          <li>Secrets stay in server environment variables and are not edited here.</li>
+    <div className="grid gap-6">
+      <PageHeader title="Settings" />
+      {notice ? <Notice tone={notice.startsWith("Enter") ? "warn" : "success"}>{notice}</Notice> : null}
+
+      <Card title="Connections">
+        <ul className="grid gap-4 text-sm">
+          <li className="flex flex-wrap items-start justify-between gap-3">
+            <div className="max-w-xl">
+              <p className="font-medium">Online payment</p>
+              <p className="mt-0.5 leading-6 text-muted">{payments ? "Customers can pay on the site." : "Customers can’t pay on the site yet. This changes once Moolre is connected."}</p>
+            </div>
+            <Badge tone={payments ? "green" : "amber"}>{payments ? "Connected" : "Not connected"}</Badge>
+          </li>
+          <li className="flex flex-wrap items-start justify-between gap-3 border-t border-line pt-4">
+            <div className="max-w-xl">
+              <p className="font-medium">Email</p>
+              <p className="mt-0.5 leading-6 text-muted">
+                {email
+                  ? "Order confirmations, new-order alerts, and password-reset links are sent by email."
+                  : "Order confirmations, new-order alerts, and password-reset links are not sent yet. To turn this on, add RESEND_API_KEY and EMAIL_FROM in Vercel."}
+              </p>
+            </div>
+            <Badge tone={email ? "green" : "amber"}>{email ? "Set up" : "Not set up"}</Badge>
+          </li>
         </ul>
-      </div>
-      <form action={saveStoreAction} className="grid gap-3">
-        <label className="grid gap-1.5 text-sm">Business name<input name="businessName" defaultValue={store.businessName} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Legal name<input name="legalName" defaultValue={store.legalName} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Tagline<input name="tagline" defaultValue={store.tagline} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Footer description<textarea name="shortDescription" defaultValue={store.shortDescription} className={`${field} min-h-24 py-2`} /></label>
-        <label className="grid gap-1.5 text-sm">Logo URL<input name="logoUrl" defaultValue={store.logoUrl} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Currency<input name="currency" defaultValue={store.currency} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Email<input name="email" defaultValue={store.email} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Phone<input name="phone" defaultValue={store.phone} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Address<input name="address" defaultValue={store.address} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Support hours<input name="supportHours" defaultValue={store.supportHours} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Instagram<input name="instagram" defaultValue={store.social.instagram} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Facebook<input name="facebook" defaultValue={store.social.facebook} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">TikTok<input name="tiktok" defaultValue={store.social.tiktok} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">YouTube<input name="youtube" defaultValue={store.social.youtube} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">WhatsApp<input name="whatsapp" defaultValue={store.social.whatsapp} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Store status
-          <select name="storeStatus" defaultValue={store.storeStatus} className={field}>
-            <option value="coming_soon">Coming soon</option>
-            <option value="open">Open</option>
-            <option value="paused">Paused</option>
-          </select>
-        </label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="showPreparationNotice" defaultChecked={store.showPreparationNotice} /> Show preparation notice</label>
-        <label className="grid gap-1.5 text-sm">Preparation notice<textarea name="preparationNotice" defaultValue={store.preparationNotice} className={`${field} min-h-20 py-2`} /></label>
-        <label className="grid gap-1.5 text-sm">Reservation minutes<input name="reservationMinutes" type="number" defaultValue={store.reservationMinutes} className={field} /></label>
-        <label className="grid gap-1.5 text-sm">Timezone<input name="timezone" defaultValue={store.timezone} className={field} /></label>
-        <button className="min-h-11 w-fit bg-ink px-4 text-paper hover:bg-pine">Save settings</button>
+      </Card>
+
+      <form action={saveStoreAction} className="grid gap-6">
+        <Card title="Store status">
+          <div className="grid gap-4">
+            <Label label="Status">
+              <select name="storeStatus" defaultValue={store.storeStatus} className={field}>
+                <option value="open">Open</option>
+                <option value="coming_soon">Coming soon</option>
+                <option value="paused">Paused</option>
+              </select>
+            </Label>
+            <Check name="showPreparationNotice" label="Show a notice bar under the menu" defaultChecked={store.showPreparationNotice} />
+            <Label label="Notice text">
+              <textarea name="preparationNotice" defaultValue={store.preparationNotice} className={textarea} />
+            </Label>
+          </div>
+        </Card>
+
+        <Card title="Business">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Label label="Business name"><input name="businessName" defaultValue={store.businessName} className={field} /></Label>
+            <Label label="Registered name" hint="Optional"><input name="legalName" defaultValue={store.legalName} className={field} /></Label>
+            <Label label="Tagline" className="sm:col-span-2"><input name="tagline" defaultValue={store.tagline} className={field} /></Label>
+            <Label label="Footer description" className="sm:col-span-2"><textarea name="shortDescription" defaultValue={store.shortDescription} className={textarea} /></Label>
+            <Label label="Logo address" hint="Link to the logo image." className="sm:col-span-2"><input name="logoUrl" defaultValue={store.logoUrl} className={field} /></Label>
+          </div>
+        </Card>
+
+        <Card title="Contact">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Label label="Phone"><input name="phone" type="tel" defaultValue={store.phone} className={field} /></Label>
+            <Label label="Email"><input name="email" type="email" defaultValue={store.email} className={field} /></Label>
+            <Label label="Address" hint="Optional"><input name="address" defaultValue={store.address} className={field} /></Label>
+            <Label label="Opening hours" hint="Optional"><input name="supportHours" defaultValue={store.supportHours} className={field} /></Label>
+          </div>
+        </Card>
+
+        <Card title="Social links" description="Paste the full link. Leave blank to hide the icon.">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Label label="WhatsApp"><input name="whatsapp" defaultValue={store.social.whatsapp} placeholder="https://wa.me/233…" className={field} /></Label>
+            <Label label="Instagram"><input name="instagram" defaultValue={store.social.instagram} className={field} /></Label>
+            <Label label="Facebook"><input name="facebook" defaultValue={store.social.facebook} className={field} /></Label>
+            <Label label="TikTok"><input name="tiktok" defaultValue={store.social.tiktok} className={field} /></Label>
+            <Label label="YouTube"><input name="youtube" defaultValue={store.social.youtube} className={field} /></Label>
+          </div>
+        </Card>
+
+        <Card title="Advanced">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Label label="Currency"><input name="currency" defaultValue={store.currency} className={field} /></Label>
+            <Label label="Time zone"><input name="timezone" defaultValue={store.timezone} className={field} /></Label>
+            <Label label="Hold items for (minutes)" hint="While a customer is paying."><input name="reservationMinutes" type="number" min={5} max={180} defaultValue={store.reservationMinutes} className={field} /></Label>
+          </div>
+        </Card>
+
+        <div className="sticky bottom-0 z-10 -mx-4 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-5">
+          <SubmitButton className="w-full sm:w-fit">Save settings</SubmitButton>
+        </div>
       </form>
-      <section>
-        <h2 className="font-display text-3xl">Delivery methods</h2>
-        <ul className="mt-3 text-sm">
-          {store.deliveryMethods.map((method) => (
-            <li key={method.id} className="flex items-center justify-between gap-3 border-b border-line py-2">
-              <span>{method.label} · {minorToMajorInput(method.feeMinor)} · {method.active ? "active" : "inactive"} · {method.summary}</span>
-              <form action={removeDeliveryAction}>
-                <input type="hidden" name="id" value={method.id} />
-                <button className="min-h-11 shrink-0 border border-line px-3 text-sm">Remove</button>
-              </form>
-            </li>
-          ))}
-        </ul>
-        <form action={saveDeliveryAction} className="mt-4 grid gap-3">
-          <input name="label" placeholder="Label" required className={field} />
-          <input name="fee" placeholder="Fee, such as 20.00" required className={field} />
-          <textarea name="summary" placeholder="What the customer should know" className={`${field} min-h-20 py-2`} />
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="active" defaultChecked /> Active</label>
-          <button className="min-h-11 w-fit border border-line px-4">Add delivery method</button>
+
+      <Card id="delivery" title="Delivery options" description="Customers choose one of these at checkout.">
+        {store.deliveryMethods.length === 0 ? (
+          <EmptyRow>No delivery options yet. Add one below.</EmptyRow>
+        ) : (
+          <ul className="divide-y divide-line">
+            {store.deliveryMethods.map((method) => (
+              <li key={method.id} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0">
+                <div className="min-w-0">
+                  <p className="font-medium">
+                    {method.label} <span className="font-normal text-muted">· {formatMoney(method.feeMinor, store.currency)}</span>
+                  </p>
+                  {method.summary ? <p className="text-sm text-muted">{method.summary}</p> : null}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge tone={method.active ? "green" : "grey"}>{method.active ? "Active" : "Off"}</Badge>
+                  <form action={removeDeliveryAction}>
+                    <input type="hidden" name="id" value={method.id} />
+                    <button className="min-h-10 px-2 text-sm text-danger underline-offset-4 hover:underline">Remove</button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <form action={saveDeliveryAction} className="mt-5 grid gap-4 border-t border-line pt-5 sm:grid-cols-2">
+          <Label label="Name"><input name="label" required placeholder="Accra delivery" className={field} /></Label>
+          <Label label={`Fee (${store.currency})`} hint="Use 0.00 for free delivery."><input name="fee" required inputMode="decimal" placeholder="0.00" className={field} /></Label>
+          <Label label="What the customer should know" className="sm:col-span-2"><textarea name="summary" placeholder="Areas covered and how long it takes." className={textarea} /></Label>
+          <Check name="active" label="Active" defaultChecked />
+          <div className="sm:col-span-2">
+            <SubmitButton variant="secondary">Add delivery option</SubmitButton>
+          </div>
         </form>
-      </section>
+      </Card>
     </div>
   );
 }

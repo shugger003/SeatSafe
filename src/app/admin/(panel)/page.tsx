@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr/ArrowRight";
+import { Card, EmptyRow, FulfillmentBadge, PageHeader, PaymentBadge } from "@/components/admin/ui";
 import { adminConfigured } from "@/lib/auth";
+import { cn } from "@/lib/cn";
 import { dashboardMetrics, getPolicies, getStore } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatWhen } from "@/lib/money";
 import { paymentsMode } from "@/lib/paystack";
 
 export const instant = false;
@@ -13,69 +16,107 @@ export default async function DashboardPage() {
   const store = await getStore();
   const metrics = await dashboardMetrics();
   const policies = await getPolicies();
-  const checks = [
-    store.businessName !== "Brand name" ? null : "Replace the placeholder business name.",
-    store.deliveryMethods.some((method) => method.active) ? null : "Add a delivery method before opening checkout.",
-    paymentsMode() === "disabled" ? "Payment is not configured." : null,
-    emailConfigured() ? null : "Email delivery is not configured.",
-    Object.values(policies).every((policy) => policy.reviewed) ? null : "Policies are still marked as drafts.",
-    adminConfigured() ? null : "Administrator sign-in is not fully configured.",
-  ].filter(Boolean);
+  const checks: Array<{ text: string; href: string } | null> = [
+    store.businessName === "Brand name" ? { text: "Add the business name.", href: "/admin/settings" } : null,
+    store.storeStatus !== "open" ? { text: `The store is set to “${store.storeStatus === "paused" ? "Paused" : "Coming soon"}”.`, href: "/admin/settings" } : null,
+    store.deliveryMethods.some((method) => method.active) ? null : { text: "Add a delivery option so customers can choose how to get their order.", href: "/admin/settings#delivery" },
+    paymentsMode() === "disabled" ? { text: "Online payment is not connected yet, so customers can’t pay on the site.", href: "/admin/settings" } : null,
+    emailConfigured() ? null : { text: "Emails are not set up yet: order confirmations and password resets won’t be sent.", href: "/admin/settings" },
+    Object.values(policies).every((policy) => policy.reviewed) ? null : { text: "Some policies are still drafts.", href: "/admin/content#policies" },
+    adminConfigured() ? null : { text: "Admin sign-in is not fully set up.", href: "/admin/settings" },
+  ];
+  const todo = checks.filter((item): item is { text: string; href: string } => item !== null);
+  const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: store.timezone || "Africa/Accra" }).format(new Date());
 
   return (
-    <div>
-      <p className="text-xs font-medium uppercase tracking-[0.16em] text-clay">Today</p>
-      <h1 className="mt-2 font-display text-5xl">Overview</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">Verified revenue counts only orders whose payment status is paid after provider verification. Failed, pending, and manually reconciled orders are excluded.</p>
-      {checks.length > 0 ? (
-        <section className="mt-6 rounded-[20px] border border-clay/30 bg-[#f8f1e6] p-5">
-          <h2 className="font-display text-2xl">Before launch</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {checks.map((item) => <li key={item} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-clay" aria-hidden="true" /><span>{item}</span></li>)}
-          </ul>
-        </section>
-      ) : null}
-      <dl className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <Stat label="Verified revenue" value={formatMoney(metrics.verifiedRevenueMinor, store.currency) || "None"} emphasis />
-        <Stat label="Orders" value={String(metrics.totalOrders)} />
-        <Stat label="Pending payment" value={String(metrics.pendingOrders)} />
-        <Stat label="Paid" value={String(metrics.paidOrders)} />
-        <Stat label="Awaiting fulfillment" value={String(metrics.awaitingFulfillment)} />
-        <Stat label="Completed" value={String(metrics.completedOrders)} />
-      </dl>
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[20px] border border-line bg-surface p-5 shadow-soft">
-          <h2 className="font-display text-2xl">Low stock</h2>
-          {metrics.lowStock.length === 0 ? <p className="mt-3 text-sm leading-6 text-muted">No published products are at or below their threshold.</p> : (
-            <ul className="mt-3 space-y-2 text-sm">
-              {metrics.lowStock.map((product) => <li key={product.id}><Link href={`/admin/products/${product.id}`} className="underline underline-offset-4">{product.name}</Link> · stock {product.stockQuantity}</li>)}
-            </ul>
-          )}
-        </section>
-        <section className="rounded-[20px] border border-line bg-surface p-5 shadow-soft">
-          <h2 className="font-display text-2xl">Recent orders</h2>
-          {metrics.recent.length === 0 ? <p className="mt-3 text-sm leading-6 text-muted">No orders yet.</p> : (
-            <ul className="mt-3 divide-y divide-line text-sm">
+    <div className="grid gap-6">
+      <PageHeader eyebrow={today} title="Overview" />
+
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <Stat label="To send" value={String(metrics.awaitingFulfillment)} hint="Paid, not delivered yet" href="/admin/orders?view=to-send" emphasis />
+        <Stat label="Revenue" value={formatMoney(metrics.verifiedRevenueMinor, store.currency) || formatMoney(0, store.currency) || "0"} hint="From paid orders" />
+        <Stat label="Awaiting payment" value={String(metrics.pendingOrders)} href="/admin/orders?view=awaiting-payment" />
+        <Stat label="Delivered" value={String(metrics.completedOrders)} hint={`${metrics.totalOrders} orders in total`} href="/admin/orders?view=delivered" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <Card
+          title="Recent orders"
+          actions={metrics.recent.length ? <Link href="/admin/orders" className="inline-flex min-h-9 items-center gap-1 text-sm font-medium text-pine hover:underline">All orders <ArrowRight size={14} aria-hidden="true" /></Link> : null}
+        >
+          {metrics.recent.length === 0 ? (
+            <EmptyRow>No orders yet. New orders will show up here.</EmptyRow>
+          ) : (
+            <ul className="-mx-2 divide-y divide-line">
               {metrics.recent.map((order) => (
-                <li key={order.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
-                  <Link href={`/admin/orders/${order.id}`} className="font-medium underline underline-offset-4">{order.orderNumber}</Link>
-                  <span className="text-muted">{order.paymentStatus} · {order.fulfillmentStatus}</span>
-                  <span className="tabular-nums">{formatMoney(order.totalMinor, order.currency)}</span>
+                <li key={order.id}>
+                  <Link href={`/admin/orders/${order.id}`} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-md px-2 py-3 hover:bg-paper">
+                    <span className="min-w-0">
+                      <span className="block font-medium">{order.customerName}</span>
+                      <span className="block text-xs text-muted">{order.orderNumber} · {formatWhen(order.createdAt)}</span>
+                    </span>
+                    <span className="flex flex-wrap items-center gap-2">
+                      <PaymentBadge status={order.paymentStatus} />
+                      <FulfillmentBadge status={order.fulfillmentStatus} />
+                      <span className="w-24 text-right font-medium tabular-nums">{formatMoney(order.totalMinor, order.currency)}</span>
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
-        </section>
+        </Card>
+
+        <div className="grid content-start gap-6">
+          <Card title="Stock">
+            {metrics.products.length === 0 ? (
+              <EmptyRow>No products yet.</EmptyRow>
+            ) : (
+              <ul className="grid gap-3">
+                {metrics.products.map((product) => {
+                  const low = metrics.lowStock.some((item) => item.id === product.id);
+                  return (
+                    <li key={product.id}>
+                      <Link href={`/admin/products/${product.id}`} className="flex items-center justify-between gap-3 rounded-md hover:underline">
+                        <span className="min-w-0 truncate text-sm">{product.name}</span>
+                        <span className={cn("shrink-0 font-display text-2xl tabular-nums", low ? "text-danger" : "text-ink")}>{product.stockQuantity}</span>
+                      </Link>
+                      {low ? <p className="text-xs text-danger">Running low. Restock soon.</p> : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+
+          {todo.length > 0 ? (
+            <Card title="Still to do" className="border-amber-200 bg-amber-50/60">
+              <ul className="grid gap-1">
+                {todo.map((item) => (
+                  <li key={item.text}>
+                    <Link href={item.href} className="group flex items-start gap-2.5 rounded-md py-1.5 text-sm leading-6 hover:text-pine">
+                      <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-amber-600" aria-hidden="true" />
+                      <span className="group-hover:underline">{item.text}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
+        </div>
       </div>
     </div>
   );
 }
 
-function Stat({ label, value, emphasis = false }: { label: string; value: string; emphasis?: boolean }) {
-  return (
-    <div className={emphasis ? "rounded-[20px] bg-pine p-5 text-paper shadow-soft sm:col-span-2 xl:col-span-1" : "rounded-[20px] border border-line bg-surface p-5 shadow-soft"}>
-      <dt className={emphasis ? "text-sm text-paper/70" : "text-sm text-muted"}>{label}</dt>
-      <dd className="mt-2 font-display text-4xl tabular-nums">{value}</dd>
-    </div>
+function Stat({ label, value, hint, href, emphasis = false }: { label: string; value: string; hint?: string; href?: string; emphasis?: boolean }) {
+  const body = (
+    <>
+      <p className={cn("text-sm", emphasis ? "text-paper/75" : "text-muted")}>{label}</p>
+      <p className="mt-1 font-display text-3xl tabular-nums sm:text-4xl">{value}</p>
+      {hint ? <p className={cn("mt-1 text-xs", emphasis ? "text-paper/65" : "text-muted")}>{hint}</p> : null}
+    </>
   );
+  const classes = cn("block h-full rounded-xl p-4 sm:p-5", emphasis ? "bg-pine text-paper" : "border border-line bg-surface", href && (emphasis ? "hover:bg-pine-dark" : "hover:border-pine"));
+  return href ? <Link href={href} className={classes}>{body}</Link> : <div className={classes}>{body}</div>;
 }
