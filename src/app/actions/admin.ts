@@ -1,15 +1,14 @@
 "use server";
 
-import { mkdirSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { clearSessionCookie, getSession, loginAdmin, setSessionCookie } from "@/lib/auth";
+import { createResetToken, resetPassword } from "@/lib/admin-credentials";
+import { adminEmail, clearSessionCookie, getSession, loginAdmin, setSessionCookie } from "@/lib/auth";
+import { emailConfigured, sendPasswordResetEmail } from "@/lib/email";
+import { supabaseAdmin } from "@/lib/supabase";
 import {
   addAudit,
-  getAbout,
-  getAnnouncement,
   getBenefits,
   getCampaigns,
   getFaqs,
@@ -41,8 +40,8 @@ import { newId, slugify } from "@/lib/safe";
 import { FAQ_CATEGORIES, ICON_KEYS, IMAGE_ROLES, PRODUCT_STATUSES, STORE_STATUSES } from "@/lib/types";
 import type { Benefit, Faq, ImageRole, ProductImage, Step, UseCase } from "@/lib/types";
 
-function bounce(path: string, message: string): never {
-  redirect(`${path}?notice=${encodeURIComponent(message)}`);
+function bounce(path: string, message: string, section = ""): never {
+  redirect(`${path}?notice=${encodeURIComponent(message)}${section ? `#${section}` : ""}`);
 }
 
 async function admin() {
@@ -69,6 +68,33 @@ export async function loginAction(formData: FormData) {
 export async function logoutAction() {
   await clearSessionCookie();
   redirect("/admin/login");
+}
+
+export async function requestResetAction(formData: FormData) {
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  if (!emailConfigured()) return { ok: false as const, error: "Password reset emails are not set up for this store yet." };
+  if (!rateLimit(`reset:${email}`, 3, 15 * 60_000).ok) return { ok: true as const };
+  const expected = adminEmail();
+  if (expected && email === expected) {
+    const token = await createResetToken();
+    if (token) {
+      const sent = await sendPasswordResetEmail(expected, token);
+      if (sent.sent) await addAudit("system", "password_reset_requested", "admin", expected);
+    }
+  }
+  return { ok: true as const };
+}
+
+export async function resetPasswordAction(formData: FormData) {
+  const token = String(formData.get("token") || "");
+  const password = String(formData.get("password") || "");
+  if (password.length < 10) return { error: "Use at least 10 characters." };
+  if (password.length > 200) return { error: "Use 200 characters or fewer." };
+  if (password !== String(formData.get("confirm") || "")) return { error: "The two passwords do not match." };
+  if (!(await resetPassword(token, password))) return { error: "This link has expired or was already used. Ask for a new one." };
+  await addAudit("system", "password_reset", "admin", adminEmail());
+  await clearSessionCookie();
+  redirect("/admin/login?reset=1");
 }
 
 const variantSchema = z.object({
@@ -129,6 +155,8 @@ export async function saveProductAction(input: unknown) {
   return { ok: true as const, id: saved.id, slug: saved.slug };
 }
 
+const IMAGE_BUCKET = "product-images";
+
 function sniff(bytes: Uint8Array) {
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return "jpg";
   if (bytes[0] === 0x89 && bytes[1] === 0x50) return "png";
@@ -150,28 +178,35 @@ export async function uploadImageAction(formData: FormData) {
   if (!kind) bounce(back, "Use a JPEG, PNG, WEBP, or GIF.");
   const role = IMAGE_ROLES.includes(String(formData.get("role")) as ImageRole) ? (String(formData.get("role")) as ImageRole) : "primary";
   const id = newId();
-  const filename = `${id}.${kind}`;
-  const dir = path.join(process.cwd(), "data", "uploads");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(path.join(dir, filename), bytes);
+  const objectPath = `products/${product.id}/${id}.${kind}`;
+  const bucket = supabaseAdmin().storage.from(IMAGE_BUCKET);
+  const uploaded = await bucket.upload(objectPath, bytes, { contentType: kind === "jpg" ? "image/jpeg" : `image/${kind}`, upsert: false });
+  if (uploaded.error) bounce(back, "The image could not be uploaded. Try again.");
   const image: ProductImage = {
     id,
-    src: `/media/${filename}`,
+    src: bucket.getPublicUrl(objectPath).data.publicUrl,
     alt: String(formData.get("alt") || `${product.name} product image`).slice(0, 180),
     role,
   };
   await updateProductImages(product.id, [...product.images, image]);
   await addAudit(session.email, "upload_image", "product", product.id);
   refresh();
+  bounce(back, "Image uploaded.");
 }
 
 export async function removeImageAction(formData: FormData) {
   const session = await admin();
   const product = await getProductById(String(formData.get("productId") || ""));
   if (!product) return;
-  await updateProductImages(product.id, product.images.filter((image) => image.id !== String(formData.get("imageId"))));
+  const removed = product.images.find((image) => image.id === String(formData.get("imageId")));
+  await updateProductImages(product.id, product.images.filter((image) => image !== removed));
+  const marker = `/${IMAGE_BUCKET}/products/${product.id}/`;
+  if (removed?.src.includes(marker)) {
+    await supabaseAdmin().storage.from(IMAGE_BUCKET).remove([`products/${product.id}/${removed.src.split(marker)[1]}`]);
+  }
   await addAudit(session.email, "remove_image", "product", product.id);
   refresh();
+  bounce(`/admin/products/${product.id}`, "Image removed.");
 }
 
 export async function saveStoreAction(formData: FormData) {
@@ -205,6 +240,7 @@ export async function saveStoreAction(formData: FormData) {
   });
   await addAudit(session.email, "save_store", "settings", "store");
   refresh();
+  bounce("/admin/settings", "Settings saved.");
 }
 
 export async function saveDeliveryAction(formData: FormData) {
@@ -224,6 +260,7 @@ export async function saveDeliveryAction(formData: FormData) {
   await saveStore({ ...store, deliveryMethods: next });
   await addAudit(session.email, "save_delivery", "settings", id);
   refresh();
+  bounce("/admin/settings", "Delivery option saved.", "delivery");
 }
 
 export async function removeDeliveryAction(formData: FormData) {
@@ -233,6 +270,7 @@ export async function removeDeliveryAction(formData: FormData) {
   await saveStore({ ...store, deliveryMethods: store.deliveryMethods.filter((method) => method.id !== id) });
   await addAudit(session.email, "remove_delivery", "settings", id);
   refresh();
+  bounce("/admin/settings", "Delivery option removed.", "delivery");
 }
 
 export async function saveHeroAction(formData: FormData) {
@@ -271,6 +309,7 @@ export async function saveHeroAction(formData: FormData) {
     },
   });
   refresh();
+  bounce("/admin/content", "Homepage saved.", "homepage");
 }
 
 export async function saveAnnouncementAction(formData: FormData) {
@@ -281,6 +320,7 @@ export async function saveAnnouncementAction(formData: FormData) {
     href: String(formData.get("href") || "").slice(0, 200),
   });
   refresh();
+  bounce("/admin/content", "Announcement saved.", "announcement");
 }
 
 function iconOf(value: string) {
@@ -301,6 +341,7 @@ export async function saveBenefitAction(formData: FormData) {
   };
   await saveBenefits([...items.filter((item) => item.id !== id), next]);
   refresh();
+  bounce("/admin/content", "Benefit saved.", "benefits");
 }
 
 export async function deleteContentAction(formData: FormData) {
@@ -313,6 +354,7 @@ export async function deleteContentAction(formData: FormData) {
   if (kind === "faq") await saveFaqs((await getFaqs()).filter((item) => item.id !== id));
   if (kind === "campaign") await saveCampaigns((await getCampaigns()).filter((item) => item.id !== id));
   refresh();
+  bounce("/admin/content", "Removed.", kind === "campaign" ? "campaigns" : "");
 }
 
 export async function saveStepAction(formData: FormData) {
@@ -330,6 +372,7 @@ export async function saveStepAction(formData: FormData) {
   };
   await saveSteps([...items.filter((item) => item.id !== id), next]);
   refresh();
+  bounce("/admin/content", "Step saved.", "steps");
 }
 
 export async function saveUseCaseAction(formData: FormData) {
@@ -348,6 +391,7 @@ export async function saveUseCaseAction(formData: FormData) {
   };
   await saveUseCases([...items.filter((item) => item.id !== id), next]);
   refresh();
+  bounce("/admin/content", "Use case saved.", "use-cases");
 }
 
 export async function saveFaqAction(formData: FormData) {
@@ -365,6 +409,7 @@ export async function saveFaqAction(formData: FormData) {
   };
   await saveFaqs([...items.filter((item) => item.id !== id), next]);
   refresh();
+  bounce("/admin/content", "Question saved.", "faqs");
 }
 
 export async function savePolicyAction(formData: FormData) {
@@ -379,6 +424,7 @@ export async function savePolicyAction(formData: FormData) {
   };
   await savePolicies(policies);
   refresh();
+  bounce("/admin/content", "Policy saved.", "policies");
 }
 
 export async function saveAboutAction(formData: FormData) {
@@ -388,6 +434,7 @@ export async function saveAboutAction(formData: FormData) {
     body: String(formData.get("body") || "").slice(0, 6000),
   });
   refresh();
+  bounce("/admin/content", "About page saved.", "about");
 }
 
 export async function saveDiscountAction(formData: FormData) {
@@ -413,6 +460,7 @@ export async function saveDiscountAction(formData: FormData) {
   });
   await addAudit(session.email, "save_discount", "discount", code);
   refresh();
+  bounce("/admin/discounts", "Code saved.");
 }
 
 export async function fulfillmentAction(formData: FormData) {
@@ -434,6 +482,7 @@ export async function fulfillmentAction(formData: FormData) {
   if (!result.ok) bounce(`/admin/orders/${orderId}`, result.error);
   await addAudit(session.email, "fulfillment", "order", orderId, status);
   refresh();
+  bounce(`/admin/orders/${orderId}`, "Order updated.");
 }
 
 export async function reconcileAction(formData: FormData) {
@@ -448,6 +497,7 @@ export async function reconcileAction(formData: FormData) {
   if (!result.ok) bounce(`/admin/orders/${orderId}`, result.error);
   await addAudit(session.email, "reconcile", "order", orderId);
   refresh();
+  bounce(`/admin/orders/${orderId}`, "Reconciliation recorded.");
 }
 
 export async function saveCampaignAction(formData: FormData) {
@@ -469,4 +519,5 @@ export async function saveCampaignAction(formData: FormData) {
   };
   await saveCampaigns([...items.filter((item) => item.id !== id), next]);
   refresh();
+  bounce("/admin/content", "Campaign saved.", "campaigns");
 }
