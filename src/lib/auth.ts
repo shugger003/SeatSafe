@@ -1,7 +1,8 @@
 import "server-only";
-import { scryptSync, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { storedCredential, verifyPasswordHash } from "@/lib/admin-credentials";
 
 const COOKIE = "admin_session";
 
@@ -15,16 +16,15 @@ export function adminConfigured() {
   return Boolean(secret() && process.env.ADMIN_EMAIL && (process.env.ADMIN_PASSWORD_HASH || (process.env.NODE_ENV !== "production" && process.env.ADMIN_PASSWORD)));
 }
 
-function passwordMatches(password: string) {
+export function adminEmail() {
+  return process.env.ADMIN_EMAIL?.trim().toLowerCase() || "";
+}
+
+async function passwordMatches(password: string) {
+  const stored = await storedCredential();
+  if (stored) return verifyPasswordHash(password, stored.hash);
   const hash = process.env.ADMIN_PASSWORD_HASH;
-  if (hash) {
-    const [salt, stored] = hash.split(":");
-    if (!salt || !stored) return false;
-    const actual = scryptSync(password, salt, 64);
-    const expected = Buffer.from(stored, "hex");
-    if (actual.length !== expected.length) return false;
-    return timingSafeEqual(actual, expected);
-  }
+  if (hash) return verifyPasswordHash(password, hash);
   if (process.env.NODE_ENV === "production") return false;
   const plain = process.env.ADMIN_PASSWORD;
   if (!plain) return false;
@@ -36,10 +36,10 @@ function passwordMatches(password: string) {
 
 export async function loginAdmin(email: string, password: string) {
   const key = secret();
-  const expected = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const expected = adminEmail();
   if (!key || !expected || !adminConfigured()) return null;
   const emailOk = email.trim().toLowerCase() === expected;
-  const passwordOk = passwordMatches(password);
+  const passwordOk = await passwordMatches(password);
   if (!emailOk || !passwordOk) return null;
   return new SignJWT({ email: expected, role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
@@ -57,6 +57,8 @@ export async function getSession() {
   try {
     const { payload } = await jwtVerify(token, key);
     if (payload.role !== "admin" || typeof payload.email !== "string") return null;
+    const stored = await storedCredential();
+    if (stored && ((payload.iat ?? 0) + 1) * 1000 < stored.changedAt) return null;
     return { email: payload.email };
   } catch {
     return null;

@@ -45,6 +45,18 @@ export async function sendInquiryEmail(input: { name: string; email: string; mes
   return { sent: result.ok };
 }
 
+export async function sendPasswordResetEmail(to: string, token: string) {
+  if (!emailConfigured()) return { sent: false as const };
+  const store = await getStore();
+  const link = `${siteUrl()}/admin/reset?token=${encodeURIComponent(token)}`;
+  const result = await sendEmail({
+    to,
+    subject: `Reset your ${store.businessName} admin password`,
+    text: `Someone asked to reset the admin password for ${store.businessName}.\n\nTo choose a new password, open this link within 30 minutes:\n${link}\n\nIf you did not ask for this, ignore this email. Your password stays the same.`,
+  });
+  return { sent: result.ok };
+}
+
 async function sendEmail(input: { to: string; subject: string; text: string }) {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
