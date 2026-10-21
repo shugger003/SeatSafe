@@ -473,12 +473,14 @@ export function getOrderById(id: string) {
   return orderBy("id", id);
 }
 
-export async function listOrders(input: { q?: string; payment?: string; fulfillment?: string; page?: number; pageSize?: number }) {
+export async function listOrders(input: { q?: string; payment?: string | string[]; fulfillment?: string | string[]; page?: number; pageSize?: number }) {
   const pageSize = input.pageSize ?? 20;
   const page = Math.max(1, input.page ?? 1);
   let query = supabaseAdmin().from("orders").select("*", { count: "exact" });
-  if (input.payment) query = query.eq("payment_status", input.payment);
-  if (input.fulfillment) query = query.eq("fulfillment_status", input.fulfillment);
+  if (typeof input.payment === "string" && input.payment) query = query.eq("payment_status", input.payment);
+  if (Array.isArray(input.payment)) query = query.in("payment_status", input.payment);
+  if (typeof input.fulfillment === "string" && input.fulfillment) query = query.eq("fulfillment_status", input.fulfillment);
+  if (Array.isArray(input.fulfillment)) query = query.in("fulfillment_status", input.fulfillment);
   const q = input.q?.trim().replace(/[%_,.()]/g, "");
   if (q) {
     const like = `%${q}%`;
@@ -602,6 +604,7 @@ export async function dashboardMetrics() {
     awaitingFulfillment,
     completedOrders,
     verifiedRevenueMinor: Number(revenue.data ?? 0),
+    products,
     lowStock,
     recent: recent.orders,
   };
