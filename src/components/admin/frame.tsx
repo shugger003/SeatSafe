@@ -103,7 +103,7 @@ export function AdminFrame({ email, businessName, logoUrl, children }: { email: 
                 <X size={22} aria-hidden="true" />
               </button>
             </div>
-            <Nav pathname={pathname} className="mt-2 grid px-3" onNavigate={() => setOpen(false)} />
+            <Nav pathname={pathname} className="mt-2 grid px-3" />
             <Account email={email} className="mt-auto" />
           </div>
         </div>
@@ -133,7 +133,7 @@ function Brand({ href, businessName, logoUrl, compact = false }: { href?: string
   return href ? <Link href={href} className={className}>{inner}</Link> : <p className={className}>{inner}</p>;
 }
 
-function Nav({ pathname, className, onNavigate }: { pathname: string; className?: string; onNavigate?: () => void }) {
+function Nav({ pathname, className }: { pathname: string; className?: string }) {
   return (
     <nav aria-label="Admin" className={className}>
       {LINKS.map(({ label, href, icon: Icon }) => {
@@ -143,7 +143,6 @@ function Nav({ pathname, className, onNavigate }: { pathname: string; className?
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            onClick={onNavigate}
             className={cn(
               "inline-flex min-h-11 items-center gap-2.5 rounded-md px-3 text-sm transition-colors",
               active ? "bg-paper font-medium text-pine" : "text-paper/75 hover:bg-paper/10 hover:text-paper",
