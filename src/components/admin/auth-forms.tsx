@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Eye } from "@phosphor-icons/react/dist/ssr/Eye";
+import { EyeSlash } from "@phosphor-icons/react/dist/ssr/EyeSlash";
 import { loginAction, requestResetAction, resetPasswordAction } from "@/app/actions/admin";
 import { Label, Notice, buttonClass, field } from "@/components/admin/ui";
 
@@ -23,7 +25,7 @@ export function LoginForm() {
         <input name="email" type="email" required autoComplete="username" className={field} />
       </Label>
       <Label label="Password">
-        <input name="password" type="password" required autoComplete="current-password" className={field} />
+        <PasswordField name="password" autoComplete="current-password" />
       </Label>
       {error ? <Notice tone="warn">{error}</Notice> : null}
       <button disabled={pending} className={buttonClass("primary", "mt-2 w-full")}>{pending ? "Signing in…" : "Sign in"}</button>
@@ -83,5 +85,29 @@ export function ResetForm({ token }: { token: string }) {
       {error ? <Notice tone="warn">{error}</Notice> : null}
       <button disabled={pending} className={buttonClass("primary", "mt-2 w-full")}>{pending ? "Saving…" : "Save new password"}</button>
     </form>
+  );
+}
+
+function PasswordField({ name, autoComplete }: { name: string; autoComplete: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="relative block">
+      <input
+        name={name}
+        type={visible ? "text" : "password"}
+        required
+        autoComplete={autoComplete}
+        className={`${field} pr-11`}
+      />
+      <button
+        type="button"
+        className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center rounded-md text-muted hover:text-ink"
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        onClick={() => setVisible((current) => !current)}
+      >
+        {visible ? <EyeSlash size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+      </button>
+    </span>
   );
 }
