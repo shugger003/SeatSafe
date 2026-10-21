@@ -20,6 +20,24 @@ export function verifyPasswordHash(password: string, hash: string) {
   return timingSafeEqual(actual, expected);
 }
 
+function envAdminEmail() {
+  return process.env.ADMIN_EMAIL?.trim().toLowerCase() || "";
+}
+
+export async function credentialForEmail(email: string): Promise<{ hash: string; changedAt: number } | null> {
+  const result = await supabaseAdmin().from("admin_users").select("password_hash, changed_at").eq("email", email.trim().toLowerCase()).maybeSingle();
+  if (result.error) throw new Error("Could not read admin credentials.");
+  if (!result.data) return null;
+  return { hash: String(result.data.password_hash), changedAt: new Date(String(result.data.changed_at)).getTime() };
+}
+
+export async function isKnownAdmin(email: string) {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized === envAdminEmail()) return true;
+  return Boolean(await credentialForEmail(normalized));
+}
+
 export async function storedCredential(): Promise<{ hash: string; changedAt: number } | null> {
   const result = await supabaseAdmin().from("admin_credentials").select("password_hash, changed_at").eq("id", 1).maybeSingle();
   if (result.error) throw new Error("Could not read admin credentials.");
@@ -32,7 +50,7 @@ function tokenHash(token: string) {
 }
 
 /** Returns a fresh reset token, or null when too many were requested in the last hour. */
-export async function createResetToken() {
+export async function createResetToken(email: string) {
   const since = new Date(Date.now() - 60 * 60_000).toISOString();
   const recent = await supabaseAdmin().from("admin_password_resets").select("id", { count: "exact", head: true }).gte("created_at", since);
   if (recent.error) throw new Error("Could not check reset requests.");
@@ -41,6 +59,7 @@ export async function createResetToken() {
   const inserted = await supabaseAdmin().from("admin_password_resets").insert({
     id: newId(),
     token_hash: tokenHash(token),
+    email: email.trim().toLowerCase(),
     expires_at: new Date(Date.now() + RESET_MINUTES * 60_000).toISOString(),
   });
   if (inserted.error) throw new Error("Could not create a reset link.");
@@ -59,6 +78,21 @@ export async function resetTokenValid(token: string) {
   return Boolean(result.data);
 }
 
+async function savePasswordForEmail(email: string, password: string) {
+  const now = new Date().toISOString();
+  const hash = hashPassword(password);
+  const user = await credentialForEmail(email);
+  if (user) {
+    const saved = await supabaseAdmin().from("admin_users").update({ password_hash: hash, changed_at: now }).eq("email", email);
+    if (saved.error) throw new Error("Could not save the new password.");
+    return;
+  }
+  if (email === envAdminEmail()) {
+    const saved = await supabaseAdmin().from("admin_credentials").upsert({ id: 1, password_hash: hash, changed_at: now });
+    if (saved.error) throw new Error("Could not save the new password.");
+  }
+}
+
 /** Uses up the token and saves the new password. Returns false if the token was expired or already used. */
 export async function resetPassword(token: string, password: string) {
   const now = new Date().toISOString();
@@ -68,10 +102,11 @@ export async function resetPassword(token: string, password: string) {
     .eq("token_hash", tokenHash(token))
     .is("used_at", null)
     .gt("expires_at", now)
-    .select("id");
+    .select("id, email");
   if (claimed.error || !claimed.data?.length) return false;
-  const saved = await supabaseAdmin().from("admin_credentials").upsert({ id: 1, password_hash: hashPassword(password), changed_at: now });
-  if (saved.error) throw new Error("Could not save the new password.");
+  const email = String(claimed.data[0].email || envAdminEmail()).trim().toLowerCase();
+  if (!email) return false;
+  await savePasswordForEmail(email, password);
   await supabaseAdmin().from("admin_password_resets").update({ used_at: now }).is("used_at", null);
   return true;
 }
