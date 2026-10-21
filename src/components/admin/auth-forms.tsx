@@ -44,7 +44,7 @@ export function ForgotForm() {
         setPending(true);
         const result = await requestResetAction(formData);
         setPending(false);
-        setMessage(result.ok ? { tone: "success", text: "If that email belongs to the admin account, a reset link is on its way. It works for 30 minutes." } : { tone: "warn", text: result.error });
+        setMessage(result.ok ? { tone: "success", text: "If that email belongs to an admin account, a reset link is on its way. It works for 30 minutes." } : { tone: "warn", text: result.error });
       }}
     >
       <Label label="Admin email">
