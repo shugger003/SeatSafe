@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createResetToken, resetPassword } from "@/lib/admin-credentials";
+import { createResetToken, isKnownAdmin, resetPassword } from "@/lib/admin-credentials";
 import { adminEmail, clearSessionCookie, getSession, loginAdmin, setSessionCookie } from "@/lib/auth";
 import { emailConfigured, sendPasswordResetEmail } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -74,12 +74,11 @@ export async function requestResetAction(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
   if (!emailConfigured()) return { ok: false as const, error: "Password reset emails are not set up for this store yet." };
   if (!rateLimit(`reset:${email}`, 3, 15 * 60_000).ok) return { ok: true as const };
-  const expected = adminEmail();
-  if (expected && email === expected) {
-    const token = await createResetToken();
+  if (await isKnownAdmin(email)) {
+    const token = await createResetToken(email);
     if (token) {
-      const sent = await sendPasswordResetEmail(expected, token);
-      if (sent.sent) await addAudit("system", "password_reset_requested", "admin", expected);
+      const sent = await sendPasswordResetEmail(email, token);
+      if (sent.sent) await addAudit("system", "password_reset_requested", "admin", email);
     }
   }
   return { ok: true as const };
