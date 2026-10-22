@@ -48,7 +48,7 @@ export function HomePage({
     <div>
       <section className="bg-mist">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-16">
-        <div className="stage order-2">
+        <div className="order-2">
           <ProductMedia
             src={featured?.images[0]?.src}
             alt={featured?.images[0]?.alt || featured?.name || store.businessName}

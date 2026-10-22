@@ -4,13 +4,13 @@ import { CartProvider } from "@/components/cart-provider";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { WhatsAppBubble } from "@/components/whatsapp-bubble";
-import { getAnnouncement, getStore, listPublicProducts } from "@/lib/db";
-import { live } from "@/lib/live";
+import { catalogCached, getAnnouncement, getStore, listPublicProducts } from "@/lib/db";
 import { safeHref } from "@/lib/safe";
 
+const YEAR = new Date().getFullYear();
+
 export async function generateMetadata(): Promise<Metadata> {
-  await live();
-  const store = await getStore();
+  const store = await catalogCached("store", getStore);
   return {
     title: {
       default: store.businessName,
@@ -20,13 +20,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const instant = false;
-
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  await live();
-  const store = await getStore();
-  const announcement = await getAnnouncement();
-  const catalog = await listPublicProducts({ pageSize: 1 });
+  const [store, announcement, catalog] = await Promise.all([
+    catalogCached("store", getStore),
+    catalogCached("announcement", getAnnouncement),
+    catalogCached("public-products-1", () => listPublicProducts({ pageSize: 1 })),
+  ]);
   const only = catalog.total === 1 ? catalog.products[0] : null;
   const href = safeHref(announcement.href);
   const logo = safeHref(store.logoUrl) || "";
@@ -62,7 +61,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer store={store} year={new Date().getFullYear()} />
+        <Footer store={store} year={YEAR} />
         {whatsapp ? <WhatsAppBubble href={whatsapp} phone={store.phone} /> : null}
         <AnalyticsGate />
       </div>

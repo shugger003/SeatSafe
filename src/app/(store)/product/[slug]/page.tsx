@@ -5,17 +5,13 @@ import { ProductMedia } from "@/components/product-media";
 import { ProductPurchase } from "@/components/product-purchase";
 import { Prose } from "@/components/ui";
 import { displayPrice, purchaseBlockersForDisplay } from "@/lib/commerce";
-import { getFaqs, getProductBySlug, getStore, listPublicProducts } from "@/lib/db";
-import { live } from "@/lib/live";
+import { catalogCached, getFaqs, getProductBySlug, getStore, listPublicProducts } from "@/lib/db";
 import { paymentsReady } from "@/lib/moolre";
 import { siteUrl } from "@/lib/safe";
 
-export const instant = false;
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  await live();
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await catalogCached(`product:${slug}`, () => getProductBySlug(slug), 30);
   if (!product || product.status === "draft") return { title: "Product" };
   const title = product.seoTitle || product.name;
   const description = product.seoDescription || product.shortDescription;
@@ -28,19 +24,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  await live();
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, store, relatedCatalog, allFaqs] = await Promise.all([
+    catalogCached(`product:${slug}`, () => getProductBySlug(slug), 30),
+    catalogCached("store", getStore),
+    catalogCached("public-products-4", () => listPublicProducts({ pageSize: 4 }), 30),
+    catalogCached("faqs", getFaqs),
+  ]);
   if (!product || product.status === "draft") notFound();
-  const store = await getStore();
   const ready = paymentsReady();
   const blockers = purchaseBlockersForDisplay(product, store, ready);
   const price = displayPrice(product);
   const stock = product.variants.length
     ? product.variants.reduce((sum, variant) => sum + (variant.available ? variant.stockQuantity : 0), 0)
     : product.stockQuantity;
-  const related = (await listPublicProducts({ pageSize: 4 })).products.filter((item) => item.id !== product.id).slice(0, 3);
-  const faqs = (await getFaqs()).filter((faq) => faq.published).slice(0, 4);
+  const related = relatedCatalog.products.filter((item) => item.id !== product.id).slice(0, 3);
+  const faqs = allFaqs.filter((faq) => faq.published).slice(0, 4);
   const jsonLd =
     product.status === "published" && price != null
       ? {

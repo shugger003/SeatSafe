@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
 import { Notice } from "@/components/ui";
-import { getFaqs, getHomepage } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getFaqs, getHomepage } from "@/lib/db";
 
 export const metadata: Metadata = { title: "FAQs", description: "Answers about Sitsafe, payment, and support.", alternates: { canonical: "/faq" } };
 
 export default async function FaqPage() {
-  await live();
-  const home = await getHomepage();
-  const faqs = (await getFaqs()).filter((faq) => faq.published);
+  const [home, allFaqs] = await Promise.all([catalogCached("homepage", getHomepage), catalogCached("faqs", getFaqs)]);
+  const faqs = allFaqs.filter((faq) => faq.published);
   const groups = [...new Set(faqs.map((faq) => faq.category))];
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">

@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Button, Prose } from "@/components/ui";
-import { getCampaigns } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getCampaigns } from "@/lib/db";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  await live();
   const { slug } = await params;
-  const campaign = (await getCampaigns()).find((item) => item.slug === slug && item.published);
+  const campaign = (await catalogCached("campaigns", getCampaigns)).find((item) => item.slug === slug && item.published);
   if (!campaign) return { title: "Campaign" };
   return {
     title: campaign.seoTitle || campaign.title,
@@ -19,9 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function CampaignPage({ params }: { params: Promise<{ slug: string }> }) {
-  await live();
   const { slug } = await params;
-  const campaign = (await getCampaigns()).find((item) => item.slug === slug && item.published);
+  const campaign = (await catalogCached("campaigns", getCampaigns)).find((item) => item.slug === slug && item.published);
   if (!campaign) notFound();
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">

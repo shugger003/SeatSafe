@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { ProductMedia } from "@/components/product-media";
 import { Notice } from "@/components/ui";
-import { getHomepage, getSteps } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getHomepage, getSteps } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "How it works",
@@ -13,9 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function HowPage() {
-  await live();
-  const home = await getHomepage();
-  const steps = (await getSteps()).filter((step) => step.published);
+  const [home, allSteps] = await Promise.all([catalogCached("homepage", getHomepage), catalogCached("steps", getSteps)]);
+  const steps = allSteps.filter((step) => step.published);
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{home.stepsHeading}</h1>

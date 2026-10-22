@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
-import { getStore } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getStore } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS Sitsafe.", alternates: { canonical: "/contact" } };
 
 export default async function ContactPage() {
-  await live();
-  const store = await getStore();
+  const store = await catalogCached("store", getStore);
   const published = Boolean(store.email || store.phone || store.address || store.supportHours);
   return (
     <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-2">

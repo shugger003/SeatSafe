@@ -99,67 +99,25 @@ select.field {
   appearance: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .stage {
-    animation: stage-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
-
-@keyframes stage-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @media (max-width: 63.99rem) {
   body:has(.buy-bar) {
     padding-bottom: 4.5rem;
   }
 }
 
-.wa-bounce {
-  animation: wa-bounce 2.4s ease-in-out infinite;
+.wa-fab {
+  bottom: 1.25rem;
 }
 
-.wa-bounce:hover,
-.wa-bounce:focus-visible {
-  animation: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wa-bounce {
-    animation-duration: 2.4s !important;
-    animation-iteration-count: infinite !important;
+@media (min-width: 1024px) {
+  .wa-fab {
+    bottom: 1.5rem;
   }
 }
 
-@keyframes wa-bounce {
-  0%,
-  42%,
-  100% {
-    transform: translateY(0);
-    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
-  }
-  12% {
-    transform: translateY(-22px);
-    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
-  }
-  22% {
-    transform: translateY(0);
-  }
-  29% {
-    transform: translateY(-9px);
-  }
-  36% {
-    transform: translateY(0);
-  }
-  39% {
-    transform: translateY(-3px);
+@media (max-width: 63.99rem) {
+  body:has(.buy-bar) .wa-fab {
+    bottom: 6rem;
   }
 }
 

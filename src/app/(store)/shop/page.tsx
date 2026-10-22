@@ -5,10 +5,7 @@ import { ProductMedia } from "@/components/product-media";
 import { StockBadge } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { displayPrice } from "@/lib/commerce";
-import { getStore, listPublicProducts } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getStore, listPublicProducts } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -17,10 +14,14 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
-  await live();
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
-  const [result, store] = await Promise.all([listPublicProducts({ q: params.q, sort: params.sort, page }), getStore()]);
+  const q = params.q ?? "";
+  const sort = params.sort ?? "featured";
+  const [result, store] = await Promise.all([
+    catalogCached(`public-products:${q}:${sort}:${page}`, () => listPublicProducts({ q: params.q, sort: params.sort, page }), 30),
+    catalogCached("store", getStore),
+  ]);
   const pages = Math.max(1, Math.ceil(result.total / result.pageSize));
   const showControls = result.total > 1 || Boolean(params.q);
 

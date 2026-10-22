@@ -1,5 +1,6 @@
 import "server-only";
 import { buildQuote, normalizeCode } from "@/lib/commerce";
+import { refreshCatalog } from "@/lib/catalog-cache";
 import { getDiscountByCode, getOrderById, getOrderByReference, getProductById, getStore } from "@/lib/db";
 import { paymentsReady } from "@/lib/moolre";
 import { newId } from "@/lib/safe";
@@ -95,6 +96,7 @@ export async function createPendingOrder(input: {
   });
   const order = await getOrderById(id);
   if (!order) throw new Error("ORDER");
+  refreshCatalog();
   return { ok: true as const, order };
 }
 
@@ -110,6 +112,9 @@ export async function applyVerification(reference: string, verification: Verific
   if (result.kind === "missing") return { kind: "missing" as const };
   const order = await getOrderByReference(reference);
   if (!order) return { kind: "missing" as const };
+  if (result.kind === "paid" || verification.status === "failed" || verification.status === "abandoned") {
+    refreshCatalog();
+  }
   return { kind: result.kind as "already" | "pending" | "mismatch" | "paid" | PaymentStatus, order };
 }
 
@@ -139,6 +144,7 @@ export async function updateFulfillment(input: {
   if (!result.ok) return { ok: false as const, error: result.error || "The order could not be updated." };
   const order = await getOrderById(input.orderId);
   if (!order) return { ok: false as const, error: "Order not found." };
+  if (input.restoreStock) refreshCatalog();
   return { ok: true as const, order };
 }
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 export function ProductMedia({
@@ -16,21 +17,19 @@ export function ProductMedia({
   className?: string;
 }) {
   const stage = tone === "stage";
+  const frame = cn(
+    "relative overflow-hidden",
+    stage ? "aspect-[4/3] w-full max-w-full rounded-lg bg-pine lg:aspect-[4/5]" : "aspect-[4/3] max-h-[28rem] rounded-lg bg-pine",
+    className,
+  );
+  const sizes = stage ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw";
+
   if (!src) {
     return (
-      <div
-        role="img"
-        aria-label={alt}
-        className={cn(
-          "flex items-center justify-center overflow-hidden",
-          stage ? "aspect-[4/3] w-full max-w-full rounded-lg bg-pine lg:aspect-[4/5]" : "aspect-[4/3] max-h-[28rem] rounded-lg bg-pine",
-          className,
-        )}
-      >
+      <div role="img" aria-label={alt} className={cn(frame, "flex items-center justify-center")}>
         {logo ? (
-          <span className={cn("flex items-center justify-center rounded-full bg-white", stage ? "size-40 sm:size-52" : "size-28")}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logo} alt="" className="size-3/4 object-contain" />
+          <span className={cn("relative flex items-center justify-center overflow-hidden rounded-full bg-white", stage ? "size-40 sm:size-52" : "size-28")}>
+            <Image src={logo} alt="" fill sizes="160px" className="object-contain p-[12%]" />
           </span>
         ) : null}
       </div>
@@ -38,16 +37,15 @@ export function ProductMedia({
   }
 
   return (
-    <div className={cn("overflow-hidden rounded-lg bg-mist", className)}>
-      {/* Uploaded media is served by the app and is not part of the static image pipeline. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+    <div className={cn(frame, "bg-mist")}>
+      <Image
         src={src}
         alt={alt}
-        className="aspect-[4/3] max-h-[28rem] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
-        decoding="async"
+        fill
+        sizes={sizes}
+        priority={priority}
+        unoptimized={src.startsWith("/")}
+        className="object-cover"
       />
     </div>
   );

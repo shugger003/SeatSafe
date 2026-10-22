@@ -1,4 +1,5 @@
 import "server-only";
+export { catalogCached, refreshCatalog } from "@/lib/catalog-cache";
 import {
   defaultAbout,
   defaultAnnouncement,

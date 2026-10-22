@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
 import { Prose } from "@/components/ui";
-import { getAbout, getStore } from "@/lib/db";
-import { live } from "@/lib/live";
-
-export const instant = false;
+import { catalogCached, getAbout, getStore } from "@/lib/db";
 
 export async function generateMetadata(): Promise<Metadata> {
-  await live();
-  const about = await getAbout();
+  const about = await catalogCached("about", getAbout);
   return { title: about.heading, description: about.body.slice(0, 160), alternates: { canonical: "/about" } };
 }
 
 export default async function AboutPage() {
-  await live();
-  const about = await getAbout();
-  const store = await getStore();
+  const [about, store] = await Promise.all([catalogCached("about", getAbout), catalogCached("store", getStore)]);
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
       <h1 className="font-display text-5xl">{about.heading}</h1>
