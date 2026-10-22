@@ -1,6 +1,7 @@
 import "server-only";
 import { buildQuote, normalizeCode } from "@/lib/commerce";
-import { getDiscountByCode, getOrderById, getOrderByReference, getProductById, getStore, refreshCatalog } from "@/lib/db";
+import { refreshCatalog } from "@/lib/catalog-cache";
+import { getDiscountByCode, getOrderById, getOrderByReference, getProductById, getStore } from "@/lib/db";
 import { paymentsReady } from "@/lib/moolre";
 import { newId } from "@/lib/safe";
 import { rpc, supabaseAdmin } from "@/lib/supabase";
