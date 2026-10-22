@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/home-page";
 import { paymentsReady } from "@/lib/moolre";
-import { getBenefits, getFaqs, getHomepage, getSteps, getStore, getUseCases, listPublicProducts } from "@/lib/db";
-import { live } from "@/lib/live";
+import { catalogCached, getBenefits, getFaqs, getHomepage, getSteps, getStore, getUseCases, listPublicProducts } from "@/lib/db";
 import { siteUrl } from "@/lib/safe";
 
-export const instant = false;
-
 export async function generateMetadata(): Promise<Metadata> {
-  await live();
-  const store = await getStore();
-  const home = await getHomepage();
+  const [store, home] = await Promise.all([catalogCached("store", getStore), catalogCached("homepage", getHomepage)]);
   const title = store.businessName;
   const description = home.hero.description;
   return {
@@ -22,15 +17,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  await live();
-  const store = await getStore();
-  const home = await getHomepage();
-  const [benefits, steps, catalog, useCases, faqs] = await Promise.all([
-    getBenefits(),
-    getSteps(),
-    listPublicProducts({ pageSize: 12 }),
-    getUseCases(),
-    getFaqs(),
+  const [store, home, benefits, steps, catalog, useCases, faqs] = await Promise.all([
+    catalogCached("store", getStore),
+    catalogCached("homepage", getHomepage),
+    catalogCached("benefits", getBenefits),
+    catalogCached("steps", getSteps),
+    catalogCached("public-products-12", () => listPublicProducts({ pageSize: 12 })),
+    catalogCached("use-cases", getUseCases),
+    catalogCached("faqs", getFaqs),
   ]);
   return (
     <>
