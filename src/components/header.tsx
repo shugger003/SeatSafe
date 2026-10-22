@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { List } from "@phosphor-icons/react/dist/ssr/List";
 import { Phone } from "@phosphor-icons/react/dist/ssr/Phone";
@@ -35,11 +34,11 @@ export function Header({
   whatsappHref?: string | null;
 }) {
   const { count } = useCart();
-  const pathname = usePathname();
-  const [openPath, setOpenPath] = useState<string | null>(null);
-  const open = openPath === pathname;
-  function setOpen(next: boolean) {
-    setOpenPath(next ? pathname : null);
+  const [open, setOpen] = useState(false);
+  const [pathname, setPathname] = useState("");
+  function openMenu() {
+    setPathname(window.location.pathname);
+    setOpen(true);
   }
   const opened = useRef(false);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -55,7 +54,7 @@ export function Header({
   useEffect(() => {
     if (!open) return;
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpenPath(null);
+      if (event.key === "Escape") setOpen(false);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -101,7 +100,7 @@ export function Header({
           className="inline-flex h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-paper/10"
           aria-label="Open menu"
           aria-expanded={open}
-          onClick={() => setOpen(true)}
+          onClick={openMenu}
         >
           <List size={22} aria-hidden="true" />
         </button>
@@ -132,6 +131,7 @@ export function Header({
                     key={link.href}
                     href={link.href}
                     aria-current={active ? "page" : undefined}
+                    onClick={() => setOpen(false)}
                     className={cn("border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em] transition-colors hover:text-paper", active ? "text-paper" : "text-paper/75")}
                   >
                     {link.label}
@@ -141,6 +141,7 @@ export function Header({
               <Link
                 href="/cart"
                 aria-current={pathname === "/cart" ? "page" : undefined}
+                onClick={() => setOpen(false)}
                 className={cn("flex items-baseline justify-between border-b border-paper/20 py-4 font-display text-3xl tracking-[-0.03em] transition-colors hover:text-paper", pathname === "/cart" ? "text-paper" : "text-paper/75")}
               >
                 Cart
