@@ -7,7 +7,7 @@ import { getDiscountByCode, getOrderByReference, getProductById, getStore, saveI
 import { sendInquiryEmail } from "@/lib/email";
 import { createPendingOrder, applyVerification } from "@/lib/orders";
 import { notifyPaidOrder } from "@/lib/notify";
-import { initializePaystack, paymentsMode, paymentsReady, verifyPaystackTransaction } from "@/lib/paystack";
+import { initializeMoolre, paymentsMode, paymentsReady, verifyMoolreTransaction } from "@/lib/moolre";
 import { rateLimit } from "@/lib/rate-limit";
 import { siteUrl } from "@/lib/safe";
 import type { CartLineInput, Quote } from "@/lib/types";
@@ -95,18 +95,18 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
   }
 
   try {
-    const payment = await initializePaystack(created.order);
+    const payment = await initializeMoolre(created.order);
     if (!payment.ok) {
       return {
         ok: true,
         token: created.order.accessToken,
         url: null,
-        message: "The order is reserved, but Paystack did not start the payment. Use the order page to try again.",
+        message: "The order is reserved, but Moolre did not start the payment. Use the order page to try again.",
       };
     }
     return { ok: true, token: created.order.accessToken, url: payment.url, message: null };
   } catch (error) {
-    console.error("paystack_initialize_failed", error instanceof Error ? error.message : "unknown");
+    console.error("moolre_initialize_failed", error instanceof Error ? error.message : "unknown");
     return {
       ok: true,
       token: created.order.accessToken,
@@ -123,7 +123,7 @@ export async function resumePaymentAction(reference: string) {
     return { ok: true as const, url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(order.paymentReference)}` };
   }
   if (paymentsMode() !== "live") return { ok: false as const, message: "Online payment is not open yet." };
-  const payment = await initializePaystack(order);
+  const payment = await initializeMoolre(order);
   if (!payment.ok) return { ok: false as const, message: payment.message };
   return { ok: true as const, url: payment.url };
 }
@@ -131,7 +131,7 @@ export async function resumePaymentAction(reference: string) {
 export async function verifyReturnAction(reference: string) {
   if (!reference) return { ok: false as const, message: "Missing payment reference." };
   if (paymentsMode() !== "live") return { ok: false as const, message: "Live payment verification is not active." };
-  const verification = await verifyPaystackTransaction(reference);
+  const verification = await verifyMoolreTransaction(reference);
   const result = await applyVerification(reference, verification);
   if (result.kind === "paid") await notifyPaidOrder({ reference });
   return { ok: true as const, kind: result.kind };

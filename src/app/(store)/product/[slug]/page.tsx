@@ -7,7 +7,7 @@ import { Prose } from "@/components/ui";
 import { displayPrice, purchaseBlockersForDisplay } from "@/lib/commerce";
 import { getFaqs, getProductBySlug, getStore, listPublicProducts } from "@/lib/db";
 import { live } from "@/lib/live";
-import { paymentsReady } from "@/lib/paystack";
+import { paymentsReady } from "@/lib/moolre";
 import { siteUrl } from "@/lib/safe";
 
 export const instant = false;

@@ -105,6 +105,7 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
         )}
         <fieldset className="grid gap-3">
           <legend className="text-sm font-medium">Payment</legend>
+          <p className="text-sm leading-6 text-muted">Continue to payment opens Moolre. The order is marked paid only after Moolre confirms the money.</p>
           <ul className="grid gap-2 text-sm">
             <li className="border border-line bg-surface px-3 py-3">
               <span className="font-medium">Mobile money</span>

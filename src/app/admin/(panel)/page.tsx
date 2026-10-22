@@ -7,7 +7,7 @@ import { dashboardMetrics, getPolicies, getStore } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
 import { formatMoney, formatWhen } from "@/lib/money";
-import { paymentsMode } from "@/lib/paystack";
+import { paymentsMode } from "@/lib/moolre";
 
 export const instant = false;
 

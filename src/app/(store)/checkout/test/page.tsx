@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { TestPayment } from "@/components/test-payment";
 import { live } from "@/lib/live";
-import { paymentsMode } from "@/lib/paystack";
+import { paymentsMode } from "@/lib/moolre";
 
 export const instant = false;
 

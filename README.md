@@ -6,7 +6,7 @@ A mobile-first storefront and administrator dashboard for a physical toilet seat
 
 - **Next.js App Router** renders the public site and keeps payment, inventory, and administrator actions on the server.
 - **Supabase Postgres** stores products, orders, content, and inquiries. The server uses the service role. Anonymous and signed-in browser roles have no table access.
-- **Paystack** is the payment provider when `PAYSTACK_SECRET_KEY` is set. The server verifies every transaction. A browser redirect is not treated as proof of payment.
+- **Moolre** is the payment provider when `MOOLRE_API_USER`, `MOOLRE_API_PUBKEY`, `MOOLRE_ACCOUNT_NUMBER`, and `MOOLRE_WEBHOOK_SECRET` are set. The server verifies every transaction. A browser redirect is not treated as proof of payment.
 - **Administrator sessions** are signed cookies. There is no public registration route.
 - **Email** uses Resend when configured. Otherwise the order is saved and the confirmation page says that email was not sent.
 
@@ -17,7 +17,7 @@ Stock reservation, payment updates, and restocking run inside database functions
 - Business name, legal name, logo, and contact details
 - Verified product name, description, price, SKU, images, and instructions
 - Delivery methods and fees
-- Paystack secret key from the merchant account, including the payment methods actually enabled there
+- Moolre username, public API key, account number, and callback secret from the merchant account
 - A public site URL
 - Reviewed shipping, returns, privacy, and terms text
 - Administrator email and password hash
@@ -59,12 +59,12 @@ See `.env.example`. Variable names only belong in git. Real keys belong in `.env
 
 | Variable | Purpose |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Canonical URL and Paystack callback |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL and Moolre redirect |
 | `SUPABASE_URL` | Supabase project URL, server only |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only key. Never expose it to the browser |
 | `SESSION_SECRET` | Signs the admin cookie |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` | Administrator sign-in |
-| `PAYSTACK_SECRET_KEY` | Server-side Paystack calls |
+| `MOOLRE_API_USER` / `MOOLRE_API_PUBKEY` / `MOOLRE_ACCOUNT_NUMBER` / `MOOLRE_WEBHOOK_SECRET` | Server-side Moolre calls and callback checks |
 | `PAYMENTS_MODE` | `test` enables the local simulator outside production |
 | `RESEND_API_KEY` / `EMAIL_FROM` | Customer and admin email |
 | `NEXT_PUBLIC_ANALYTICS_ID` | Optional GA4 ID, loaded only after consent |
@@ -91,21 +91,21 @@ Checkout sequence:
 1. The customer submits contact and delivery details.
 2. The server reloads products, stock, discounts, and delivery fees.
 3. It creates a pending order and reserves stock.
-4. Paystack is initialized with the server total, or the local test screen is used.
-5. After the customer returns, and again on a signed webhook, the server calls Paystack’s verify endpoint.
+4. Moolre is given a one-time payment link for the server total, or the local test screen is used.
+5. After the customer returns, and again on a signed webhook, the server calls Moolre’s status endpoint.
 6. The order becomes `paid` only when the verified amount and currency match.
 7. A failed, cancelled, or expired payment returns the reserved stock.
 8. The same verification can arrive twice. The second one does not deduct stock again.
 
-Webhook URL: `https://YOUR_DOMAIN/api/paystack/webhook`
+Webhook URL: `https://YOUR_DOMAIN/api/moolre/webhook`
 
-In the Paystack dashboard, send charge events to that URL. The route checks `x-paystack-signature` with the secret key.
+In the Moolre dashboard, set that address as the payment callback URL. The route checks the callback `secret` and then verifies the transaction with Moolre.
 
-`PAYMENTS_MODE=test` shows a page that can mark a test order successful, failed, or cancelled. It is disabled when `NODE_ENV` is `production`. It does not talk to Paystack and must not be described as a real charge.
+`PAYMENTS_MODE=test` shows a page that can mark a test order successful, failed, or cancelled. It is disabled when `NODE_ENV` is `production`. It does not talk to Moolre and must not be described as a real charge.
 
-If the secret key is missing, checkout explains that payment is not configured and does not create a paid order.
+If the Moolre values are missing, checkout explains that payment is not configured and does not create a paid order.
 
-Card numbers are never stored. Paystack decides which methods (cards, mobile money, and others) appear, based on the merchant account.
+Customers pay with MTN, Telecel, or AirtelTigo on Moolre’s page. This site does not store wallet PINs.
 
 ## Products and orders
 
@@ -138,14 +138,14 @@ Unpublished entries are hidden. Policy pages that are not marked reviewed show t
 1. Use Node.js 24 on a host with a persistent disk.
 2. Set every production variable in the host, not in git.
 3. Set `NEXT_PUBLIC_SITE_URL` to the real `https` origin.
-4. Set `PAYSTACK_SECRET_KEY` from the live merchant account when you are ready to charge customers.
+4. Set the four Moolre values from the live merchant account when you are ready to charge customers.
 5. Do not set `PAYMENTS_MODE=test` in production.
 6. Point the domain at the host and confirm `https`.
-7. Register the webhook URL in Paystack.
+7. Register `https://YOUR_DOMAIN/api/moolre/webhook` as the Moolre callback URL.
 8. Run `npm run build` and `npm start`, or the host’s equivalent.
-9. Sign in, replace placeholder content, publish a priced product, add delivery, then place a Paystack test transaction before going live if the account supports test keys. Use test keys only in a non-production environment.
+9. Sign in, replace placeholder content, publish a priced product, add delivery, then place a small live Moolre payment before taking customer orders.
 
-This repository does not deploy itself and is not connected to a host, domain, or Paystack account until you do that.
+This repository does not deploy itself and is not connected to a host, domain, or Moolre account until you do that.
 
 ## Production checks
 
@@ -153,7 +153,7 @@ This repository does not deploy itself and is not connected to a host, domain, o
 - Cart quantities and the server quote match.
 - Checkout rejects a missing name, email, phone, or address.
 - An unpublished or out-of-stock product cannot be ordered.
-- A successful test payment (non-production) or a verified Paystack payment shows the paid state once.
+- A successful test payment (non-production) or a verified Moolre payment shows the paid state once.
 - A failed or cancelled payment does not stay paid and returns stock.
 - Repeating the webhook does not reduce stock again.
 - `/admin` redirects when signed out.
@@ -163,7 +163,7 @@ This repository does not deploy itself and is not connected to a host, domain, o
 ## Backup and maintenance
 
 - Copy `data/store.db` and `data/uploads` on a schedule.
-- Keep Paystack and email secrets rotated through the host, not through the database.
+- Keep Moolre and email secrets rotated through the host, not through the database.
 - Review low-stock items on the dashboard.
 - Verified revenue is the sum of orders with payment status `paid` only.
 

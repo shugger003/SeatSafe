@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/home-page";
-import { paymentsReady } from "@/lib/paystack";
+import { paymentsReady } from "@/lib/moolre";
 import { getBenefits, getFaqs, getHomepage, getSteps, getStore, getUseCases, listPublicProducts } from "@/lib/db";
 import { live } from "@/lib/live";
 import { siteUrl } from "@/lib/safe";
