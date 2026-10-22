@@ -95,6 +95,10 @@ summary::-webkit-details-marker {
   box-shadow: 0 0 0 3px rgb(22 25 24 / 0.12);
 }
 
+select.field {
+  appearance: auto;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .stage {
     animation: stage-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;

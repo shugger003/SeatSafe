@@ -76,12 +76,16 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
         <Text label="Delivery address" name="address" autoComplete="street-address" required />
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Region</span>
-          <input name="region" list="regions" required autoComplete="address-level1" className="field" />
-          <datalist id="regions">
+          <select name="region" required autoComplete="address-level1" defaultValue="" className="field">
+            <option value="" disabled>
+              Choose a region
+            </option>
             {REGIONS.map((region) => (
-              <option key={region} value={region} />
+              <option key={region} value={region}>
+                {region}
+              </option>
             ))}
-          </datalist>
+          </select>
         </label>
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Delivery instructions</span>
