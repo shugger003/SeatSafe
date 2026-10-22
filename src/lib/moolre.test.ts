@@ -1,9 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { paymentsMode, verifyMoolreSecret } from "@/lib/moolre";
 
-const KEYS = ["PAYMENTS_MODE", "MOOLRE_API_USER", "MOOLRE_API_PUBKEY", "MOOLRE_ACCOUNT_NUMBER", "MOOLRE_WEBHOOK_SECRET", "NODE_ENV"] as const;
+const KEYS = ["PAYMENTS_MODE", "MOOLRE_API_USER", "MOOLRE_API_PUBKEY", "MOOLRE_ACCOUNT_NUMBER", "MOOLRE_WEBHOOK_SECRET"] as const;
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   for (const key of KEYS) delete process.env[key];
 });
 
@@ -30,7 +31,7 @@ describe("payments mode", () => {
 
   it("keeps the test simulator off in production", () => {
     process.env.PAYMENTS_MODE = "test";
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     expect(paymentsMode()).toBe("disabled");
   });
 });
