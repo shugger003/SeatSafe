@@ -3,7 +3,7 @@ import { getOrderByReference } from "@/lib/db";
 import { live } from "@/lib/live";
 import { notifyPaidOrder } from "@/lib/notify";
 import { applyVerification } from "@/lib/orders";
-import { paymentsMode, verifyPaystackTransaction } from "@/lib/paystack";
+import { paymentsMode, verifyMoolreTransaction } from "@/lib/moolre";
 
 export const instant = false;
 
@@ -12,7 +12,7 @@ export default async function ReturnPage({ searchParams }: { searchParams: Promi
   const { reference } = await searchParams;
   if (!reference) return <p className="px-5 py-16 text-center">The payment reference is missing.</p>;
   if (paymentsMode() === "live") {
-    const verification = await verifyPaystackTransaction(reference);
+    const verification = await verifyMoolreTransaction(reference);
     const result = await applyVerification(reference, verification);
     if (result.kind === "paid") await notifyPaidOrder({ reference });
   }

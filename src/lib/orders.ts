@@ -1,7 +1,7 @@
 import "server-only";
 import { buildQuote, normalizeCode } from "@/lib/commerce";
 import { getDiscountByCode, getOrderById, getOrderByReference, getProductById, getStore } from "@/lib/db";
-import { paymentsReady } from "@/lib/paystack";
+import { paymentsReady } from "@/lib/moolre";
 import { newId } from "@/lib/safe";
 import { rpc, supabaseAdmin } from "@/lib/supabase";
 import type { CartLineInput, Order, OrderLine, PaymentStatus } from "@/lib/types";
@@ -89,7 +89,7 @@ export async function createPendingOrder(input: {
       discount_id: freshDiscount && rechecked.discountMinor > 0 ? freshDiscount.id : "",
       total_minor: rechecked.totalMinor,
       currency: rechecked.currency,
-      payment_provider: paymentsReady() && process.env.PAYSTACK_SECRET_KEY ? "paystack" : "test",
+      payment_provider: paymentsReady() && process.env.MOOLRE_ACCOUNT_NUMBER ? "moolre" : "test",
       payment_reference: paymentReference,
     },
   });
