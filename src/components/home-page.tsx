@@ -7,6 +7,7 @@ import { Button, EmptyState, Price } from "@/components/ui";
 import { videoEmbed } from "@/lib/media";
 import { purchaseBlockersForDisplay } from "@/lib/commerce";
 import { formatMoney } from "@/lib/money";
+import { paymentsMode } from "@/lib/moolre";
 import type { Benefit, Faq, HomepageContent, Product, Step, StoreSettings, UseCase } from "@/lib/types";
 
 export function HomePage({
@@ -299,8 +300,8 @@ function trustRows(store: StoreSettings, paymentsReady: boolean) {
       value: [method.feeMinor > 0 ? formatMoney(method.feeMinor, store.currency) : "", method.summary].filter(Boolean).join(". "),
     });
   }
-  if (paymentsReady && process.env.PAYSTACK_SECRET_KEY) {
-    rows.push({ label: "Payment", value: "MTN, Telecel, or AirtelTigo mobile money." });
+  if (paymentsReady && paymentsMode() === "live") {
+    rows.push({ label: "Payment", value: "MTN, Telecel, or AirtelTigo mobile money through Moolre." });
   } else if (paymentsReady) {
     rows.push({ label: "Payment", value: "Test payments only. No real money is collected." });
   } else if (store.phone || store.social.whatsapp) {
