@@ -4,12 +4,14 @@ import "./globals.css";
 
 const sans = Manrope({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-manrope",
   display: "swap",
 });
 
 const display = Newsreader({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-newsreader",
   display: "swap",
 });
@@ -29,8 +31,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   colorScheme: "light",
 };
-
-export const instant = false;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

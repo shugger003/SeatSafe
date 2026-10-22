@@ -50,6 +50,14 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   agentRules: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "sitsafe.company" },
+      { protocol: "https", hostname: "www.sitsafe.company" },
+    ],
+  },
   turbopack: {
     root: path.resolve(process.cwd()),
     rules: {
