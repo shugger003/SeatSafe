@@ -27,7 +27,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <p className="mt-0.5 leading-6 text-muted">
                 {payments
                   ? "Customers can pay with MTN, Telecel, or AirtelTigo on Moolre. Orders are marked paid only after Moolre confirms the money."
-                  : "Customers can’t pay on the site yet. To connect Moolre, add MOOLRE_API_USER, MOOLRE_API_PUBKEY, MOOLRE_ACCOUNT_NUMBER, and MOOLRE_WEBHOOK_SECRET in Vercel, and set the Moolre callback URL to this site’s /api/moolre/webhook."}
+                  : "Moolre is disconnected. Customers can’t pay on the site. When the new merchant account is ready, add its API user, public key, account number, and callback secret in Vercel, and set the Moolre callback URL to this site’s /api/moolre/webhook."}
               </p>
             </div>
             <Badge tone={payments ? "green" : "amber"}>{payments ? "Connected" : "Not connected"}</Badge>
