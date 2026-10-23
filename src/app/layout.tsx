@@ -20,10 +20,10 @@ const display = Newsreader({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "ASAS Sitsafe",
+    default: "ASAS Seat Shield",
     template: "%s",
   },
-  description: "Sitsafe toilet seat sanitizer from ASAS Sitsafe. Shake, spray, wait 30 seconds, and sit.",
+  description: "Seat Shield toilet seat sanitizer from ASAS Seat Shield. Shake, spray, wait 30 seconds, and sit.",
 };
 
 export const viewport: Viewport = {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { catalogCached, getStore } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS Sitsafe.", alternates: { canonical: "/contact" } };
+export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS Seat Shield.", alternates: { canonical: "/contact" } };
 
 export default async function ContactPage() {
   const store = await catalogCached("store", getStore);

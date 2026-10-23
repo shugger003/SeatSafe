@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Notice } from "@/components/ui";
 import { catalogCached, getFaqs, getHomepage } from "@/lib/db";
 
-export const metadata: Metadata = { title: "FAQs", description: "Answers about Sitsafe, payment, and support.", alternates: { canonical: "/faq" } };
+export const metadata: Metadata = { title: "FAQs", description: "Answers about Seat Shield, payment, and support.", alternates: { canonical: "/faq" } };
 
 export default async function FaqPage() {
   const [home, allFaqs] = await Promise.all([catalogCached("homepage", getHomepage), catalogCached("faqs", getFaqs)]);
