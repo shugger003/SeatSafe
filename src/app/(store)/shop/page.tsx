@@ -9,7 +9,7 @@ import { catalogCached, getStore, listPublicProducts } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Shop the Sitsafe toilet seat sanitizer.",
+  description: "Shop the Seat Shield toilet seat sanitizer.",
   alternates: { canonical: "/shop" },
 };
 

@@ -5,7 +5,7 @@ import { catalogCached, getHomepage, getSteps } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "How it works",
-  description: "How to use Sitsafe: shake, spray, wait 30 seconds, and sit.",
+  description: "How to use Seat Shield: shake, spray, wait 30 seconds, and sit.",
   alternates: { canonical: "/how-it-works" },
 };
 
