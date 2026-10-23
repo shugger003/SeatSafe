@@ -74,7 +74,10 @@ const nextConfig: NextConfig = {
       destination: "https://seatshieldghana.com/:path*",
       permanent: true,
     });
-    return [toCanonical("www.seatshieldghana.com")];
+    return [
+      toCanonical("www.seatshieldghana.com"),
+      { source: "/product/safeseat", destination: "/product/seat-shield", permanent: true },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
