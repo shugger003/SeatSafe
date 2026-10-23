@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Newsreader } from "next/font/google";
+import { siteUrl } from "@/lib/safe";
 import "./globals.css";
 
 const sans = Manrope({
@@ -17,7 +18,7 @@ const display = Newsreader({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "ASAS Sitsafe",
     template: "%s",
