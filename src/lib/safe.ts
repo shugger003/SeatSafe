@@ -32,9 +32,15 @@ export function parseJson<T>(value: string | null | undefined, fallback: T): T {
   }
 }
 
+export const CANONICAL_SITE_URL = "https://seatshieldghana.com";
+
 export function siteUrl() {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
-  return configured.replace(/\/$/, "");
+  if (process.env.VERCEL_ENV === "preview") {
+    const host = process.env.VERCEL_URL?.trim();
+    if (host) return `https://${host.replace(/^https?:\/\//, "")}`;
+  }
+  if (process.env.NODE_ENV === "production") return CANONICAL_SITE_URL;
+  return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
 }
 
 export function newId() {
