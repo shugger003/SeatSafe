@@ -18,17 +18,20 @@ export type MoolreEnvelope = {
   code?: string;
   message?: string;
   txstatus?: number | string;
-  data?: {
-    authorization_url?: string;
-    reference?: string;
-    txstatus?: number | string;
-    amount?: string | number;
-    currency?: string;
-    accountnumber?: string;
-    transactionid?: string | number | null;
-    externalref?: string;
-    secret?: string;
-  } | string | null;
+  data?:
+    | {
+        authorization_url?: string;
+        reference?: string;
+        txstatus?: number | string;
+        amount?: string | number;
+        currency?: string;
+        accountnumber?: string;
+        transactionid?: string | number | null;
+        externalref?: string;
+        secret?: string;
+      }
+    | string
+    | null;
 };
 
 function moolreUser() {
@@ -47,7 +50,11 @@ function moolreSecret() {
   return process.env.MOOLRE_WEBHOOK_SECRET?.trim() || "";
 }
 
+/** Live Moolre stays off until a new merchant account is connected. */
+export const MOOLRE_LIVE = false;
+
 export function moolreConfigured() {
+  if (!MOOLRE_LIVE) return false;
   return Boolean(moolreUser() && moolreKey() && moolreAccount() && moolreSecret());
 }
 
