@@ -56,8 +56,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "seatshieldghana.com" },
       { protocol: "https", hostname: "www.seatshieldghana.com" },
-      { protocol: "https", hostname: "sitsafe.company" },
-      { protocol: "https", hostname: "www.sitsafe.company" },
     ],
   },
   turbopack: {
@@ -76,11 +74,7 @@ const nextConfig: NextConfig = {
       destination: "https://seatshieldghana.com/:path*",
       permanent: true,
     });
-    return [
-      toCanonical("sitsafe.company"),
-      toCanonical("www.sitsafe.company"),
-      toCanonical("www.seatshieldghana.com"),
-    ];
+    return [toCanonical("www.seatshieldghana.com")];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
