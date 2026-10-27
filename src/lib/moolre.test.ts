@@ -19,13 +19,13 @@ describe("moolre callback secret", () => {
 });
 
 describe("payments mode", () => {
-  it("stays off while the previous Moolre merchant is disconnected", () => {
+  it("is live when the Moolre merchant values are set", () => {
     expect(paymentsMode()).toBe("disabled");
     process.env.MOOLRE_API_USER = "merchant";
     process.env.MOOLRE_API_PUBKEY = "pub";
     process.env.MOOLRE_ACCOUNT_NUMBER = "123";
     process.env.MOOLRE_WEBHOOK_SECRET = "secret";
-    expect(paymentsMode()).toBe("disabled");
+    expect(paymentsMode()).toBe("live");
   });
 
   it("keeps the test simulator off in production", () => {

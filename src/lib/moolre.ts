@@ -50,11 +50,7 @@ function moolreSecret() {
   return process.env.MOOLRE_WEBHOOK_SECRET?.trim() || "";
 }
 
-/** Live Moolre stays off until a new merchant account is connected. */
-export const MOOLRE_LIVE = false;
-
 export function moolreConfigured() {
-  if (!MOOLRE_LIVE) return false;
   return Boolean(moolreUser() && moolreKey() && moolreAccount() && moolreSecret());
 }
 
