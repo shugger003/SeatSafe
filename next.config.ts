@@ -50,14 +50,6 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   agentRules: false,
-  images: {
-    formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      { protocol: "https", hostname: "*.supabase.co" },
-      { protocol: "https", hostname: "seatshieldghana.com" },
-      { protocol: "https", hostname: "www.seatshieldghana.com" },
-    ],
-  },
   turbopack: {
     root: path.resolve(process.cwd()),
     rules: {
@@ -68,15 +60,9 @@ const nextConfig: NextConfig = {
     },
   },
   async redirects() {
-    const toCanonical = (host: string) => ({
-      source: "/:path*",
-      has: [{ type: "host" as const, value: host }],
-      destination: "https://seatshieldghana.com/:path*",
-      permanent: true,
-    });
     return [
-      toCanonical("www.seatshieldghana.com"),
-      { source: "/product/safeseat", destination: "/product/seat-shield", permanent: true },
+      { source: "/product/safeseat", destination: "/product/sitsafe", permanent: true },
+      { source: "/product/seat-shield", destination: "/product/sitsafe", permanent: true },
     ];
   },
   async headers() {
