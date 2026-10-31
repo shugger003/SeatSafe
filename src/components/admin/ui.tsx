@@ -98,7 +98,7 @@ export function Badge({ tone, children }: { tone: Tone; children: React.ReactNod
     <span
       className={cn(
         "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium",
-        tone === "green" && "bg-mist text-pine",
+        tone === "green" && "bg-[#dcf3e3] text-[#166534]",
         tone === "amber" && "bg-amber-100 text-amber-900",
         tone === "red" && "bg-red-100 text-danger",
         tone === "blue" && "bg-sky-100 text-sky-900",
