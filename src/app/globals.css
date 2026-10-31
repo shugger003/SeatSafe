@@ -3,17 +3,17 @@
 @theme {
   --font-display: var(--font-newsreader), "Iowan Old Style", Palatino, "Palatino Linotype", serif;
   --font-sans: var(--font-manrope), "Avenir Next", "Segoe UI", sans-serif;
-  --color-paper: #f3eee4;
-  --color-surface: #faf6ef;
-  --color-stone: #e6ddd0;
-  --color-ink: #1c1914;
-  --color-muted: #5c5348;
-  --color-line: #e2d7c8;
-  --color-pine: #1c4f45;
-  --color-pine-dark: #12352f;
-  --color-mist: #e4efe8;
-  --color-clay: #8a4e3c;
-  --color-danger: #7d332c;
+  --color-paper: #fff6f8;
+  --color-surface: #ffffff;
+  --color-stone: #f8e6ee;
+  --color-ink: #2a121c;
+  --color-muted: #6b4454;
+  --color-line: #f0d5e2;
+  --color-pine: #c2185b;
+  --color-pine-dark: #9d1450;
+  --color-mist: #fde8f1;
+  --color-clay: #c2185b;
+  --color-danger: #8c1d32;
   --shadow-soft: 0 18px 40px -28px rgb(22 25 24 / 0.28);
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -42,7 +42,7 @@ h3,
 }
 
 ::selection {
-  background: #d7e4dc;
+  background: #f8c5dc;
   color: var(--color-ink);
 }
 
@@ -87,12 +87,12 @@ summary::-webkit-details-marker {
 }
 
 .field::placeholder {
-  color: #5c6661;
+  color: #6b4454;
 }
 
 .field:focus {
   border-color: var(--color-ink);
-  box-shadow: 0 0 0 3px rgb(22 25 24 / 0.12);
+  box-shadow: 0 0 0 3px rgb(194 24 91 / 0.16);
 }
 
 select.field {

@@ -122,9 +122,9 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
                   </span>
                 ) : (
                   <svg viewBox="0 0 32 32" className="size-10 shrink-0 sm:size-12" aria-hidden="true">
-                    <circle cx="16" cy="16" r="15" fill="#f3eee4" />
-                    <circle cx="16" cy="16" r="8" fill="none" stroke="#1c4f45" strokeWidth="1.8" />
-                    <circle cx="16" cy="16" r="3.2" fill="none" stroke="#1c4f45" strokeWidth="1.6" />
+                    <circle cx="16" cy="16" r="15" fill="#fff6f8" />
+                    <circle cx="16" cy="16" r="8" fill="none" stroke="#c2185b" strokeWidth="1.8" />
+                    <circle cx="16" cy="16" r="3.2" fill="none" stroke="#c2185b" strokeWidth="1.6" />
                   </svg>
                 )}
                 <span className="min-w-0">
