@@ -165,8 +165,8 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
 
         <div className="py-3 text-center text-xs text-paper/75 sm:mt-12 sm:border-t sm:border-paper/20 sm:py-6 sm:text-sm">
           <p>
-            <span className="sm:hidden">\u00a9 {year} {store.businessName}</span>
-            <span className="hidden sm:inline">Copyright \u00a9 {year} \u00b7 All rights reserved {store.businessName}</span>
+            <span className="sm:hidden">© {year} {store.businessName}</span>
+            <span className="hidden sm:inline">Copyright © {year} · All rights reserved {store.businessName}</span>
             <span className="px-2 text-paper/40" aria-hidden="true">|</span>
             <a href="/sitemap.xml" className={`${linkClass} inline-flex min-h-10 items-center sm:inline sm:min-h-0`}>Sitemap</a>
           </p>
