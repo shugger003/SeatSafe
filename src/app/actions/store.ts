@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { z } from "zod";
 import { buildQuote, normalizeCode } from "@/lib/commerce";
-import { getDiscountByCode, getOrderByReference, getProductById, getStore, saveInquiry } from "@/lib/db";
+import { getDiscountByCode, getOrderByToken, getProductById, getStore, saveInquiry } from "@/lib/db";
 import { sendInquiryEmail } from "@/lib/email";
 import { createPendingOrder, applyVerification } from "@/lib/orders";
 import { notifyPaidOrder } from "@/lib/notify";
@@ -89,7 +89,7 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
     return {
       ok: true,
       token: created.order.accessToken,
-      url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(created.order.paymentReference)}`,
+      url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(created.order.paymentReference)}&token=${encodeURIComponent(created.order.accessToken)}`,
       message: null,
     };
   }
@@ -116,11 +116,18 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
   }
 }
 
-export async function resumePaymentAction(reference: string) {
-  const order = await getOrderByReference(reference);
+async function orderForSecret(reference: string, token: string) {
+  if (!reference || !token) return null;
+  const order = await getOrderByToken(token);
+  if (!order || order.paymentReference !== reference) return null;
+  return order;
+}
+
+export async function resumePaymentAction(reference: string, token: string) {
+  const order = await orderForSecret(reference, token);
   if (!order || order.paymentStatus !== "pending") return { ok: false as const, message: "This order is not waiting for payment." };
   if (paymentsMode() === "test") {
-    return { ok: true as const, url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(order.paymentReference)}` };
+    return { ok: true as const, url: `${siteUrl()}/checkout/test?reference=${encodeURIComponent(order.paymentReference)}&token=${encodeURIComponent(order.accessToken)}` };
   }
   if (paymentsMode() !== "live") return { ok: false as const, message: "Online payment is not open yet." };
   const payment = await initializeMoolre(order);
@@ -128,8 +135,9 @@ export async function resumePaymentAction(reference: string) {
   return { ok: true as const, url: payment.url };
 }
 
-export async function verifyReturnAction(reference: string) {
-  if (!reference) return { ok: false as const, message: "Missing payment reference." };
+export async function verifyReturnAction(reference: string, token: string) {
+  const order = await orderForSecret(reference, token);
+  if (!order) return { ok: false as const, message: "Missing payment reference." };
   if (paymentsMode() !== "live") return { ok: false as const, message: "Live payment verification is not active." };
   const verification = await verifyMoolreTransaction(reference);
   const result = await applyVerification(reference, verification);
@@ -137,9 +145,9 @@ export async function verifyReturnAction(reference: string) {
   return { ok: true as const, kind: result.kind };
 }
 
-export async function simulateTestPaymentAction(reference: string, outcome: "success" | "failed" | "abandoned") {
+export async function simulateTestPaymentAction(reference: string, token: string, outcome: "success" | "failed" | "abandoned") {
   if (paymentsMode() !== "test") return { ok: false as const, message: "The test gateway is not enabled." };
-  const order = await getOrderByReference(reference);
+  const order = await orderForSecret(reference, token);
   if (!order) return { ok: false as const, message: "Order not found." };
   const verification =
     outcome === "success"

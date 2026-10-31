@@ -38,7 +38,7 @@ export default async function OrderPage({ params }: { params: Promise<{ token: s
           {emailed ? "A confirmation email was sent." : "Keep this page for your reference."}
         </p>
       ) : null}
-      {order.paymentStatus === "pending" ? <ResumePayment reference={order.paymentReference} /> : null}
+      {order.paymentStatus === "pending" ? <ResumePayment reference={order.paymentReference} token={order.accessToken} /> : null}
       <dl className="mt-8 divide-y divide-line border-y border-line text-sm">
         <Row label="Placed" value={formatWhen(order.createdAt)} />
         <Row label="Payment reference" value={order.paymentReference} />

@@ -1,3 +1,4 @@
+import "server-only";
 import { timingSafeEqual } from "node:crypto";
 import { majorToMinor, minorToMajorInput } from "@/lib/money";
 import { siteUrl } from "@/lib/safe";
@@ -18,20 +19,17 @@ export type MoolreEnvelope = {
   code?: string;
   message?: string;
   txstatus?: number | string;
-  data?:
-    | {
-        authorization_url?: string;
-        reference?: string;
-        txstatus?: number | string;
-        amount?: string | number;
-        currency?: string;
-        accountnumber?: string;
-        transactionid?: string | number | null;
-        externalref?: string;
-        secret?: string;
-      }
-    | string
-    | null;
+  data?: {
+    authorization_url?: string;
+    reference?: string;
+    txstatus?: number | string;
+    amount?: string | number;
+    currency?: string;
+    accountnumber?: string;
+    transactionid?: string | number | null;
+    externalref?: string;
+    secret?: string;
+  } | string | null;
 };
 
 function moolreUser() {
@@ -115,7 +113,7 @@ export async function initializeMoolre(order: Order) {
       email,
       externalref: order.paymentReference,
       callback: `${siteUrl()}/api/moolre/webhook`,
-      redirect: `${siteUrl()}/checkout/return?reference=${encodeURIComponent(order.paymentReference)}`,
+      redirect: `${siteUrl()}/checkout/return?reference=${encodeURIComponent(order.paymentReference)}&token=${encodeURIComponent(order.accessToken)}`,
       reusable: "0",
       expiration_time: Math.max(1, store.reservationMinutes || 30),
       currency: order.currency,
@@ -131,7 +129,7 @@ export async function initializeMoolre(order: Order) {
     return { ok: true as const, url };
   }
   if (body?.code === "INP02") {
-    return { ok: true as const, url: `${siteUrl()}/checkout/return?reference=${encodeURIComponent(order.paymentReference)}` };
+    return { ok: true as const, url: `${siteUrl()}/checkout/return?reference=${encodeURIComponent(order.paymentReference)}&token=${encodeURIComponent(order.accessToken)}` };
   }
   return { ok: false as const, message: body?.message || "Moolre did not start the payment." };
 }

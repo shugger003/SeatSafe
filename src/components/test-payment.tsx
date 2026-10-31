@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { simulateTestPaymentAction } from "@/app/actions/store";
 
-export function TestPayment({ reference }: { reference: string }) {
+export function TestPayment({ reference, token }: { reference: string; token: string }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
 
   async function choose(outcome: "success" | "failed" | "abandoned") {
     setPending(true);
-    const result = await simulateTestPaymentAction(reference, outcome);
+    const result = await simulateTestPaymentAction(reference, token, outcome);
     if (!result.ok) {
       setMessage(result.message);
       setPending(false);
