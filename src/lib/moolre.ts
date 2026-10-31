@@ -1,7 +1,7 @@
 import "server-only";
 import { timingSafeEqual } from "node:crypto";
 import { majorToMinor, minorToMajorInput } from "@/lib/money";
-import { siteUrl } from "@/lib/safe";
+import { callbackOrigin, siteUrl } from "@/lib/safe";
 import type { Order } from "@/lib/types";
 
 export type ProviderStatus = "success" | "failed" | "abandoned" | "pending";
@@ -112,7 +112,7 @@ export async function initializeMoolre(order: Order) {
       amount: minorToMajorInput(order.totalMinor),
       email,
       externalref: order.paymentReference,
-      callback: `${siteUrl()}/api/moolre/webhook`,
+      callback: `${callbackOrigin()}/api/moolre/webhook`,
       redirect: `${siteUrl()}/checkout/return?reference=${encodeURIComponent(order.paymentReference)}&token=${encodeURIComponent(order.accessToken)}`,
       reusable: "0",
       expiration_time: Math.max(1, store.reservationMinutes || 30),

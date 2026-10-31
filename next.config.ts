@@ -54,6 +54,8 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "sitsafe.company" },
+      { protocol: "https", hostname: "www.sitsafe.company" },
       { protocol: "https", hostname: "seatshieldghana.com" },
       { protocol: "https", hostname: "www.seatshieldghana.com" },
     ],
@@ -71,10 +73,11 @@ const nextConfig: NextConfig = {
     const toCanonical = (host: string) => ({
       source: "/:path*",
       has: [{ type: "host" as const, value: host }],
-      destination: "https://seatshieldghana.com/:path*",
+      destination: "https://sitsafe.company/:path*",
       permanent: true,
     });
     return [
+      toCanonical("seatshieldghana.com"),
       toCanonical("www.seatshieldghana.com"),
       { source: "/product/safeseat", destination: "/product/sitsafe", permanent: true },
       { source: "/product/seat-shield", destination: "/product/sitsafe", permanent: true },

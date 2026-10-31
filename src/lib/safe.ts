@@ -32,7 +32,7 @@ export function parseJson<T>(value: string | null | undefined, fallback: T): T {
   }
 }
 
-export const CANONICAL_SITE_URL = "https://seatshieldghana.com";
+export const CANONICAL_SITE_URL = "https://sitsafe.company";
 
 export function siteUrl() {
   if (process.env.VERCEL_ENV === "preview") {
@@ -41,6 +41,11 @@ export function siteUrl() {
   }
   if (process.env.NODE_ENV === "production") return CANONICAL_SITE_URL;
   return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
+}
+
+/** The apex redirects to www before the app runs, so server callbacks use the host that answers. */
+export function callbackOrigin() {
+  return siteUrl() === CANONICAL_SITE_URL ? "https://www.sitsafe.company" : siteUrl();
 }
 
 export function newId() {
