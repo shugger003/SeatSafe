@@ -5,6 +5,7 @@ import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
 import { formatMoney } from "@/lib/money";
 import { paymentsMode } from "@/lib/moolre";
+import { smsConfigured } from "@/lib/sms";
 
 export const instant = false;
 
@@ -14,6 +15,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const store = await getStore();
   const payments = paymentsMode() !== "disabled";
   const email = emailConfigured();
+  const sms = smsConfigured();
   return (
     <div className="grid gap-6">
       <PageHeader title="Settings" />
@@ -42,6 +44,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </p>
             </div>
             <Badge tone={email ? "green" : "amber"}>{email ? "Set up" : "Not set up"}</Badge>
+          </li>
+          <li className="flex flex-wrap items-start justify-between gap-3 border-t border-line pt-4">
+            <div className="max-w-xl">
+              <p className="font-medium">SMS</p>
+              <p className="mt-0.5 leading-6 text-muted">
+                {sms
+                  ? "Signed-in admins can text a customer from the SMS page or an order."
+                  : "Texts are not sent yet. Add MOOLRE_SMS_VASKEY and an approved MOOLRE_SMS_SENDER_ID in Vercel."}
+              </p>
+            </div>
+            <Badge tone={sms ? "green" : "amber"}>{sms ? "Connected" : "Not connected"}</Badge>
           </li>
         </ul>
       </Card>

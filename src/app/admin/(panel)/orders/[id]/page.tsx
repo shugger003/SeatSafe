@@ -2,10 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr/ArrowLeft";
 import { fulfillmentAction, reconcileAction } from "@/app/actions/admin";
+import { SmsForm } from "@/components/admin/sms-form";
 import { Card, ContactButtons, FULFILLMENT_LABELS, FulfillmentBadge, Label, Notice, PaymentBadge, SubmitButton, field, textarea } from "@/components/admin/ui";
 import { getOrderById, getStore, listOrderEvents } from "@/lib/db";
 import { live } from "@/lib/live";
 import { formatMoney, formatWhen } from "@/lib/money";
+import { smsConfigured } from "@/lib/sms";
 import { FULFILLMENT_STATUSES, type FulfillmentStatus, type Order } from "@/lib/types";
 
 export const instant = false;
@@ -25,6 +27,8 @@ export default async function OrderDetailPage({ params, searchParams }: { params
   const store = await getStore();
   const events = await listOrderEvents(order.id);
   const paid = order.paymentStatus === "paid" || order.paymentStatus === "reconciled";
+  const smsReady = smsConfigured();
+  const saved = notice === "Order updated." || notice === "Reconciliation recorded." || notice === "SMS sent.";
   const next = NEXT_STEP[order.fulfillmentStatus];
   const money = (minor: number) => formatMoney(minor, order.currency);
 
@@ -48,7 +52,7 @@ export default async function OrderDetailPage({ params, searchParams }: { params
         </div>
       </div>
 
-      {notice ? <Notice>{notice}</Notice> : null}
+      {notice ? <Notice tone={saved ? "success" : "warn"}>{notice}</Notice> : null}
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="grid content-start gap-6">
@@ -156,6 +160,16 @@ export default async function OrderDetailPage({ params, searchParams }: { params
               </form>
             </Card>
           ) : null}
+
+          <Card title="Text the customer" description="Sends one SMS through Moolre to this phone number.">
+            <SmsForm
+              phone={order.customerPhone}
+              message={`Hello ${order.customerName.split(" ")[0]}, this is ${store.businessName} about order ${order.orderNumber}.`}
+              orderId={order.id}
+              returnTo={`/admin/orders/${order.id}`}
+              ready={smsReady}
+            />
+          </Card>
 
           <Card title="Payment">
             <dl className="grid gap-3 text-sm">
