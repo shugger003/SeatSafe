@@ -65,6 +65,7 @@ See `.env.example`. Variable names only belong in git. Real keys belong in `.env
 | `SESSION_SECRET` | Signs the admin cookie |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` | Administrator sign-in |
 | `MOOLRE_API_USER` / `MOOLRE_API_PUBKEY` / `MOOLRE_ACCOUNT_NUMBER` / `MOOLRE_WEBHOOK_SECRET` | Server-side Moolre calls and callback checks |
+| `MOOLRE_SMS_VASKEY` / `MOOLRE_SMS_SENDER_ID` | Admin SMS. The VAS key stays on the server and is separate from the payment key |
 | `PAYMENTS_MODE` | `test` enables the local simulator outside production |
 | `RESEND_API_KEY` / `EMAIL_FROM` | Customer and admin email |
 | `NEXT_PUBLIC_ANALYTICS_ID` | Optional GA4 ID, loaded only after consent |
@@ -106,6 +107,8 @@ In the Moolre dashboard, set that address as the payment callback URL. The route
 If the Moolre values are missing, checkout explains that payment is not configured and does not create a paid order.
 
 Customers pay with MTN, Telecel, or AirtelTigo on Moolre’s page. This site does not store wallet PINs.
+
+SMS uses a separate Moolre VAS key. Set `MOOLRE_SMS_VASKEY` and `MOOLRE_SMS_SENDER_ID` (the approved sender name, at most 11 letters or numbers). A signed-in admin can send one text from `/admin/sms` or from an order. `POST /api/admin/sms` accepts JSON `{ phone, message, network, orderId }` only with that admin session, and only from this site. It does not accept the VAS key from the browser.
 
 ## Products and orders
 
