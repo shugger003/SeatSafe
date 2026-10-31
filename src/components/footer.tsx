@@ -8,6 +8,7 @@ import { TiktokLogo } from "@phosphor-icons/react/dist/ssr/TiktokLogo";
 import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr/WhatsappLogo";
 import { YoutubeLogo } from "@phosphor-icons/react/dist/ssr/YoutubeLogo";
 import { POLICY_LINKS } from "@/lib/defaults";
+import { PARTNERSHIP_LINKS } from "@/lib/partnerships";
 import { safeHref } from "@/lib/safe";
 import type { StoreSettings } from "@/lib/types";
 
@@ -20,11 +21,7 @@ const QUICK_LINKS = [
   { href: "/contact", label: "Contact us" },
 ];
 
-const COMPANY_LINKS = [
-  { href: "/contact", label: "Bulk Buying" },
-  { href: "/contact", label: "Become an Affiliate" },
-  { href: "/contact", label: "Become a Distributor" },
-];
+const COMPANY_LINKS = PARTNERSHIP_LINKS;
 
 const REGIONS = ["Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern", "Greater Accra", "North East", "Northern", "Oti", "Savannah", "Upper East", "Upper West", "Volta", "Western", "Western North"];
 
@@ -168,8 +165,8 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
 
         <div className="py-3 text-center text-xs text-paper/75 sm:mt-12 sm:border-t sm:border-paper/20 sm:py-6 sm:text-sm">
           <p>
-            <span className="sm:hidden">© {year} {store.businessName}</span>
-            <span className="hidden sm:inline">Copyright © {year} · All rights reserved {store.businessName}</span>
+            <span className="sm:hidden">\u00a9 {year} {store.businessName}</span>
+            <span className="hidden sm:inline">Copyright \u00a9 {year} \u00b7 All rights reserved {store.businessName}</span>
             <span className="px-2 text-paper/40" aria-hidden="true">|</span>
             <a href="/sitemap.xml" className={`${linkClass} inline-flex min-h-10 items-center sm:inline sm:min-h-0`}>Sitemap</a>
           </p>

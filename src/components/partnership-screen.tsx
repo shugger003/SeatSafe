@@ -25,7 +25,7 @@ export async function PartnershipScreen({ id }: { id: PartnershipId }) {
               {product.name}
             </Link>
           ) : null}
-          {product ? <span className="text-muted"> \u00b7 </span> : null}
+          {product ? <span className="text-muted"> · </span> : null}
           <Link href="/shop" className="underline underline-offset-4">
             {page.shop}
           </Link>
@@ -36,7 +36,7 @@ export async function PartnershipScreen({ id }: { id: PartnershipId }) {
               <div>
                 <dt className="font-medium">Phone</dt>
                 <dd>
-                  <a href={`tel:${store.phone.replace(/\\s+/g, "")}`}>{store.phone}</a>
+                  <a href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a>
                 </dd>
               </div>
             ) : null}

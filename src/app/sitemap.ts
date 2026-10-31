@@ -4,7 +4,7 @@ import { siteUrl } from "@/lib/safe";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
-  const staticRoutes = ["", "/shop", "/how-it-works", "/about", "/faq", "/contact", "/policies/shipping", "/policies/returns", "/policies/privacy", "/policies/terms"].map((path) => ({
+  const staticRoutes = ["", "/shop", "/how-it-works", "/about", "/faq", "/contact", "/bulk", "/affiliate", "/distributor", "/policies/shipping", "/policies/returns", "/policies/privacy", "/policies/terms"].map((path) => ({
     url: `${base}${path || "/"}`,
     changeFrequency: "weekly" as const,
     priority: path === "" ? 1 : 0.7,
