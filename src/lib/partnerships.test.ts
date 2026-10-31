@@ -9,7 +9,7 @@ describe("partnership requests", () => {
       kind: "bulk",
       ...person,
       organisation: "Ridge Hotel",
-      quantity: "40",
+      quantity: "50",
       place: "Greater Accra",
       channel: "",
       selling: "",
@@ -18,14 +18,14 @@ describe("partnership requests", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.message).toBe(
-      ["Request: Bulk buying", "Organisation: Ridge Hotel", "Bottles: 40", "Deliver to: Greater Accra", "", "Need them before a conference."].join("\n"),
+      ["Request: Bulk buying", "Organisation: Ridge Hotel", "Bottles: 50", "Deliver to: Greater Accra", "", "Need them before a conference."].join("\n"),
     );
     expect(result.message.toLowerCase()).not.toContain("discount");
   });
 
-  it("rejects a single bottle as a bulk order", () => {
-    const result = partnershipMessage({ kind: "bulk", ...person, organisation: "", quantity: "1", place: "Accra", channel: "", selling: "", note: "" });
-    expect(result).toEqual({ ok: false, message: "Enter how many bottles you need, from 2 to 10,000." });
+  it("rejects an order under 50 bottles", () => {
+    const result = partnershipMessage({ kind: "bulk", ...person, organisation: "", quantity: "49", place: "Accra", channel: "", selling: "", note: "" });
+    expect(result).toEqual({ ok: false, message: "Bulk orders start at 50 bottles." });
   });
 
   it("requires a place an affiliate would share SitSafe", () => {

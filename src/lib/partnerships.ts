@@ -7,11 +7,11 @@ export const PARTNERSHIPS = {
     title: "Bulk buying",
     request: "Bulk buying",
     description: "Ask for a price on a larger order of SitSafe toilet seat sanitizer.",
-    lead: "Hotels, offices, schools, clinics, and shops can ask for more than one bottle.",
+    lead: "Hotels, offices, schools, clinics, and shops can order 50 bottles or more.",
     detail: "Tell us how many bottles you need and where they should go. We reply with a price for that order and how delivery would work.",
-    caveat: "A bulk price is not listed on this page. We confirm it when we reply.",
+    caveat: "A bulk price is not listed on this page. We confirm it when we reply. Orders under 50 bottles stay on the shop.",
     submit: "Ask for a quote",
-    shop: "For one bottle, use the shop.",
+    shop: "For fewer than 50 bottles, use the shop.",
   },
   affiliate: {
     href: "/affiliate",
@@ -83,8 +83,8 @@ export function partnershipMessage(input: PartnershipInput): { ok: true; message
   const note = input.note.trim();
 
   if (kind === "bulk") {
-    if (!/^\d+$/.test(input.quantity) || Number(input.quantity) < 2 || Number(input.quantity) > 10000) {
-      return { ok: false, message: "Enter how many bottles you need, from 2 to 10,000." };
+    if (!/^\d+$/.test(input.quantity) || Number(input.quantity) < 50 || Number(input.quantity) > 10000) {
+      return { ok: false, message: "Bulk orders start at 50 bottles." };
     }
     const place = input.place.trim();
     if (place.length < 2) return { ok: false, message: "Tell us where to deliver." };

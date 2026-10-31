@@ -53,8 +53,8 @@ export function PartnershipForm({ kind }: { kind: PartnershipId }) {
           <Field label="Organisation" hint="Optional. A hotel, office, school, clinic, or shop.">
             <input name="organisation" autoComplete="organization" className={field} />
           </Field>
-          <Field label="How many bottles" hint="From 2 to 10,000.">
-            <input name="quantity" type="number" required min={2} max={10000} inputMode="numeric" className={field} />
+          <Field label="How many bottles" hint="50 or more.">
+            <input name="quantity" type="number" required min={50} max={10000} inputMode="numeric" className={field} />
           </Field>
           <Field label="Where should we deliver">
             <input name="place" required autoComplete="address-level1" className={field} />
