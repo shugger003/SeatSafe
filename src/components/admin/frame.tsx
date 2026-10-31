@@ -9,6 +9,7 @@ import { GearSix } from "@phosphor-icons/react/dist/ssr/GearSix";
 import { House } from "@phosphor-icons/react/dist/ssr/House";
 import { List } from "@phosphor-icons/react/dist/ssr/List";
 import { Package } from "@phosphor-icons/react/dist/ssr/Package";
+import { PaperPlaneTilt } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 import { Receipt } from "@phosphor-icons/react/dist/ssr/Receipt";
 import { SignOut } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { Tag } from "@phosphor-icons/react/dist/ssr/Tag";
@@ -22,6 +23,7 @@ const LINKS = [
   { label: "Orders", href: "/admin/orders", icon: Receipt },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Messages", href: "/admin/inquiries", icon: ChatCircleText },
+  { label: "SMS", href: "/admin/sms", icon: PaperPlaneTilt },
   { label: "Content", href: "/admin/content", icon: TextAa },
   { label: "Discounts", href: "/admin/discounts", icon: Tag },
   { label: "Settings", href: "/admin/settings", icon: GearSix },
