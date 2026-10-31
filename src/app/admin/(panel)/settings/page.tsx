@@ -5,6 +5,7 @@ import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
 import { formatMoney } from "@/lib/money";
 import { paymentsMode } from "@/lib/moolre";
+import { callbackOrigin } from "@/lib/safe";
 import { smsConfigured } from "@/lib/sms";
 
 export const instant = false;
@@ -16,6 +17,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const payments = paymentsMode() !== "disabled";
   const email = emailConfigured();
   const sms = smsConfigured();
+  const callbackUrl = `${callbackOrigin()}/api/moolre/webhook`;
   return (
     <div className="grid gap-6">
       <PageHeader title="Settings" />
@@ -29,7 +31,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <p className="mt-0.5 leading-6 text-muted">
                 {payments
                   ? "Customers can pay with MTN, Telecel, or AirtelTigo on Moolre. Orders are marked paid only after Moolre confirms the money."
-                  : "Moolre is disconnected. Customers can’t pay on the site. When the new merchant account is ready, add its API user, public key, account number, and callback secret in Vercel, and set the Moolre callback URL to this site’s /api/moolre/webhook."}
+                  : "Moolre is disconnected. Customers can’t pay on the site. When the new merchant account is ready, add its API user, public key, account number, and callback secret in Vercel."}
+              </p>
+              <p className="mt-2 leading-6 text-muted">
+                Callback URL this site sends to Moolre: <span className="break-all text-ink">{callbackUrl}</span>
               </p>
             </div>
             <Badge tone={payments ? "green" : "amber"}>{payments ? "Connected" : "Not connected"}</Badge>

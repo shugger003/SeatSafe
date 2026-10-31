@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr/ArrowLeft";
 import { fulfillmentAction, reconcileAction } from "@/app/actions/admin";
+import { checkMoolrePaymentAction } from "@/app/actions/admin-moolre";
 import { SmsForm } from "@/components/admin/sms-form";
 import { Card, ContactButtons, FULFILLMENT_LABELS, FulfillmentBadge, Label, Notice, PaymentBadge, SubmitButton, field, textarea } from "@/components/admin/ui";
 import { getOrderById, getStore, listOrderEvents } from "@/lib/db";
@@ -171,11 +172,17 @@ export default async function OrderDetailPage({ params, searchParams }: { params
             />
           </Card>
 
-          <Card title="Payment">
+          <Card title="Payment" description={order.paymentProvider === "moolre" ? "This order was sent to Moolre." : undefined}>
             <dl className="grid gap-3 text-sm">
               <Detail label="Reference" value={order.paymentReference} />
               {order.providerReference ? <Detail label="Transaction ID" value={order.providerReference} /> : null}
             </dl>
+            {order.paymentProvider === "moolre" && order.paymentStatus === "pending" ? (
+              <form action={checkMoolrePaymentAction} className="mt-5">
+                <input type="hidden" name="orderId" value={order.id} />
+                <SubmitButton variant="secondary">Check this payment with Moolre</SubmitButton>
+              </form>
+            ) : null}
           </Card>
         </div>
       </div>
