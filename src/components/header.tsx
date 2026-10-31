@@ -9,6 +9,7 @@ import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr/WhatsappLogo";
 import { X } from "@phosphor-icons/react/dist/ssr/X";
 import { useCart } from "@/components/cart-provider";
 import { cn } from "@/lib/cn";
+import { PARTNERSHIP_LINKS } from "@/lib/partnerships";
 
 const LINKS = [
   { href: "/shop", label: "Shop" },
@@ -72,6 +73,7 @@ export function Header({
   const links = [
     productHref ? { href: productHref, label: productLabel || "Product" } : { href: "/shop", label: "Shop" },
     ...LINKS.filter((link) => link.href !== "/shop"),
+    ...PARTNERSHIP_LINKS,
   ];
 
   return (
