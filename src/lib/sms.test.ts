@@ -31,7 +31,7 @@ describe("send Moolre sms", () => {
     vi.stubGlobal("fetch", fetchMock);
     const result = await sendMoolreSms({ phone: "0265617666", message: "Your order is ready.", network: "mtn" });
     expect(result.ok).toBe(true);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://api.moolre.com/open/sms/send");
     expect(init.headers).toMatchObject({ "X-API-VASKEY": "vas-test" });
     expect(JSON.parse(String(init.body))).toEqual({
