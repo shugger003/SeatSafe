@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refreshCatalog } from "@/lib/catalog-cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createResetToken, isKnownAdmin, resetPassword } from "@/lib/admin-credentials";
@@ -51,7 +51,7 @@ async function admin() {
 }
 
 function refresh() {
-  revalidatePath("/", "layout");
+  refreshCatalog();
 }
 
 export async function loginAction(formData: FormData) {
