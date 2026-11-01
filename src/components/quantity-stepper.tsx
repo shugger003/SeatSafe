@@ -13,7 +13,8 @@ export function QuantityStepper({
   disabled?: boolean;
   onChange: (quantity: number) => void;
 }) {
-  const ceiling = Math.max(1, Math.min(20, max || 1));
+  const ceiling = Math.max(1, Math.floor(Number.isFinite(max) ? max : 1));
+  const digits = String(ceiling).length;
   const [draft, setDraft] = useState(String(value));
   const [editing, setEditing] = useState(false);
 
@@ -59,7 +60,7 @@ export function QuantityStepper({
           event.currentTarget.select();
         }}
         onChange={(event) => {
-          const next = event.target.value.replace(/\D/g, "").slice(0, 2);
+          const next = event.target.value.replace(/\D/g, "").slice(0, digits);
           setDraft(next);
           if (/^\d+$/.test(next)) apply(Number(next));
         }}
@@ -67,7 +68,8 @@ export function QuantityStepper({
         onKeyDown={(event) => {
           if (event.key === "Enter") event.currentTarget.blur();
         }}
-        className="h-11 w-10 border-0 bg-transparent text-center text-sm tabular-nums text-ink outline-none focus:outline-none disabled:opacity-40"
+        style={{ width: `${Math.max(2.5, digits) + 1}ch` }}
+        className="h-11 min-w-10 border-0 bg-transparent px-0.5 text-center text-sm tabular-nums text-ink outline-none focus:outline-none disabled:opacity-40"
       />
       <button
         type="button"

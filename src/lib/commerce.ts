@@ -14,6 +14,9 @@ export type CatalogProduct = Pick<
   | "variants"
 >;
 
+/** Safety stop for a typed quantity. Shoppers are limited by the stock on hand. */
+export const MAX_LINE_QUANTITY = 1_000_000;
+
 export function availableStock(product: CatalogProduct, variant: ProductVariant | null) {
   if (variant) return variant.available ? variant.stockQuantity : 0;
   return product.stockQuantity;
@@ -51,7 +54,7 @@ export function evaluateDiscount(subtotalMinor: number, discount: Discount | nul
     return { discountMinor: 0, message: "That code has reached its usage limit.", ok: false };
   }
   if (subtotalMinor < discount.minOrderMinor) {
-    return { discountMinor: 0, message: "The order has not reached this code’s minimum.", ok: false };
+    return { discountMinor: 0, message: "The order has not reached this code\u2019s minimum.", ok: false };
   }
   const raw = discount.type === "percent" ? Math.floor((subtotalMinor * discount.value) / 100) : discount.value;
   const discountMinor = Math.min(Math.max(0, raw), subtotalMinor);
@@ -115,12 +118,12 @@ export function buildQuote(input: {
     } else if (!Number.isInteger(quantity) || quantity < 1) {
       available = false;
       message = "Enter a quantity of at least 1.";
+    } else if (quantity > MAX_LINE_QUANTITY) {
+      available = false;
+      message = "Enter a smaller quantity.";
     } else if (quantity > stock) {
       available = false;
       message = stock > 0 ? `Only ${stock} available.` : "Out of stock.";
-    } else if (quantity > 20) {
-      available = false;
-      message = "Quantity is above the limit of 20 per order.";
     }
     if (!available && message) blockers.push(`${name}: ${message}`);
     quoteLines.push({
@@ -130,6 +133,7 @@ export function buildQuote(input: {
       variantName,
       sku,
       quantity: quantity > 0 ? quantity : 0,
+      stock,
       unitPriceMinor: available ? price : price,
       lineTotalMinor: available && price != null ? price * quantity : null,
       available,
@@ -189,6 +193,7 @@ function emptyLine(line: CartLineInput, message: string, name = "Unavailable ite
     variantName: "",
     sku: "",
     quantity: line.quantity,
+    stock: 0,
     unitPriceMinor: null,
     lineTotalMinor: null,
     available: false,
