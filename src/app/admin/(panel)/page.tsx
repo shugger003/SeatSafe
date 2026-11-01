@@ -8,13 +8,14 @@ import { emailConfigured } from "@/lib/email";
 import { live } from "@/lib/live";
 import { formatMoney, formatWhen } from "@/lib/money";
 import { paymentsMode } from "@/lib/moolre";
+import { salesSnapshot, type SalesDay } from "@/lib/sales";
 
 export const instant = false;
 
 export default async function DashboardPage() {
   await live();
   const store = await getStore();
-  const metrics = await dashboardMetrics();
+  const [metrics, sales] = await Promise.all([dashboardMetrics(), salesSnapshot(store.timezone || "Africa/Accra")]);
   const policies = await getPolicies();
   const checks: Array<{ text: string; href: string } | null> = [
     store.businessName === "Brand name" ? { text: "Add the business name.", href: "/admin/settings" } : null,
@@ -38,6 +39,22 @@ export default async function DashboardPage() {
         <Stat label="Awaiting payment" value={String(metrics.pendingOrders)} href="/admin/orders?view=awaiting-payment" />
         <Stat label="Delivered" value={String(metrics.completedOrders)} hint={`${metrics.totalOrders} orders in total`} href="/admin/orders?view=delivered" />
       </div>
+
+      <Card title="Sales" description="Paid orders from the last 7 days. A checkout that has not been paid is not included.">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Figure label="Today" value={money(sales.today.revenueMinor, store.currency)} hint={sales.today.orders === 1 ? "1 paid order" : `${sales.today.orders} paid orders`} />
+          <Figure label="Bottles today" value={String(sales.today.bottles)} hint="From paid orders" />
+          <Figure label="7 days" value={money(sales.weekRevenueMinor, store.currency)} hint={sales.weekOrders === 1 ? "1 paid order" : `${sales.weekOrders} paid orders`} />
+          <Figure label="Bottles, 7 days" value={String(sales.weekBottles)} hint="From paid orders" />
+        </div>
+        <SalesBars days={sales.days} currency={store.currency} />
+        {sales.waitingOrders > 0 ? (
+          <p className="mt-4 text-sm text-muted">
+            {money(sales.waitingMinor, store.currency)} is still waiting on payment
+            {sales.waitingOrders === 1 ? " from 1 order." : ` from ${sales.waitingOrders} orders.`}
+          </p>
+        ) : null}
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
         <Card
@@ -106,6 +123,42 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function money(minor: number, currency: string) {
+  return formatMoney(minor, currency) || formatMoney(0, currency) || "0";
+}
+
+function Figure({ label, value, hint }: { label: string; value: string; hint: string }) {
+  return (
+    <div>
+      <p className="text-sm text-muted">{label}</p>
+      <p className="mt-1 font-display text-3xl tabular-nums">{value}</p>
+      <p className="mt-1 text-xs text-muted">{hint}</p>
+    </div>
+  );
+}
+
+function SalesBars({ days, currency }: { days: SalesDay[]; currency: string }) {
+  const peak = Math.max(...days.map((day) => day.revenueMinor), 0);
+  return (
+    <ol className="mt-6 grid grid-cols-7 items-end gap-2">
+      {days.map((day) => {
+        const height = peak === 0 || day.revenueMinor === 0 ? 4 : Math.max(12, Math.round((day.revenueMinor / peak) * 112));
+        const amount = money(day.revenueMinor, currency);
+        const detail = `${day.label}: ${amount}, ${day.bottles} bottles, ${day.orders === 1 ? "1 paid order" : `${day.orders} paid orders`}`;
+        return (
+          <li key={day.key} className="grid justify-items-center gap-2">
+            <div className="flex h-28 w-full items-end" title={detail}>
+              <div className={cn("w-full rounded-t-md", day.revenueMinor > 0 ? "bg-pine" : "bg-stone")} style={{ height }} />
+            </div>
+            <span className="text-center text-[11px] leading-4 text-muted">{day.label}</span>
+            <span className="sr-only">{detail}</span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
