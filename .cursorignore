@@ -1,0 +1,4 @@
+# Keep local secrets out of the editor index and agent context.
+.env
+.env.*
+!.env.example
