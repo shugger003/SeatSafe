@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
+import { ghanaDisplay } from "@/lib/contact";
 import { catalogCached, getStore } from "@/lib/db";
+import { safeHref } from "@/lib/safe";
 
-export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS Seat Shield.", alternates: { canonical: "/contact" } };
+export const metadata: Metadata = { title: "Contact", description: "Call, email, or message ASAS SitSafe.", alternates: { canonical: "/contact" } };
 
 export default async function ContactPage() {
   const store = await catalogCached("store", getStore);
-  const published = Boolean(store.email || store.phone || store.address || store.supportHours);
+  const whatsapp = safeHref(store.social.whatsapp);
+  const published = Boolean(store.email || store.phone || whatsapp || store.address || store.supportHours);
   return (
     <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-2">
       <div>
@@ -14,7 +17,8 @@ export default async function ContactPage() {
         {published ? (
           <dl className="mt-6 space-y-3 text-sm">
             {store.email ? <div><dt className="font-medium">Email</dt><dd><a href={`mailto:${store.email}`}>{store.email}</a></dd></div> : null}
-            {store.phone ? <div><dt className="font-medium">Phone</dt><dd><a href={`tel:${store.phone}`}>{store.phone}</a></dd></div> : null}
+            {store.phone ? <div><dt className="font-medium">Call</dt><dd><a href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a></dd></div> : null}
+            {whatsapp ? <div><dt className="font-medium">WhatsApp</dt><dd><a href={whatsapp}>{ghanaDisplay(whatsapp)}</a></dd></div> : null}
             {store.address ? <div><dt className="font-medium">Address</dt><dd>{store.address}</dd></div> : null}
             {store.supportHours ? <div><dt className="font-medium">Hours</dt><dd>{store.supportHours}</dd></div> : null}
           </dl>

@@ -17,3 +17,11 @@ export function whatsappLink(phone: string, text?: string) {
   if (!digits) return null;
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 }
+
+/** Local display for a Ghana number or a wa.me link, such as 024 364 6400. */
+export function ghanaDisplay(value: string) {
+  const digits = phoneDigits(value);
+  if (!digits.startsWith("233") || digits.length !== 12) return value.trim();
+  const local = `0${digits.slice(3)}`;
+  return `${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}`;
+}

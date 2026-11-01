@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { WhatsAppBubble } from "@/components/whatsapp-bubble";
 import { catalogCached, getAnnouncement, getStore, listPublicProducts } from "@/lib/db";
+import { ghanaDisplay } from "@/lib/contact";
 import { safeHref } from "@/lib/safe";
 
 const YEAR = new Date().getFullYear();
@@ -30,6 +31,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const href = safeHref(announcement.href);
   const logo = safeHref(store.logoUrl) || "";
   const whatsapp = safeHref(store.social.whatsapp);
+  const whatsappLabel = whatsapp ? ghanaDisplay(whatsapp) : "";
 
   return (
     <CartProvider>
@@ -52,6 +54,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           productLabel={only ? only.name.replace(/\s+toilet sanitizer$/i, "") : undefined}
           phone={store.phone}
           whatsappHref={whatsapp}
+          whatsappLabel={whatsappLabel}
         />
         {store.showPreparationNotice && store.preparationNotice ? (
           <p className="bg-pine-dark px-5 py-2.5 text-center text-sm leading-6 text-paper/80">
@@ -62,7 +65,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           {children}
         </main>
         <Footer store={store} year={YEAR} />
-        {whatsapp ? <WhatsAppBubble href={whatsapp} phone={store.phone} /> : null}
+        {whatsapp ? <WhatsAppBubble href={whatsapp} phone={whatsappLabel} /> : null}
         <AnalyticsGate />
       </div>
     </CartProvider>

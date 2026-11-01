@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { PartnershipForm } from "@/components/partnership-form";
+import { ghanaDisplay } from "@/lib/contact";
 import { catalogCached, getStore, listPublicProducts } from "@/lib/db";
 import { PARTNERSHIPS, type PartnershipId } from "@/lib/partnerships";
+import { safeHref } from "@/lib/safe";
 
 export async function PartnershipScreen({ id }: { id: PartnershipId }) {
   const page = PARTNERSHIPS[id];
@@ -30,13 +32,21 @@ export async function PartnershipScreen({ id }: { id: PartnershipId }) {
             {page.shop}
           </Link>
         </p>
-        {store.phone || store.email ? (
+        {store.phone || store.email || safeHref(store.social.whatsapp) ? (
           <dl className="mt-8 space-y-3 text-sm">
             {store.phone ? (
               <div>
-                <dt className="font-medium">Phone</dt>
+                <dt className="font-medium">Call</dt>
                 <dd>
                   <a href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a>
+                </dd>
+              </div>
+            ) : null}
+            {safeHref(store.social.whatsapp) ? (
+              <div>
+                <dt className="font-medium">WhatsApp</dt>
+                <dd>
+                  <a href={safeHref(store.social.whatsapp)!}>{ghanaDisplay(store.social.whatsapp)}</a>
                 </dd>
               </div>
             ) : null}
