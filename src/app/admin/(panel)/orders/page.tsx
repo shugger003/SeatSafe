@@ -10,7 +10,7 @@ export const instant = false;
 
 const VIEWS = {
   all: { label: "All", payment: undefined, fulfillment: undefined },
-  "to-send": { label: "To send", payment: ["paid", "reconciled"], fulfillment: ["unfulfilled", "processing"] },
+  "to-send": { label: "Paid", payment: ["paid", "reconciled"], fulfillment: ["unfulfilled", "processing"] },
   "on-the-way": { label: "On the way", payment: undefined, fulfillment: "shipped" },
   "awaiting-payment": { label: "Awaiting payment", payment: "pending", fulfillment: undefined },
   delivered: { label: "Delivered", payment: undefined, fulfillment: "completed" },

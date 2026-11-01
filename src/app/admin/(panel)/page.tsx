@@ -33,7 +33,7 @@ export default async function DashboardPage() {
       <PageHeader eyebrow={today} title="Overview" />
 
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <Stat label="To send" value={String(metrics.awaitingFulfillment)} hint="Paid, not delivered yet" href="/admin/orders?view=to-send" emphasis />
+        <Stat label="Paid" value={String(metrics.awaitingFulfillment)} hint="Paid, not delivered yet" href="/admin/orders?view=to-send" emphasis />
         <Stat label="Revenue" value={formatMoney(metrics.verifiedRevenueMinor, store.currency) || formatMoney(0, store.currency) || "0"} hint="From paid orders" />
         <Stat label="Awaiting payment" value={String(metrics.pendingOrders)} href="/admin/orders?view=awaiting-payment" />
         <Stat label="Delivered" value={String(metrics.completedOrders)} hint={`${metrics.totalOrders} orders in total`} href="/admin/orders?view=delivered" />
