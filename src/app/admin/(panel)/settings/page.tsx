@@ -31,7 +31,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <p className="mt-0.5 leading-6 text-muted">
                 {payments
                   ? "Customers can pay with MTN, Telecel, or AirtelTigo on Moolre. Orders are marked paid only after Moolre confirms the money."
-                  : "Moolre is disconnected. Customers can’t pay on the site. When the new merchant account is ready, add its API user, public key, account number, and callback secret in Vercel."}
+                  : "Moolre is disconnected. Customers can\u2019t pay on the site. When the new merchant account is ready, add its API user, public key, account number, and callback secret in Vercel."}
               </p>
               <p className="mt-2 leading-6 text-muted">
                 Callback URL this site sends to Moolre: <span className="break-all text-ink">{callbackUrl}</span>
@@ -102,7 +102,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
         <Card title="Social links" description="Paste the full link. Leave blank to hide the icon.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Label label="WhatsApp"><input name="whatsapp" defaultValue={store.social.whatsapp} placeholder="https://wa.me/233…" className={field} /></Label>
+            <Label label="WhatsApp"><input name="whatsapp" defaultValue={store.social.whatsapp} placeholder="https://wa.me/233\u2026" className={field} /></Label>
             <Label label="Instagram"><input name="instagram" defaultValue={store.social.instagram} className={field} /></Label>
             <Label label="Facebook"><input name="facebook" defaultValue={store.social.facebook} className={field} /></Label>
             <Label label="TikTok"><input name="tiktok" defaultValue={store.social.tiktok} className={field} /></Label>
@@ -114,7 +114,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="grid gap-4 sm:grid-cols-3">
             <Label label="Currency"><input name="currency" defaultValue={store.currency} className={field} /></Label>
             <Label label="Time zone"><input name="timezone" defaultValue={store.timezone} className={field} /></Label>
-            <Label label="Hold items for (minutes)" hint="While a customer is paying."><input name="reservationMinutes" type="number" min={5} max={180} defaultValue={store.reservationMinutes} className={field} /></Label>
+            <Label label="Payment window (minutes)" hint="How long a customer has to pay. Stock is taken only after payment is confirmed."><input name="reservationMinutes" type="number" min={5} max={180} defaultValue={store.reservationMinutes} className={field} /></Label>
           </div>
         </Card>
 

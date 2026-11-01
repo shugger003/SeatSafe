@@ -101,7 +101,7 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
         ok: true,
         token: created.order.accessToken,
         url: null,
-        message: "The order is reserved, but Moolre did not start the payment. Use the order page to try again.",
+        message: "The order was saved, but Moolre did not start the payment. Use the order page to try again.",
       };
     }
     return { ok: true, token: created.order.accessToken, url: payment.url, message: null };
@@ -111,7 +111,7 @@ export async function placeOrderAction(input: unknown): Promise<{ ok: true; toke
       ok: true,
       token: created.order.accessToken,
       url: null,
-      message: "The order is reserved, but the payment service could not be reached.",
+      message: "The order was saved, but the payment service could not be reached.",
     };
   }
 }
