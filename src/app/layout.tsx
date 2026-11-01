@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import { Manrope, Newsreader } from "next/font/google";
 import { siteUrl } from "@/lib/safe";
 import "./globals.css";
@@ -33,7 +34,8 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  await connection();
   return (
     <html lang="en" className={`${sans.variable} ${display.variable} h-full`}>
       <body className="min-h-full bg-paper text-ink antialiased">
