@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { sendMoolreSms, smsRecipient } from "@/lib/sms";
+import { paymentConfirmationSms, sendMoolreSms, smsNetworkForPhone, smsRecipient } from "@/lib/sms";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -12,6 +12,39 @@ describe("sms recipient", () => {
   it("turns a local Ghana number into the Moolre form", () => {
     expect(smsRecipient("026 561 7666")).toBe("233265617666");
     expect(smsRecipient("not a phone")).toBe("");
+  });
+});
+
+describe("payment confirmation", () => {
+  it("names the order, the total, and the call number inside one text", () => {
+    const message = paymentConfirmationSms({
+      businessName: "ASAS SitSafe",
+      orderNumber: "ORD-20261101-9646",
+      total: "GH\u20b530.00",
+      phone: "026 561 7666",
+    });
+    expect(message).toBe(
+      "ASAS SitSafe: payment received for ORD-20261101-9646. Total GH\u20b530.00. We will deliver your order. Call 026 561 7666 with questions.",
+    );
+    expect(message.length).toBeLessThanOrEqual(160);
+  });
+
+  it("drops the call line when a long name would overflow one text", () => {
+    const message = paymentConfirmationSms({
+      businessName: "A".repeat(80),
+      orderNumber: "ORD-20261101-9646",
+      total: "GH\u20b530.00",
+      phone: "026 561 7666",
+    });
+    expect(message.length).toBeLessThanOrEqual(160);
+    expect(message).not.toContain("Call");
+    expect(message).toContain("ORD-20261101-9646");
+  });
+
+  it("routes MTN and Telecel prefixes and leaves other networks unset", () => {
+    expect(smsNetworkForPhone("0243646400")).toBe("MTN");
+    expect(smsNetworkForPhone("0205551234")).toBe("TELECEL");
+    expect(smsNetworkForPhone("0265617666")).toBe("");
   });
 });
 
@@ -42,7 +75,7 @@ describe("send Moolre sms", () => {
     });
   });
 
-  it("returns Moolre’s error when the sender id is not approved", async () => {
+  it("returns Moolre\u2019s error when the sender id is not approved", async () => {
     process.env.MOOLRE_SMS_VASKEY = "vas-test";
     process.env.MOOLRE_SMS_SENDER_ID = "SitSafe";
     vi.stubGlobal(

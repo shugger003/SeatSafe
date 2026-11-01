@@ -123,6 +123,16 @@ export async function setNotificationStatus(orderId: string, status: string) {
   if (result.error) throw new Error("Database request failed.");
 }
 
+export async function setSmsStatus(orderId: string, status: "pending" | "sending" | "sent" | "failed" | "skipped") {
+  const result = await supabaseAdmin().from("orders").update({ sms_status: status, updated_at: new Date().toISOString() }).eq("id", orderId);
+  if (result.error) throw new Error("Database request failed.");
+}
+
+/** Marks one paid order as the sender. A second call does not win the claim. */
+export async function claimPaymentSms(orderId: string) {
+  return rpc<string>("claim_payment_sms", { p_order_id: orderId });
+}
+
 export async function updateFulfillment(input: {
   orderId: string;
   status: Order["fulfillmentStatus"];
@@ -156,6 +166,12 @@ export async function reconcileOrder(input: { orderId: string; reason: string; e
     p_actor: input.actor,
   });
   if (!result.ok) return { ok: false as const, error: result.error || "The order could not be reconciled." };
+  try {
+    const { notifyPaidOrder } = await import("@/lib/notify");
+    await notifyPaidOrder({ id: input.orderId });
+  } catch (error) {
+    console.error("reconcile_notice_failed", error instanceof Error ? error.message : "unknown");
+  }
   return { ok: true as const };
 }
 

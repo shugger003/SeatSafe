@@ -23,6 +23,32 @@ export function smsNetwork(value: string | null | undefined) {
   return NETWORKS.find((item) => item === network) || "";
 }
 
+const MTN_PREFIXES = new Set(["024", "025", "053", "054", "055", "059"]);
+const TELECEL_PREFIXES = new Set(["020", "050"]);
+
+/** MTN or Telecel when the Ghana prefix is known. Other networks are left for Moolre to route. */
+export function smsNetworkForPhone(phone: string) {
+  const digits = smsRecipient(phone);
+  if (!digits) return "";
+  const prefix = `0${digits.slice(3, 5)}`;
+  if (MTN_PREFIXES.has(prefix)) return "MTN";
+  if (TELECEL_PREFIXES.has(prefix)) return "TELECEL";
+  return "";
+}
+
+/** One payment receipt, kept within a single SMS. */
+export function paymentConfirmationSms(input: { businessName: string; orderNumber: string; total: string; phone: string }) {
+  const name = input.businessName.trim() || "SitSafe";
+  const total = input.total.trim();
+  const call = input.phone.trim();
+  const full = call
+    ? `${name}: payment received for ${input.orderNumber}. Total ${total}. We will deliver your order. Call ${call} with questions.`
+    : `${name}: payment received for ${input.orderNumber}. Total ${total}. We will deliver your order.`;
+  if (full.length <= 160) return full;
+  const short = `${name}: payment received for ${input.orderNumber}. Total ${total}.`;
+  return short.length <= 160 ? short : short.slice(0, 160);
+}
+
 export async function sendMoolreSms(input: { phone: string; message: string; network?: string; ref?: string }) {
   const key = process.env.MOOLRE_SMS_VASKEY?.trim() || "";
   const senderid = smsSenderId();
