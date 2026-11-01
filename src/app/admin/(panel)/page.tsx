@@ -153,7 +153,7 @@ function SalesBars({ days, currency }: { days: SalesDay[]; currency: string }) {
             <div className="flex h-28 w-full items-end" title={detail}>
               <div className={cn("w-full rounded-t-md", day.revenueMinor > 0 ? "bg-pine" : "bg-stone")} style={{ height }} />
             </div>
-            <span className="text-center text-[11px] leading-4 text-muted">{day.label}</span>
+            <span aria-hidden="true" className="text-center text-[11px] leading-4 text-muted">{day.label}</span>
             <span className="sr-only">{detail}</span>
           </li>
         );
