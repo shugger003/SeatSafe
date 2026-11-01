@@ -1,18 +1,17 @@
 import { jwtVerify } from "jose";
 import { NextResponse, type NextRequest } from "next/server";
+import { PUBLIC_CLOSED_HOSTS, publicSiteClosed } from "@/lib/public-access";
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot", "/admin/reset"]);
-const RETIRED_HOSTS = new Set(["sitsafe.company", "www.sitsafe.company", "seatshieldghana.com", "www.seatshieldghana.com"]);
 
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
   const { pathname } = request.nextUrl;
-  if (RETIRED_HOSTS.has(host) && !pathname.startsWith("/api/moolre/webhook")) {
+  if (publicSiteClosed() && PUBLIC_CLOSED_HOSTS.has(host) && pathname !== "/unavailable" && !pathname.startsWith("/api/moolre/webhook")) {
     const url = request.nextUrl.clone();
-    url.protocol = "https:";
-    url.hostname = "seat-safe-two.vercel.app";
-    url.port = "";
-    return NextResponse.redirect(url, 307);
+    url.pathname = "/unavailable";
+    url.search = "";
+    return NextResponse.rewrite(url);
   }
   if (!pathname.startsWith("/admin") || PUBLIC_ADMIN_PATHS.has(pathname)) return NextResponse.next();
   const token = request.cookies.get("admin_session")?.value;
