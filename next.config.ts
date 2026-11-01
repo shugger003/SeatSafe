@@ -70,15 +70,7 @@ const nextConfig: NextConfig = {
     },
   },
   async redirects() {
-    const toCanonical = (host: string) => ({
-      source: "/:path*",
-      has: [{ type: "host" as const, value: host }],
-      destination: "https://sitsafe.company/:path*",
-      permanent: true,
-    });
     return [
-      toCanonical("seatshieldghana.com"),
-      toCanonical("www.seatshieldghana.com"),
       { source: "/product/safeseat", destination: "/product/sitsafe", permanent: true },
       { source: "/product/seat-shield", destination: "/product/sitsafe", permanent: true },
     ];

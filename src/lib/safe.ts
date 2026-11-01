@@ -32,7 +32,7 @@ export function parseJson<T>(value: string | null | undefined, fallback: T): T {
   }
 }
 
-export const CANONICAL_SITE_URL = "https://sitsafe.company";
+export const CANONICAL_SITE_URL = "https://seat-safe-two.vercel.app";
 
 export function siteUrl() {
   if (process.env.VERCEL_ENV === "preview") {
@@ -43,9 +43,9 @@ export function siteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
 }
 
-/** The apex redirects to www before the app runs, so server callbacks use the host that answers. */
+/** Payment callbacks use the same host the store is served on. */
 export function callbackOrigin() {
-  return siteUrl() === CANONICAL_SITE_URL ? "https://www.sitsafe.company" : siteUrl();
+  return siteUrl();
 }
 
 export function newId() {
