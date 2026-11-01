@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export function QuantityStepper({
   value,
   max,
@@ -10,26 +14,67 @@ export function QuantityStepper({
   onChange: (quantity: number) => void;
 }) {
   const ceiling = Math.max(1, Math.min(20, max || 1));
+  const [draft, setDraft] = useState(String(value));
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (!editing) setDraft(String(value));
+  }, [editing, value]);
+
+  function apply(next: number) {
+    const quantity = Math.min(ceiling, Math.max(1, next));
+    setDraft(String(quantity));
+    if (quantity !== value) onChange(quantity);
+  }
+
+  function commit() {
+    setEditing(false);
+    if (!/^\d+$/.test(draft)) {
+      setDraft(String(value));
+      return;
+    }
+    apply(Number(draft));
+  }
+
   return (
-    <div className="inline-flex items-center border border-line bg-surface">
+    <div className="inline-flex items-center border border-line bg-surface focus-within:border-ink">
       <button
         type="button"
         className="inline-flex h-11 w-11 items-center justify-center text-lg disabled:opacity-40"
         aria-label="Decrease quantity"
         disabled={disabled || value <= 1}
-        onClick={() => onChange(Math.max(1, value - 1))}
+        onClick={() => apply(value - 1)}
       >
         −
       </button>
-      <span className="min-w-8 text-center text-sm tabular-nums" aria-live="polite">
-        {value}
-      </span>
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        aria-label="Quantity"
+        disabled={disabled}
+        value={draft}
+        onFocus={(event) => {
+          setEditing(true);
+          event.currentTarget.select();
+        }}
+        onChange={(event) => {
+          const next = event.target.value.replace(/\D/g, "").slice(0, 2);
+          setDraft(next);
+          if (/^\d+$/.test(next)) apply(Number(next));
+        }}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.currentTarget.blur();
+        }}
+        className="h-11 w-10 border-0 bg-transparent text-center text-sm tabular-nums text-ink outline-none focus:outline-none disabled:opacity-40"
+      />
       <button
         type="button"
         className="inline-flex h-11 w-11 items-center justify-center text-lg disabled:opacity-40"
         aria-label="Increase quantity"
         disabled={disabled || value >= ceiling}
-        onClick={() => onChange(Math.min(ceiling, value + 1))}
+        onClick={() => apply(value + 1)}
       >
         +
       </button>
