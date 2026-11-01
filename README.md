@@ -98,7 +98,7 @@ Checkout sequence:
 7. A failed, cancelled, or expired payment returns the reserved stock.
 8. The same verification can arrive twice. The second one does not deduct stock again.
 
-Webhook URL: `https://www.sitsafe.company/api/moolre/webhook`
+Webhook URL: `https://seat-safe-two.vercel.app/api/moolre/webhook`
 
 In the Moolre dashboard, set that address as the payment callback URL. The route checks the callback `secret` and then verifies the transaction with Moolre.
 
@@ -140,11 +140,11 @@ Unpublished entries are hidden. Policy pages that are not marked reviewed show t
 
 1. Use Node.js 24 on a host with a persistent disk.
 2. Set every production variable in the host, not in git.
-3. Production canonical is `https://sitsafe.company`. Set `NEXT_PUBLIC_SITE_URL` only for local or preview work.
+3. Production is `https://seat-safe-two.vercel.app` until the custom domain is attached again. Set `NEXT_PUBLIC_SITE_URL` only for local or preview work.
 4. Set the four Moolre values from the live merchant account when you are ready to charge customers.
 5. Do not set `PAYMENTS_MODE=test` in production.
 6. Point the domain at the host and confirm `https`.
-7. Register `https://www.sitsafe.company/api/moolre/webhook` as the Moolre callback URL. The public address is `https://sitsafe.company`, and that host forwards to `www` before the app runs.
+7. Register `https://seat-safe-two.vercel.app/api/moolre/webhook` as the Moolre callback URL.
 8. Run `npm run build` and `npm start`, or the host’s equivalent.
 9. Sign in, replace placeholder content, publish a priced product, add delivery, then place a small live Moolre payment before taking customer orders.
 
