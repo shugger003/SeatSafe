@@ -7,6 +7,7 @@ import { InstagramLogo } from "@phosphor-icons/react/dist/ssr/InstagramLogo";
 import { TiktokLogo } from "@phosphor-icons/react/dist/ssr/TiktokLogo";
 import { WhatsappLogo } from "@phosphor-icons/react/dist/ssr/WhatsappLogo";
 import { YoutubeLogo } from "@phosphor-icons/react/dist/ssr/YoutubeLogo";
+import { ghanaDisplay } from "@/lib/contact";
 import { POLICY_LINKS } from "@/lib/defaults";
 import { PARTNERSHIP_LINKS } from "@/lib/partnerships";
 import { safeHref } from "@/lib/safe";
@@ -135,7 +136,8 @@ export function Footer({ store, year }: { store: StoreSettings; year: number }) 
               {socials.length > 0 ? socialList("flex shrink-0 gap-2 sm:hidden", "size-10") : null}
             </div>
             <ul className="mt-3 flex flex-wrap gap-x-5 text-sm sm:mt-5 sm:block lg:mt-7 lg:space-y-2">
-              {store.phone ? <li><a className={tapLinkClass} href={`tel:${store.phone.replace(/\s+/g, "")}`}>{store.phone}</a></li> : null}
+              {store.phone ? <li><a className={tapLinkClass} href={`tel:${store.phone.replace(/\s+/g, "")}`}>Call {store.phone}</a></li> : null}
+              {safeHref(store.social.whatsapp) ? <li><a className={tapLinkClass} href={safeHref(store.social.whatsapp)!} target="_blank" rel="noopener noreferrer">WhatsApp {ghanaDisplay(store.social.whatsapp)}</a></li> : null}
               {store.email ? <li><a className={tapLinkClass} href={`mailto:${store.email}`}>{store.email}</a></li> : null}
               {store.address ? <li className="text-paper/80">{store.address}</li> : null}
               {store.supportHours ? <li className="text-paper/80">{store.supportHours}</li> : null}

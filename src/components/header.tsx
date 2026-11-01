@@ -27,6 +27,7 @@ export function Header({
   productLabel,
   phone,
   whatsappHref,
+  whatsappLabel,
 }: {
   businessName: string;
   logoUrl: string;
@@ -34,6 +35,7 @@ export function Header({
   productLabel?: string;
   phone?: string;
   whatsappHref?: string | null;
+  whatsappLabel?: string;
 }) {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
@@ -221,7 +223,13 @@ export function Header({
                     </a>
                   ) : null}
                 </div>
-                {phone ? <p className="mt-3 text-center text-sm text-muted">{phone}</p> : null}
+                {phone || whatsappLabel ? (
+                  <p className="mt-3 text-center text-sm text-muted">
+                    {phone ? <span>Call {phone}</span> : null}
+                    {phone && whatsappLabel ? <span> · </span> : null}
+                    {whatsappLabel ? <span>WhatsApp {whatsappLabel}</span> : null}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </div>
