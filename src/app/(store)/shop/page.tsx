@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { availabilityLabel } from "@/components/product-card";
+import { availabilityLabel, listedInStock } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { StockBadge } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
@@ -9,7 +9,7 @@ import { catalogCached, getStore, listPublicProducts } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Shop the Seat Shield toilet seat sanitizer.",
+  description: "Shop the SitSafe toilet seat sanitizer.",
   alternates: { canonical: "/shop" },
 };
 
@@ -53,7 +53,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                 <h2 className="mt-4 font-display text-2xl">{product.name}</h2>
               </Link>
               <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted">{product.shortDescription}</p>
-              <StockBadge inStock={availabilityLabel(product) === "In stock"} label={availabilityLabel(product)} className="mt-3" />
+              <StockBadge inStock={listedInStock(product)} label={availabilityLabel(product)} className="mt-3" />
               <p className="mt-1"><Price minor={displayPrice(product)} currency={product.currency} compare={product.variants.length ? null : product.compareAtPriceMinor} /></p>
             </li>
           ))}
