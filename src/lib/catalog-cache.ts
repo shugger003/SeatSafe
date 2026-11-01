@@ -1,6 +1,6 @@
 import { revalidateTag, unstable_cache, updateTag } from "next/cache";
 
-const CATALOG = "catalog";
+const CATALOG = "catalog-2";
 
 /**
  * Expire catalog data after a save or a stock change.
