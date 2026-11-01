@@ -10,6 +10,7 @@ type CartContextValue = {
   count: number;
   notice: string;
   add: (line: CartLineInput, name: string) => void;
+  setLine: (line: CartLineInput) => void;
   setQuantity: (productId: string, variantId: string | null, quantity: number) => void;
   remove: (productId: string, variantId: string | null) => void;
   clear: () => void;
@@ -105,6 +106,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           : [...current, { ...line, quantity }];
         publish({ lines: next, discountCode: getSnapshot().discountCode });
         setNotice(`${name} added to cart`);
+      },
+      setLine: (line) => {
+        const quantity = Math.min(MAX_LINE_QUANTITY, Math.max(1, Math.floor(line.quantity || 1)));
+        const current = getSnapshot().lines.filter((item) => !same(item, line));
+        publish({
+          lines: [...current, { productId: line.productId, variantId: line.variantId, quantity }],
+          discountCode: getSnapshot().discountCode,
+        });
       },
       setQuantity: (productId, variantId, quantity) => {
         const nextQuantity = Math.min(MAX_LINE_QUANTITY, Math.max(0, Math.floor(quantity)));

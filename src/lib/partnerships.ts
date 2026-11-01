@@ -1,4 +1,5 @@
 import { phoneDigits } from "@/lib/contact";
+import { MAX_LINE_QUANTITY } from "@/lib/commerce";
 
 export const PARTNERSHIPS = {
   bulk: {
@@ -6,11 +7,11 @@ export const PARTNERSHIPS = {
     nav: "Bulk Buying",
     title: "Bulk buying",
     request: "Bulk buying",
-    description: "Ask for a price on a larger order of SitSafe toilet seat sanitizer.",
+    description: "Order 50 bottles or more at the shop price. You may resell each bottle for GH\u20b520.",
     lead: "Hotels, offices, schools, clinics, and shops can order 50 bottles or more.",
-    detail: "Tell us how many bottles you need and where they should go. We reply with a price for that order and how delivery would work.",
-    caveat: "A bulk price is not listed on this page. We confirm it when we reply. Orders under 50 bottles stay on the shop.",
-    submit: "Ask for a quote",
+    detail: "Each bottle is the same price as the shop. You may resell each bottle for GH\u20b520.",
+    caveat: "Orders under 50 bottles stay on the shop.",
+    submit: "Continue to checkout",
     shop: "For fewer than 50 bottles, use the shop.",
   },
   affiliate: {
@@ -40,6 +41,20 @@ export const PARTNERSHIPS = {
 } as const;
 
 export type PartnershipId = keyof typeof PARTNERSHIPS;
+
+export const BULK_MIN_BOTTLES = 50;
+/** What a bulk buyer may charge their own customer. Checkout still uses the shop price. */
+export const BULK_RESALE_MINOR = 2_000;
+
+export function bulkQuantity(value: number, stock: number) {
+  if (!Number.isInteger(value) || value < BULK_MIN_BOTTLES) {
+    return { ok: false as const, message: "Bulk orders start at 50 bottles." };
+  }
+  if (value > MAX_LINE_QUANTITY) return { ok: false as const, message: "Enter a smaller quantity." };
+  if (stock < BULK_MIN_BOTTLES) return { ok: false as const, message: "Not enough bottles are in stock for a bulk order." };
+  if (value > stock) return { ok: false as const, message: `Only ${stock} available.` };
+  return { ok: true as const, quantity: value };
+}
 
 export const PARTNERSHIP_LINKS = (Object.keys(PARTNERSHIPS) as PartnershipId[]).map((id) => ({
   href: PARTNERSHIPS[id].href,
