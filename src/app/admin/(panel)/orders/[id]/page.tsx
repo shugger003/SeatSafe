@@ -177,7 +177,7 @@ export default async function OrderDetailPage({ params, searchParams }: { params
               <Detail label="Reference" value={order.paymentReference} />
               {order.providerReference ? <Detail label="Transaction ID" value={order.providerReference} /> : null}
             </dl>
-            {order.paymentProvider === "moolre" && order.paymentStatus === "pending" ? (
+            {order.paymentProvider === "moolre" && (order.paymentStatus === "pending" || order.paymentStatus === "expired") ? (
               <form action={checkMoolrePaymentAction} className="mt-5">
                 <input type="hidden" name="orderId" value={order.id} />
                 <SubmitButton variant="secondary">Check this payment with Moolre</SubmitButton>

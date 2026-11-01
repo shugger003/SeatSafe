@@ -20,7 +20,7 @@ export async function checkMoolrePaymentAction(formData: FormData) {
   const order = await getOrderById(orderId);
   if (!order) bounce("/admin/orders", "Order not found.");
   if (order.paymentProvider !== "moolre") bounce(back, "This order was not sent to Moolre.");
-  if (order.paymentStatus !== "pending") bounce(back, "This order is no longer waiting on Moolre.");
+  if (order.paymentStatus !== "pending" && order.paymentStatus !== "expired") bounce(back, "This order is no longer waiting on Moolre.");
 
   let verification;
   try {
