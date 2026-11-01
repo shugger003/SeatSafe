@@ -34,6 +34,9 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
+/** A fresh script nonce has to be chosen per request, so the document cannot be a static shell. */
+export const instant = false;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   await connection();
   return (
