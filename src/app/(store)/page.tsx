@@ -5,7 +5,7 @@ import { catalogCached, getBenefits, getFaqs, getHomepage, getSteps, getStore, g
 import { siteUrl } from "@/lib/safe";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [store, home] = await Promise.all([catalogCached("store", getStore), catalogCached("homepage", getHomepage)]);
+  const [store, home] = await Promise.all([catalogCached("store", getStore), catalogCached("homepage-2", getHomepage)]);
   const title = store.businessName;
   const description = home.hero.description;
   return {
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [store, home, benefits, steps, catalog, useCases, faqs] = await Promise.all([
     catalogCached("store", getStore),
-    catalogCached("homepage", getHomepage),
+    catalogCached("homepage-2", getHomepage),
     catalogCached("benefits", getBenefits),
     catalogCached("steps", getSteps),
     catalogCached("public-products-12", () => listPublicProducts({ pageSize: 12 })),

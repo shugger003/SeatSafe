@@ -94,15 +94,15 @@ export function HomePage({
               <Link href={`/product/${featured.slug}`} className={HERO_LINK}>
                 {home.hero.primaryLabel || "View product"}
               </Link>
-              <Link href={home.hero.secondaryHref || "/how-it-works"} className={HERO_LINK}>
-                {home.hero.secondaryLabel || "How it works"}
+              <Link href={home.hero.secondaryHref || "/bulk"} className={HERO_LINK}>
+                {home.hero.secondaryLabel || "Buy in bulk"}
               </Link>
             </div>
           ) : (
             <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Button href={cta.href}>{home.hero.primaryLabel || "View the product"}</Button>
-              <Button href={home.hero.secondaryHref || "/how-it-works"} variant="quiet">
-                {home.hero.secondaryLabel || "How it works"}
+              <Button href={home.hero.secondaryHref || "/bulk"} variant="quiet">
+                {home.hero.secondaryLabel || "Buy in bulk"}
               </Button>
             </div>
           )}
