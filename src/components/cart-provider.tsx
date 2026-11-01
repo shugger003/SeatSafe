@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { MAX_LINE_QUANTITY } from "@/lib/commerce";
 import type { CartLineInput } from "@/lib/types";
 
 type CartContextValue = {
@@ -96,18 +97,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       discountCode,
       setDiscountCode: (code) => publish({ lines: getSnapshot().lines, discountCode: code }),
       add: (line, name) => {
-        const quantity = Math.max(1, Math.min(20, Math.floor(line.quantity || 1)));
+        const quantity = Math.max(1, Math.min(MAX_LINE_QUANTITY, Math.floor(line.quantity || 1)));
         const current = getSnapshot().lines;
         const match = current.find((item) => same(item, line));
         const next = match
-          ? current.map((item) => (same(item, line) ? { ...item, quantity: Math.min(20, item.quantity + quantity) } : item))
+          ? current.map((item) => (same(item, line) ? { ...item, quantity: Math.min(MAX_LINE_QUANTITY, item.quantity + quantity) } : item))
           : [...current, { ...line, quantity }];
         publish({ lines: next, discountCode: getSnapshot().discountCode });
         setNotice(`${name} added to cart`);
       },
       setQuantity: (productId, variantId, quantity) => {
+        const nextQuantity = Math.min(MAX_LINE_QUANTITY, Math.max(0, Math.floor(quantity)));
         const next = getSnapshot()
-          .lines.map((item) => (item.productId === productId && item.variantId === variantId ? { ...item, quantity } : item))
+          .lines.map((item) => (item.productId === productId && item.variantId === variantId ? { ...item, quantity: nextQuantity } : item))
           .filter((item) => item.quantity > 0);
         publish({ lines: next, discountCode: getSnapshot().discountCode });
       },

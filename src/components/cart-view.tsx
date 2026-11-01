@@ -66,7 +66,7 @@ export function CartView({ methods, currency }: { methods: DeliveryMethod[]; cur
             <div className="mt-4 flex items-center gap-4">
               <QuantityStepper
                 value={line.quantity}
-                max={20}
+                max={Math.max(1, line.stock)}
                 onChange={(quantity) => cart.setQuantity(line.productId, line.variantId, quantity)}
               />
               <button type="button" className="min-h-11 text-sm underline underline-offset-4" onClick={() => cart.remove(line.productId, line.variantId)}>

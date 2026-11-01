@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { z } from "zod";
-import { buildQuote, normalizeCode } from "@/lib/commerce";
+import { buildQuote, MAX_LINE_QUANTITY, normalizeCode } from "@/lib/commerce";
 import { getDiscountByCode, getOrderByToken, getProductById, getStore, saveInquiry } from "@/lib/db";
 import { sendInquiryEmail } from "@/lib/email";
 import { createPendingOrder, applyVerification } from "@/lib/orders";
@@ -15,7 +15,7 @@ import type { CartLineInput, Quote } from "@/lib/types";
 const lineSchema = z.object({
   productId: z.string().min(1).max(80),
   variantId: z.string().min(1).max(80).nullable(),
-  quantity: z.number().int().min(1).max(20),
+  quantity: z.number().int().min(1).max(MAX_LINE_QUANTITY),
 });
 
 async function clientIp() {

@@ -8,6 +8,7 @@ import { StockBadge, stockLabel } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { track } from "@/components/analytics";
 import { cn } from "@/lib/cn";
+import { MAX_LINE_QUANTITY } from "@/lib/commerce";
 
 type Option = {
   id: string;
@@ -58,7 +59,7 @@ export function ProductPurchase({
     if (stock <= 0) return "Out of stock.";
     return null;
   }, [blocked, options.length, selected, price, stock]);
-  const quantityCap = stock > 0 ? Math.min(20, stock) : blocked || price == null ? 20 : 1;
+  const quantityCap = stock > 0 ? Math.min(stock, MAX_LINE_QUANTITY) : 1;
 
   function addToCart() {
     if (reason) return;
