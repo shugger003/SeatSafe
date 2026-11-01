@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useCart } from "@/components/cart-provider";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { StockBadge, stockLabel } from "@/components/stock-badge";
@@ -27,6 +28,7 @@ export function ProductPurchase({
   baseStock,
   blocked,
   stickyBar = true,
+  links = [],
 }: {
   productId: string;
   name: string;
@@ -37,6 +39,7 @@ export function ProductPurchase({
   baseStock: number;
   blocked: string | null;
   stickyBar?: boolean;
+  links?: Array<{ href: string; label: string }>;
 }) {
   const { add } = useCart();
   useEffect(() => {
@@ -64,7 +67,7 @@ export function ProductPurchase({
   }
 
   const control = (
-    <div className="grid gap-4 rounded-lg border border-line bg-surface p-5 text-left">
+    <div className="grid gap-5 rounded-2xl border border-line bg-surface p-5 text-left">
       {options.length > 0 ? (
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Option</span>
@@ -85,13 +88,13 @@ export function ProductPurchase({
           </select>
         </label>
       ) : null}
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="grid gap-1.5 text-sm">
-          <span className="font-medium">Quantity</span>
-          <QuantityStepper value={quantity} max={quantityCap} onChange={setQuantity} />
-          <StockBadge inStock={stock > 0} label={stockLabel(stock)} className="mt-1" />
-        </div>
-        <Price minor={price} currency={currency} compare={compare} className="pb-2 text-lg" />
+      <div className="flex items-center justify-between gap-3">
+        <Price minor={price} currency={currency} compare={compare} className="font-display text-3xl tracking-[-0.03em]" />
+        <StockBadge inStock={stock > 0} label={stockLabel(stock)} />
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-medium">Quantity</span>
+        <QuantityStepper value={quantity} max={quantityCap} disabled={Boolean(reason)} onChange={setQuantity} />
       </div>
       <button
         type="button"
@@ -106,6 +109,15 @@ export function ProductPurchase({
       </button>
       {reason ? <p className="text-sm text-muted">{reason}</p> : null}
       <p className="text-sm leading-6 text-muted">Pay with MTN, Telecel, or AirtelTigo mobile money.</p>
+      {links.length > 0 ? (
+        <div className="flex items-center justify-between gap-4 border-t border-line pt-4">
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="text-sm font-medium text-ink underline-offset-4 hover:text-pine hover:underline">
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 
