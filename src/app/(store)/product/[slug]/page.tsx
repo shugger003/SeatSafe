@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductMedia } from "@/components/product-media";
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const { slug } = await params;
   const [product, store, relatedCatalog, allFaqs] = await Promise.all([
     catalogCached(`product:${slug}`, () => getProductBySlug(slug), 30),
@@ -61,7 +63,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-8 pb-28 sm:px-8 lg:pb-10">
-      {jsonLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /> : null}
+      {jsonLd ? <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /> : null}
       <nav className="text-sm text-muted" aria-label="Breadcrumb">
         <Link href="/">Home</Link> / <Link href="/shop">Shop</Link> / <span>{product.name}</span>
       </nav>

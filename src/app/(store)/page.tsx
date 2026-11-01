@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { HomePage } from "@/components/home-page";
 import { paymentsReady } from "@/lib/moolre";
 import { catalogCached, getBenefits, getFaqs, getHomepage, getSteps, getStore, getUseCases, listPublicProducts } from "@/lib/db";
@@ -17,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const [store, home, benefits, steps, catalog, useCases, faqs] = await Promise.all([
     catalogCached("store", getStore),
     catalogCached("homepage-2", getHomepage),
@@ -30,6 +32,7 @@ export default async function Page() {
     <>
       {store.businessName !== "Brand name" ? (
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({

@@ -1,5 +1,6 @@
 import { jwtVerify } from "jose";
 import { NextResponse, type NextRequest } from "next/server";
+import { contentSecurityPolicy } from "@/lib/csp";
 
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot", "/admin/reset"]);
 /** 6:00 p.m. Ghana time on 1 November 2026. Accra stays on GMT. */
@@ -39,31 +40,48 @@ const CLOSED_PAGE = `<!doctype html>
 </body>
 </html>`;
 
+function secure(response: NextResponse, request?: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const policy = contentSecurityPolicy(nonce, process.env.NODE_ENV !== "production");
+  if (request) {
+    const headers = new Headers(request.headers);
+    headers.set("x-nonce", nonce);
+    headers.set("Content-Security-Policy", policy);
+    const next = NextResponse.next({ request: { headers } });
+    next.headers.set("Content-Security-Policy", policy);
+    return next;
+  }
+  response.headers.set("Content-Security-Policy", policy);
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
   const { pathname } = request.nextUrl;
   if (Date.now() < PUBLIC_CLOSED_UNTIL && PUBLIC_CLOSED_HOSTS.has(host) && !pathname.startsWith("/api/moolre/webhook")) {
-    return new NextResponse(CLOSED_PAGE, {
-      status: 200,
-      headers: {
-        "content-type": "text/html; charset=utf-8",
-        "cache-control": "no-store",
-        "x-robots-tag": "noindex",
-      },
-    });
+    return secure(
+      new NextResponse(CLOSED_PAGE, {
+        status: 200,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store",
+          "x-robots-tag": "noindex",
+        },
+      }),
+    );
   }
-  if (!pathname.startsWith("/admin") || PUBLIC_ADMIN_PATHS.has(pathname)) return NextResponse.next();
+  if (!pathname.startsWith("/admin") || PUBLIC_ADMIN_PATHS.has(pathname)) return secure(NextResponse.next(), request);
   const token = request.cookies.get("admin_session")?.value;
   const secret = process.env.SESSION_SECRET;
   if (!token || !secret || secret.length < 16) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return secure(NextResponse.redirect(new URL("/admin/login", request.url)));
   }
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
     if (payload.role !== "admin") throw new Error("role");
-    return NextResponse.next();
+    return secure(NextResponse.next(), request);
   } catch {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return secure(NextResponse.redirect(new URL("/admin/login", request.url)));
   }
 }
 
