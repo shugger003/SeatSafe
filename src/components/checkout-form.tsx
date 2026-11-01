@@ -5,6 +5,7 @@ import { placeOrderAction, quoteCartAction } from "@/app/actions/store";
 import { track } from "@/components/analytics";
 import { useCart } from "@/components/cart-provider";
 import { EmptyState, Notice } from "@/components/ui";
+import { bulkInstructions, clearBulkDetails, readBulkDetails } from "@/lib/bulk-details";
 import { formatMoney } from "@/lib/money";
 import type { DeliveryMethod, Quote } from "@/lib/types";
 
@@ -16,6 +17,22 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
   const [quote, setQuote] = useState<Quote | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
+  const [customer, setCustomer] = useState({ name: "", email: "", phone: "", address: "", city: "", region: "", instructions: "" });
+
+  useEffect(() => {
+    const saved = readBulkDetails();
+    if (!saved) return;
+    const region = REGIONS.find((item) => item.toLowerCase() === saved.place.trim().toLowerCase()) ?? "";
+    setCustomer({
+      name: saved.name,
+      email: saved.email,
+      phone: saved.phone,
+      address: saved.place,
+      city: "",
+      region,
+      instructions: bulkInstructions(saved),
+    });
+  }, []);
 
   useEffect(() => {
     if (!cart.ready || cart.lines.length === 0) return;
@@ -48,6 +65,7 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
     }
     track("payment_initiated", { currency });
     cart.clear();
+    clearBulkDetails();
     window.location.href = result.url || `/order/${result.token}`;
   }
 
@@ -68,15 +86,15 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
           <Notice key={error} tone="warn">{error}</Notice>
         ))}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Text label="Full name" name="name" autoComplete="name" required />
-          <Text label="Email" name="email" type="email" autoComplete="email" required />
-          <Text label="Phone" name="phone" type="tel" autoComplete="tel" required />
-          <Text label="City or locality" name="city" autoComplete="address-level2" required />
+          <Text label="Full name" name="name" autoComplete="name" required value={customer.name} onChange={(name) => setCustomer((current) => ({ ...current, name }))} />
+          <Text label="Email" name="email" type="email" autoComplete="email" required value={customer.email} onChange={(email) => setCustomer((current) => ({ ...current, email }))} />
+          <Text label="Phone" name="phone" type="tel" autoComplete="tel" required value={customer.phone} onChange={(phone) => setCustomer((current) => ({ ...current, phone }))} />
+          <Text label="City or locality" name="city" autoComplete="address-level2" required value={customer.city} onChange={(city) => setCustomer((current) => ({ ...current, city }))} />
         </div>
-        <Text label="Delivery address" name="address" autoComplete="street-address" required />
+        <Text label="Delivery address" name="address" autoComplete="street-address" required value={customer.address} onChange={(address) => setCustomer((current) => ({ ...current, address }))} />
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Region</span>
-          <select name="region" required autoComplete="address-level1" defaultValue="" className="field">
+          <select name="region" required autoComplete="address-level1" value={customer.region} onChange={(event) => setCustomer((current) => ({ ...current, region: event.target.value }))} className="field">
             <option value="" disabled>
               Choose a region
             </option>
@@ -89,7 +107,7 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
         </label>
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Delivery instructions</span>
-          <textarea name="instructions" maxLength={300} className="field min-h-24" />
+          <textarea name="instructions" maxLength={300} value={customer.instructions} onChange={(event) => setCustomer((current) => ({ ...current, instructions: event.target.value }))} className="field min-h-24" />
         </label>
         {methods.length > 0 ? (
           <fieldset className="grid gap-2">
@@ -136,18 +154,34 @@ export function CheckoutForm({ methods, currency }: { methods: DeliveryMethod[];
         </dl>
         {quote && !quote.purchasable && quote.blockers[0] ? <p className="mt-4 text-sm leading-6 text-muted">{quote.blockers[0]}</p> : null}
         <button type="submit" disabled={pending || !quote?.purchasable} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-pine px-4 font-medium text-paper transition-colors hover:bg-pine-dark disabled:opacity-50">
-          {pending ? "Starting payment…" : "Continue to payment"}
+          {pending ? "Starting payment\u2026" : "Continue to payment"}
         </button>
       </aside>
     </form>
   );
 }
 
-function Text({ label, name, type = "text", autoComplete, required }: { label: string; name: string; type?: string; autoComplete?: string; required?: boolean }) {
+function Text({
+  label,
+  name,
+  type = "text",
+  autoComplete,
+  required,
+  value,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  autoComplete?: string;
+  required?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <label className="grid gap-1.5 text-sm">
       <span className="font-medium">{label}</span>
-      <input name={name} type={type} required={required} autoComplete={autoComplete} className="field" />
+      <input name={name} type={type} required={required} autoComplete={autoComplete} value={value} onChange={(event) => onChange(event.target.value)} className="field" />
     </label>
   );
 }
