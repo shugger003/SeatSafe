@@ -8,7 +8,7 @@ import { StockBadge, stockLabel } from "@/components/stock-badge";
 import { Price } from "@/components/ui";
 import { track } from "@/components/analytics";
 import { cn } from "@/lib/cn";
-import { MAX_LINE_QUANTITY } from "@/lib/commerce";
+import { BULK_MIN_BOTTLES, BULK_UNIT_MINOR, MAX_LINE_QUANTITY } from "@/lib/commerce";
 
 type Option = {
   id: string;
@@ -49,7 +49,8 @@ export function ProductPurchase({
   const [variantId, setVariantId] = useState(options[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const selected = options.find((option) => option.id === variantId) ?? null;
-  const price = selected ? selected.priceMinor : basePrice;
+  const shelf = selected ? selected.priceMinor : basePrice;
+  const price = shelf != null && quantity >= BULK_MIN_BOTTLES && shelf > BULK_UNIT_MINOR ? BULK_UNIT_MINOR : shelf;
   const compare = selected ? selected.compareAtPriceMinor : baseCompare;
   const stock = selected ? (selected.available ? selected.stockQuantity : 0) : baseStock;
   const reason = useMemo(() => {

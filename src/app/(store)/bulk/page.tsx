@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BulkPurchase } from "@/components/bulk-purchase";
 import { ghanaDisplay } from "@/lib/contact";
 import { catalogCached, getStore, listPublicProducts } from "@/lib/db";
-import { PARTNERSHIPS } from "@/lib/partnerships";
+import { BULK_UNIT_MINOR, PARTNERSHIPS } from "@/lib/partnerships";
 import { safeHref } from "@/lib/safe";
 
 const page = PARTNERSHIPS.bulk;
@@ -74,7 +74,7 @@ export default async function BulkPage() {
       </div>
       <div className="rounded-[16px] border border-line bg-surface p-5 sm:p-6">
         {canBuy && product && priceMinor != null ? (
-          <BulkPurchase productId={product.id} name={product.name} priceMinor={priceMinor} currency={product.currency || store.currency} stock={product.stockQuantity} />
+          <BulkPurchase productId={product.id} name={product.name} priceMinor={BULK_UNIT_MINOR} currency={product.currency || store.currency} stock={product.stockQuantity} />
         ) : (
           <p className="text-sm leading-6">Bulk orders start at 50 bottles. There are not enough bottles in stock for that right now.</p>
         )}

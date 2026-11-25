@@ -1,5 +1,7 @@
 import { phoneDigits } from "@/lib/contact";
-import { MAX_LINE_QUANTITY } from "@/lib/commerce";
+import { BULK_MIN_BOTTLES, BULK_UNIT_MINOR, MAX_LINE_QUANTITY } from "@/lib/commerce";
+
+export { BULK_MIN_BOTTLES, BULK_UNIT_MINOR };
 
 export const PARTNERSHIPS = {
   bulk: {
@@ -7,9 +9,9 @@ export const PARTNERSHIPS = {
     nav: "Bulk Buying",
     title: "Bulk buying",
     request: "Bulk buying",
-    description: "Order 50 bottles or more at the shop price. You may resell each bottle for GH\u20b520.",
+    description: "Order 50 bottles or more at GH₵15 a bottle. You may resell each bottle for GH₵20.",
     lead: "Hotels, offices, schools, clinics, and shops can order 50 bottles or more.",
-    detail: "Each bottle is the same price as the shop. You may resell each bottle for GH\u20b520.",
+    detail: "Each bottle is GH₵15. You may resell each bottle for GH₵20.",
     caveat: "Orders under 50 bottles stay on the shop.",
     submit: "Continue to checkout",
     shop: "For fewer than 50 bottles, use the shop.",
@@ -42,8 +44,7 @@ export const PARTNERSHIPS = {
 
 export type PartnershipId = keyof typeof PARTNERSHIPS;
 
-export const BULK_MIN_BOTTLES = 50;
-/** What a bulk buyer may charge their own customer. Checkout still uses the shop price. */
+/** What a bulk buyer may charge their own customer. Checkout charges GH₵15 from 50 bottles. */
 export const BULK_RESALE_MINOR = 2_000;
 
 export function bulkQuantity(value: number, stock: number) {

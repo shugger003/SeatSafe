@@ -62,7 +62,7 @@ export function BulkPurchase({
       }}
     >
       <p className="text-sm leading-6">
-        Each bottle is {each}, the same price as the shop. You may resell each bottle for {resale}.
+        Each bottle is {each} for {BULK_MIN_BOTTLES} or more. You may resell each bottle for {resale}.
       </p>
       <Field label="Name">
         <input name="name" required autoComplete="name" className={field} />

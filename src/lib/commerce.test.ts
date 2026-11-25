@@ -71,6 +71,31 @@ describe("quote", () => {
     expect(quote.subtotalMinor).toBe(105000);
   });
 
+  it("keeps the shelf price under 50 bottles and charges GH₵15 from 50", () => {
+    const priced = product({ priceMinor: 2000, stockQuantity: 80 });
+    const retail = buildQuote({
+      lines: [{ productId: "p1", variantId: null, quantity: 49 }],
+      products: [priced],
+      store: store(),
+      discount: null,
+      methodId: "standard",
+      paymentsReady: true,
+    });
+    expect(retail.lines[0]?.unitPriceMinor).toBe(2000);
+    expect(retail.subtotalMinor).toBe(98_000);
+    const bulk = buildQuote({
+      lines: [{ productId: "p1", variantId: null, quantity: 50 }],
+      products: [priced],
+      store: store(),
+      discount: null,
+      methodId: "standard",
+      paymentsReady: true,
+    });
+    expect(bulk.lines[0]?.unitPriceMinor).toBe(1500);
+    expect(bulk.subtotalMinor).toBe(75_000);
+    expect(bulk.purchasable).toBe(true);
+  });
+
   it("rejects quantities above stock", () => {
     const quote = buildQuote({
       lines: [{ productId: "p1", variantId: null, quantity: 5 }],

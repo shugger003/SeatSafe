@@ -16,15 +16,20 @@ export type CatalogProduct = Pick<
 
 /** Safety stop for a typed quantity. Shoppers are limited by the stock on hand. */
 export const MAX_LINE_QUANTITY = 1_000_000;
+/** A bulk order starts at this many bottles and uses the lower unit price. */
+export const BULK_MIN_BOTTLES = 50;
+export const BULK_UNIT_MINOR = 1_500;
 
 export function availableStock(product: CatalogProduct, variant: ProductVariant | null) {
   if (variant) return variant.available ? variant.stockQuantity : 0;
   return product.stockQuantity;
 }
 
-export function unitPrice(product: CatalogProduct, variant: ProductVariant | null) {
-  if (variant) return variant.priceMinor;
-  return product.priceMinor;
+export function unitPrice(product: CatalogProduct, variant: ProductVariant | null, quantity = 1) {
+  const price = variant ? variant.priceMinor : product.priceMinor;
+  if (price == null) return null;
+  if (quantity >= BULK_MIN_BOTTLES && price > BULK_UNIT_MINOR) return BULK_UNIT_MINOR;
+  return price;
 }
 
 export function displayPrice(product: CatalogProduct) {
@@ -54,7 +59,7 @@ export function evaluateDiscount(subtotalMinor: number, discount: Discount | nul
     return { discountMinor: 0, message: "That code has reached its usage limit.", ok: false };
   }
   if (subtotalMinor < discount.minOrderMinor) {
-    return { discountMinor: 0, message: "The order has not reached this code\u2019s minimum.", ok: false };
+    return { discountMinor: 0, message: "The order has not reached this code’s minimum.", ok: false };
   }
   const raw = discount.type === "percent" ? Math.floor((subtotalMinor * discount.value) / 100) : discount.value;
   const discountMinor = Math.min(Math.max(0, raw), subtotalMinor);
@@ -102,7 +107,7 @@ export function buildQuote(input: {
       blockers.push(`Choose an option for ${product.name}.`);
       continue;
     }
-    const price = unitPrice(product, variant);
+    const price = unitPrice(product, variant, quantity);
     const stock = availableStock(product, variant);
     const name = product.name;
     const variantName = variant?.name ?? "";
