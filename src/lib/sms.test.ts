@@ -57,6 +57,17 @@ describe("send Moolre sms", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("sends as SitSafe when the host still has the rejected sender name", async () => {
+    process.env.MOOLRE_SMS_VASKEY = "vas-test";
+    process.env.MOOLRE_SMS_SENDER_ID = "AsasSitSafe";
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ status: 1, code: "SMS01", message: "Success" }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await sendMoolreSms({ phone: "0500383342", message: "Payment received." });
+    expect(result.ok).toBe(true);
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(String(init.body)).senderid).toBe("SitSafe");
+  });
+
   it("posts one message with the VAS key and approved sender id", async () => {
     process.env.MOOLRE_SMS_VASKEY = "vas-test";
     process.env.MOOLRE_SMS_SENDER_ID = "SitSafe";

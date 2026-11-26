@@ -4,7 +4,9 @@ import { phoneDigits } from "@/lib/contact";
 const NETWORKS = ["MTN", "TELECEL"] as const;
 
 export function smsSenderId() {
-  const id = process.env.MOOLRE_SMS_SENDER_ID?.trim() || "";
+  const configured = process.env.MOOLRE_SMS_SENDER_ID?.trim() || "";
+  // Moolre approved SitSafe. The earlier name AsasSitSafe is rejected.
+  const id = configured === "AsasSitSafe" ? "SitSafe" : configured;
   return /^[A-Za-z0-9]{1,11}$/.test(id) ? id : "";
 }
 
